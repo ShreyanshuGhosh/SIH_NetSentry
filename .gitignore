@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Production build
+dist/
+frontend/dist/
+
+# Reference folder requested to be ignored
+ref/
+ref/*
+
+# Logs & temp
+*.log
+npm-debug.log*
+yarn-debug.log*
+.DS_Store
+.idea/
+.vscode/
+
+# Sensitive and Meta Files
+*.md
+.env*
+.agents/
+skills-lock.json
+*.pem
+*.key
+!README.md
