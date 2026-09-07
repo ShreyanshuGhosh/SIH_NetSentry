@@ -136,6 +136,21 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                     borderColor: 'var(--border-subtle)',
                   }}
                 >
+                  {/* Exemplar Provenance (§6.2, Test 2) */}
+                  {finding.resolvedViaExemplar && (
+                    <div className="p-3 rounded border border-sky-200 bg-sky-50 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-sky-950">
+                        <Brain size={16} className="text-sky-600 shrink-0" />
+                        <span>
+                          Resolved via exemplar <strong className="font-mono text-sky-900">{finding.resolvedViaExemplar.exemplarId}</strong> (learned from device <strong className="font-mono text-sky-900">{finding.resolvedViaExemplar.sourceDeviceId}</strong>)
+                        </span>
+                      </div>
+                      <span className="font-mono text-[10px] text-sky-700 font-semibold uppercase tracking-wider bg-white px-2 py-0.5 rounded border border-sky-200 shrink-0">
+                        Cross-Device Reused
+                      </span>
+                    </div>
+                  )}
+
                   {/* Line-Level Evidence */}
                   <div>
                     <div className="text-[10px] uppercase font-mono text-slate-500 mb-1.5">

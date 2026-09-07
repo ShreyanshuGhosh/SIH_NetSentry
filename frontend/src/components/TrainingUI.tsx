@@ -53,6 +53,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
   );
   const [mappedValue, setMappedValue] = useState<string>('10');
   const [toast, setToast] = useState<{ type: 'success' | 'reject'; message: string } | null>(null);
+  const [bottomTab, setBottomTab] = useState<'exemplars' | 'rejected'>('exemplars');
 
   // §6.1 New field creation state
   const [isCreatingField, setIsCreatingField] = useState(false);
@@ -471,59 +472,119 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
             </div>
           )}
 
-          {/* Part 3: Few-Shot Exemplar Store Table (§6.2, Test 2 Verification) */}
+          {/* Part 3: Few-Shot Exemplar Store & Rejection Audit Log (§6.2, §6.8, Test 2 & Test 4) */}
           <div
             className="rounded-lg border overflow-hidden"
             style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
           >
             <div
-              className="px-5 py-3 border-b flex items-center justify-between"
+              className="px-5 py-2.5 border-b flex flex-wrap items-center justify-between gap-3"
               style={{ borderColor: 'var(--border-subtle)' }}
             >
               <div className="flex items-center gap-2">
-                <Database size={16} style={{ color: 'var(--status-pass)' }} />
-                <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
-                  Few-Shot Exemplar Store ({exemplars.length} Approved Mappings)
-                </h3>
+                <button
+                  type="button"
+                  onClick={() => setBottomTab('exemplars')}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold cursor-pointer transition-colors ${
+                    bottomTab === 'exemplars'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Database size={14} />
+                  <span>Exemplar Store ({exemplars.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBottomTab('rejected')}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-semibold cursor-pointer transition-colors ${
+                    bottomTab === 'rejected'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Archive size={14} />
+                  <span>Rejection Audit Log ({exemplarStore.getRejectedAuditLog().length})</span>
+                </button>
               </div>
-              <span className="font-mono text-[10px] text-emerald-700 font-medium">Persistent across sessions</span>
+              <span className="font-mono text-[10px] text-slate-500 font-medium">
+                {bottomTab === 'exemplars' ? 'Persistent across sessions & devices' : 'Retained per §6.8 / Test 4 audit rule'}
+              </span>
             </div>
 
-            <div className="divide-y divide-slate-200 max-h-[300px] overflow-y-auto">
-              {exemplars.map((ex) => (
-                <div key={ex.id} className="p-3.5 text-xs flex items-center justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-mono text-[10px] px-1.5 py-0.2 rounded border text-slate-700 border-slate-300 bg-slate-100">
-                        {ex.vendor}
-                      </span>
-                      <span className="font-semibold text-slate-900">{ex.mappedFieldKey}</span>
-                      <span className="text-slate-400">•</span>
-                      <span className="font-mono text-[11px] text-emerald-700 font-semibold">
-                        = {String(ex.mappedValue)}
-                      </span>
-                    </div>
-                    <div className="font-mono text-[11px] text-slate-600 truncate">
-                      Pattern: "{ex.rawLinePattern}"
-                    </div>
-                  </div>
+            {bottomTab === 'exemplars' ? (
+              <div className="divide-y divide-slate-200 max-h-[300px] overflow-y-auto">
+                {exemplars.length === 0 ? (
+                  <div className="p-6 text-center text-xs text-slate-500 italic">No approved exemplars yet.</div>
+                ) : (
+                  exemplars.map((ex) => (
+                    <div key={ex.id} className="p-3.5 text-xs flex items-center justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-[10px] px-1.5 py-0.2 rounded border text-slate-700 border-slate-300 bg-slate-100">
+                            {ex.vendor}
+                          </span>
+                          <span className="font-semibold text-slate-900">{ex.mappedFieldKey}</span>
+                          <span className="text-slate-400">•</span>
+                          <span className="font-mono text-[11px] text-emerald-700 font-semibold">
+                            = {String(ex.mappedValue)}
+                          </span>
+                        </div>
+                        <div className="font-mono text-[11px] text-slate-600 truncate">
+                          Pattern: "{ex.rawLinePattern}"
+                        </div>
+                      </div>
 
-                  <div className="text-right shrink-0">
-                    <div
-                      className="font-mono text-[11px] font-bold px-2 py-0.5 rounded border inline-block"
-                      style={{
-                        backgroundColor: ex.timesReused > 0 ? 'rgba(46, 204, 113, 0.1)' : 'var(--bg-surface-raised)',
-                        borderColor: ex.timesReused > 0 ? 'rgba(46, 204, 113, 0.3)' : 'var(--border-subtle)',
-                        color: ex.timesReused > 0 ? 'var(--status-pass)' : 'var(--text-disabled)',
-                      }}
-                    >
-                      {ex.timesReused}x Reused
+                      <div className="text-right shrink-0">
+                        <div
+                          className="font-mono text-[11px] font-bold px-2 py-0.5 rounded border inline-block"
+                          style={{
+                            backgroundColor: ex.timesReused > 0 ? 'rgba(46, 204, 113, 0.1)' : 'var(--bg-surface-raised)',
+                            borderColor: ex.timesReused > 0 ? 'rgba(46, 204, 113, 0.3)' : 'var(--border-subtle)',
+                            color: ex.timesReused > 0 ? 'var(--status-pass)' : 'var(--text-disabled)',
+                          }}
+                        >
+                          {ex.timesReused}x Reused
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">{ex.approvedAt}</div>
+                      </div>
                     </div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{ex.approvedAt}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  ))
+                )}
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-200 max-h-[300px] overflow-y-auto">
+                {exemplarStore.getRejectedAuditLog().length === 0 ? (
+                  <div className="p-6 text-center text-xs text-slate-500 italic">No rejected items in audit log.</div>
+                ) : (
+                  exemplarStore.getRejectedAuditLog().map((rej) => (
+                    <div key={rej.id} className="p-3.5 text-xs flex items-center justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-[10px] px-1.5 py-0.2 rounded border text-slate-700 border-slate-300 bg-slate-100">
+                            {rej.vendor}
+                          </span>
+                          <span className="font-mono text-[10px] text-slate-500">{rej.deviceId}</span>
+                          <span className="text-slate-400">•</span>
+                          <span className="font-mono text-[10px] text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200 font-semibold">
+                            STATUS: REJECTED
+                          </span>
+                        </div>
+                        <div className="font-mono text-[11px] text-slate-700 truncate">
+                          Command: {rej.rawCommandBlock}
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">
+                          Audit Trail: Excluded from active review queue; preserved to verify system avoids training on non-compliance noise.
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="font-mono text-[10px] text-slate-400">{rej.lineNumbers}</span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

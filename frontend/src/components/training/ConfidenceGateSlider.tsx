@@ -53,7 +53,8 @@ export const ConfidenceGateSlider: React.FC<ConfidenceGateSliderProps> = ({
       </div>
 
       <div className="text-[11px] text-slate-600 leading-snug">
-        Syntax lines extracted with confidence below <span className="font-mono text-slate-900 font-semibold">{(confidenceThreshold * 100).toFixed(0)}%</span> route
+        <strong className="text-slate-900 font-medium">Affects future ingestion passes:</strong> Syntax lines extracted with confidence below{' '}
+        <span className="font-mono text-slate-900 font-semibold">{(confidenceThreshold * 100).toFixed(0)}%</span> route
         to the Human-in-the-Loop review queue. <span className="font-mono text-amber-700 font-medium">({pendingCount} items pending review)</span>
       </div>
     </div>
