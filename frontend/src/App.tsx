@@ -173,6 +173,34 @@ export function App() {
   // Telemetry metrics for top bar
   const currentSummary = pipelineResult.auditResult.summary;
 
+  // Callback when launching console from landing page
+  const handleLaunchFromLanding = useCallback(
+    (configId?: string, targetTab?: string) => {
+      if (configId) {
+        const found = SAMPLE_CONFIGS.find((c) => c.id === configId);
+        if (found) {
+          setSelectedConfig(found);
+          const res = runCompliancePipeline(found.rawText, {
+            deviceId: found.id,
+            vendorOverride: found.vendor as any,
+            frameworks: [selectedFramework],
+          });
+          setPipelineResult(res);
+          setActiveTab((targetTab as ActiveNavTab) || 'results');
+          setViewMode('console');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+      }
+      if (targetTab) {
+        setActiveTab(targetTab as ActiveNavTab);
+      }
+      setViewMode('console');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [selectedFramework]
+  );
+
   return (
     <div
       className="min-h-screen flex flex-col selection:bg-sky-100 selection:text-sky-900"
@@ -182,9 +210,9 @@ export function App() {
         fontFamily: 'var(--font-sans)',
       }}
     >
-      {/* MODE 1: PUBLIC LANDING OVERVIEW (Single page, calm, zero slop, 1 CTA, §1, C4) */}
+      {/* MODE 1: PUBLIC LANDING OVERVIEW (Institutional, Light Mode, Tactical Reticle) */}
       {viewMode === 'landing' ? (
-        <PublicLandingPage onLaunchConsole={() => setViewMode('console')} />
+        <PublicLandingPage onLaunchConsole={handleLaunchFromLanding} />
       ) : (
         /* MODE 2: AUTHENTICATED CONSOLE (Persistent NavRail + TopBar) */
         <div className="flex-1 flex min-h-screen">
