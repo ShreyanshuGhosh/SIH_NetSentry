@@ -1,7 +1,9 @@
-﻿export type VendorId = 
+export type VendorId = 
   | 'cisco_ios'
   | 'juniper_junos'
   | 'palo_alto'
+  | 'palo_alto_panos'
+  | 'sonic'
   | 'sonic_whitebox'
   | 'fortinet_fortios'
   | 'arista_eos'
@@ -69,7 +71,7 @@ export interface AuditRule {
   targetValue: any;
   passMessage: string;
   failMessage: string;
-  remediation: Record<VendorId, string>;
+  remediation: Partial<Record<VendorId, string>> & Record<string, any>;
   description: string;
 }
 

@@ -302,7 +302,7 @@ export function evaluateAudit(
       }
     }
 
-    const remediationCmd = rule.remediation[device.vendor] || rule.remediation.cisco_ios;
+    const remediationCmd = (rule.remediation[device.vendor] || rule.remediation.cisco_ios || 'Configuration check required') as string;
 
     findings.push({
       ruleId: rule.id,

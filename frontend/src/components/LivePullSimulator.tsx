@@ -1,199 +1,244 @@
+// src/components/LivePullSimulator.tsx
+// Live SSH Collector Simulator with explicit state machine and honest telemetry (§6.5, C1)
+
 import React, { useState } from 'react';
-import { Play, CheckCircle, ArrowRight } from '@phosphor-icons/react';
+import {
+  Play,
+  CheckCircle,
+  WarningCircle,
+  ArrowRight,
+  ArrowsClockwise,
+  ShieldCheck,
+  Terminal,
+} from '@phosphor-icons/react';
 import { SampleDeviceConfig } from '../types/audit';
 import { SAMPLE_CONFIGS } from '../data/sampleConfigs';
+import { CollectorLogStream, CollectorLogLine } from './live-pull/CollectorLogStream';
+import { LivePullState } from '../types/canonical';
 
 interface LivePullSimulatorProps {
   onIngestPulledConfig: (config: SampleDeviceConfig) => void;
 }
 
 const DRIVERS = [
-  { value: 'cisco_ios',        label: 'cisco_ios         Catalyst / ISR / ASR' },
-  { value: 'juniper_junos',    label: 'juniper_junos     SRX / MX Firewall' },
-  { value: 'palo_alto',        label: 'palo_alto         PAN-OS NGFW' },
-  { value: 'sonic_whitebox',   label: 'sonic_whitebox    SONiC Linux' },
-  { value: 'fortinet_fortios', label: 'fortinet_fortios  FortiGate' },
-  { value: 'arista_eos',       label: 'arista_eos        Arista EOS' },
+  { value: 'cisco_ios', label: 'cisco_ios (Cisco IOS-XE Catalyst/ISR)' },
+  { value: 'juniper_junos', label: 'juniper_junos (Juniper JunOS SRX/MX)' },
+  { value: 'palo_alto_panos', label: 'palo_alto_panos (Palo Alto PAN-OS NGFW)' },
+  { value: 'sonic', label: 'sonic (SONiC Open Linux NOS)' },
+  { value: 'fortinet_fortios', label: 'fortinet_fortios (Fortinet FortiGate)' },
+  { value: 'arista_eos', label: 'arista_eos (Arista EOS Data Center)' },
 ];
 
 export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPulledConfig }) => {
-  const [host, setHost]       = useState('10.14.20.1');
-  const [driver, setDriver]   = useState('cisco_ios');
-  const [user, setUser]       = useState('audit_readonly');
-  const [pulling, setPulling] = useState(false);
-  const [done, setDone]       = useState(false);
-  const [logs, setLogs]       = useState<{ text: string; level: 'info' | 'ok' | 'warn' }[]>([
-    { text: '[INIT]  Netmiko collector driver initialized in read-only sandbox.', level: 'info' },
-    { text: '[WAIT]  Ready to establish SSHv2 session with remote target.', level: 'info' },
+  const [host, setHost] = useState('10.14.20.1');
+  const [port, setPort] = useState('22');
+  const [driver, setDriver] = useState('cisco_ios');
+  const [user, setUser] = useState('audit_readonly');
+  const [state, setState] = useState<LivePullState>('idle');
+  const [simulateError, setSimulateError] = useState(false);
+  const [logs, setLogs] = useState<CollectorLogLine[]>([
+    {
+      id: 'log-0',
+      timestamp: '00:00:00',
+      level: 'info',
+      message: 'Netmiko read-only collector driver loaded in unprivileged container sandbox.',
+    },
+    {
+      id: 'log-1',
+      timestamp: '00:00:00',
+      level: 'info',
+      message: 'Target queue ready. System will issue read-only commands without configuration changes.',
+    },
   ]);
 
-  const handlePull = () => {
-    setPulling(true);
-    setDone(false);
-    setLogs([
-      { text: `[INFO]  Connecting to ${host} via netmiko.${driver}...`, level: 'info' },
-      { text: `[INFO]  Establishing SSHv2 session on port 22 as '${user}'...`, level: 'info' },
+  const addLog = (level: CollectorLogLine['level'], message: string) => {
+    const now = new Date().toTimeString().split(' ')[0];
+    setLogs((prev) => [
+      ...prev,
+      {
+        id: `log-${Date.now()}-${Math.random()}`,
+        timestamp: now,
+        level,
+        message,
+      },
     ]);
-    setTimeout(() => {
-      setLogs(prev => [
-        ...prev,
-        { text: '[OK]    SSH session authenticated. RSA keypair accepted.', level: 'ok' },
-        { text: "[INFO]  Executing: 'show running-config' (read-only, no state change).", level: 'info' },
-        { text: '[INFO]  Receiving configuration stream...', level: 'info' },
-      ]);
-    }, 900);
-    setTimeout(() => {
-      const cfg = SAMPLE_CONFIGS.find(s => s.vendor === driver) ?? SAMPLE_CONFIGS[0];
-      setLogs(prev => [
-        ...prev,
-        { text: `[OK]    Capture complete. ${cfg.rawText.split('\n').length} lines ingested.`, level: 'ok' },
-        { text: '[INFO]  Applying in-memory secret redaction pattern...', level: 'info' },
-        { text: `[OK]    SHA-256: e8b7a42c91f...d3c. ${cfg.redactedSecretsCount} secrets redacted.`, level: 'ok' },
-        { text: '[DONE]  Config ready for compliance audit pipeline.', level: 'ok' },
-      ]);
-      setPulling(false);
-      setDone(true);
-      onIngestPulledConfig(cfg);
-    }, 2200);
   };
 
-  const logColor = (level: 'info' | 'ok' | 'warn') =>
-    level === 'ok'   ? 'var(--pass)'
-    : level === 'warn' ? 'var(--warn)'
-    : 'var(--text-secondary)';
+  const handleStartPull = () => {
+    setState('connecting');
+    setLogs([]);
+    addLog('info', `Initializing Netmiko connection: target=${host}:${port} driver=${driver}...`);
+    addLog('info', `Establishing cryptographic SSHv2 session with unprivileged audit account '${user}'...`);
 
-  const inputStyle = {
-    width: '100%',
-    backgroundColor: 'var(--bg-surface)',
-    border: '1px solid var(--border-default)',
-    borderRadius: 8,
-    padding: '10px 16px',
-    fontFamily: 'var(--font-mono)',
-    fontSize: 13,
-    color: 'var(--text-primary)',
-    outline: 'none',
-  } as React.CSSProperties;
+    if (simulateError) {
+      setTimeout(() => {
+        setState('failed');
+        addLog('error', `Connection refused or timed out after 3000ms: host ${host} unreachable.`);
+        addLog('warn', 'Recovery action: Verify management gateway ACLs, VPN tunnel, or test host reachability.');
+      }, 1500);
+      return;
+    }
+
+    setTimeout(() => {
+      setState('collecting');
+      addLog('ok', 'SSHv2 session authenticated successfully. Host key fingerprint verified.');
+      addLog('info', "Invoking read-only command: 'show running-config'...");
+      addLog('info', 'Receiving raw ASCII configuration stream from terminal buffer...');
+    }, 1200);
+
+    setTimeout(() => {
+      setState('parsing');
+      const targetConfig =
+        SAMPLE_CONFIGS.find((s) => s.vendor === driver || s.id.includes(driver.split('_')[0])) ||
+        SAMPLE_CONFIGS[0];
+      const lines = targetConfig.rawText.split('\n');
+
+      addLog('ok', `Configuration captured: ${lines.length} lines (${targetConfig.rawText.length} bytes).`);
+      addLog('info', 'Executing client-side in-memory secret masking before pipeline handoff...');
+      addLog('ok', `Redacted ${targetConfig.redactedSecretsCount} secrets (SHA-256 provenance generated).`);
+      addLog('ok', 'Pipeline handoff successful. Configuration ready for deterministic compliance audit.');
+
+      setState('completed');
+      onIngestPulledConfig(targetConfig);
+    }, 2800);
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-14">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      {/* Header */}
+      <div className="border-b pb-6" style={{ borderColor: 'var(--border-subtle)' }}>
+        <div className="flex items-center gap-2">
+          <Terminal size={22} style={{ color: 'var(--accent-primary)' }} />
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Live SSH Collector Simulator</h1>
+        </div>
+        <p className="text-xs text-slate-600 mt-1">
+          Automated read-only telemetry collection via Netmiko. Strictly executes non-modifying retrieval commands
+          with immediate client-side secret masking.
+        </p>
+      </div>
 
-      <h2 className="text-xl font-semibold tracking-tight mb-1" style={{ color: 'var(--text-primary)' }}>
-        Live Device Pull Simulator
-      </h2>
-      <p className="text-sm mb-10" style={{ color: 'var(--text-secondary)' }}>
-        Read-only SSH collection via Netmiko. No write commands executed. Secrets redacted in memory before ingestion.
-      </p>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12">
-
-        {/* Params */}
-        <aside className="lg:col-span-4 space-y-6">
-          {[
-            { label: 'Target Host', val: host, setter: setHost },
-            { label: 'Audit Account', val: user, setter: setUser },
-          ].map(({ label, val, setter }) => (
-            <div key={label}>
-              <label className="block font-mono text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-tertiary)' }}>
-                {label}
-              </label>
-              <input
-                type="text"
-                value={val}
-                onChange={e => setter(e.target.value)}
-                style={inputStyle}
-                onFocus={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                onBlur={e => (e.currentTarget.style.borderColor = 'var(--border-default)')}
-              />
-            </div>
-          ))}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left: Connection Parameters (4 cols) */}
+        <aside
+          className="lg:col-span-4 p-5 rounded-lg border shadow-xs space-y-4"
+          style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+        >
+          <div className="text-[11px] font-mono uppercase text-slate-500 font-medium">Connection Parameters</div>
 
           <div>
-            <label className="block font-mono text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-tertiary)' }}>
-              Device Driver
-            </label>
+            <label className="block text-xs text-slate-600 mb-1">Target Host IP / FQDN</label>
+            <input
+              type="text"
+              value={host}
+              onChange={(e) => setHost(e.target.value)}
+              className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-slate-600 mb-1">Port</label>
+              <input
+                type="text"
+                value={port}
+                onChange={(e) => setPort(e.target.value)}
+                className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-600 mb-1">Audit Account</label>
+              <input
+                type="text"
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
+                className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs text-slate-600 mb-1">Device Driver</label>
             <select
               value={driver}
-              onChange={e => setDriver(e.target.value)}
-              style={{ ...inputStyle, cursor: 'pointer' }}
-              onFocus={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-              onBlur={e => (e.currentTarget.style.borderColor = 'var(--border-default)')}
+              onChange={(e) => setDriver(e.target.value)}
+              className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
             >
-              {DRIVERS.map(d => (
-                <option key={d.value} value={d.value} style={{ backgroundColor: 'var(--bg-elevated)' }}>
+              {DRIVERS.map((d) => (
+                <option key={d.value} value={d.value}>
                   {d.label}
                 </option>
               ))}
             </select>
           </div>
 
-          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: 16 }}>
-            <p className="font-mono text-[10px] mb-3" style={{ color: 'var(--text-tertiary)' }}>
-              Key-based auth only. Password is never transmitted.
-            </p>
-            <button
-              onClick={handlePull}
-              disabled={pulling}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm cursor-pointer active:scale-95 disabled:opacity-50 transition-opacity"
-              style={{ backgroundColor: 'var(--accent)', color: '#fff' }}
-              onMouseEnter={e => !pulling && (e.currentTarget.style.opacity = '0.88')}
-              onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-            >
-              <Play size={14} weight="fill" />
-              {pulling ? 'Pulling...' : 'Start Live Pull'}
-            </button>
+          {/* Test Fail State Toggle (§6.5 C1 demonstration) */}
+          <div className="pt-2 border-t border-slate-200">
+            <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={simulateError}
+                onChange={(e) => setSimulateError(e.target.checked)}
+                className="rounded text-sky-600 border-slate-300"
+              />
+              <span>Simulate connection timeout failure</span>
+            </label>
           </div>
 
-          {done && (
-            <div className="flex items-start gap-3 text-sm pl-3" style={{ borderLeft: '2px solid var(--pass)' }}>
-              <CheckCircle size={14} weight="fill" style={{ color: 'var(--pass)', marginTop: 2, flexShrink: 0 }} />
-              <div>
-                <p style={{ color: 'var(--text-primary)' }}>Pull complete</p>
-                <p className="font-mono text-[11px] mt-0.5" style={{ color: 'var(--pass)' }}>
-                  Config sent to Audit Console
-                </p>
+          <button
+            onClick={handleStartPull}
+            disabled={state === 'connecting' || state === 'collecting' || state === 'parsing'}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded text-xs font-semibold text-white transition-all cursor-pointer shadow-sm hover:brightness-105 active:scale-95 disabled:opacity-50 mt-2"
+            style={{ backgroundColor: 'var(--accent-primary)' }}
+          >
+            <Play size={14} weight="bold" />
+            <span>
+              {state === 'connecting'
+                ? 'Handshaking...'
+                : state === 'collecting'
+                ? 'Streaming Config...'
+                : state === 'parsing'
+                ? 'Masking Secrets...'
+                : 'Initiate Live Pull'}
+            </span>
+          </button>
+        </aside>
+
+        {/* Right: Collector Log Stream (8 cols) */}
+        <div className="lg:col-span-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-slate-900 uppercase tracking-wider font-mono">
+              Live Netmiko Session Telemetry
+            </div>
+            {state === 'failed' && (
+              <button
+                onClick={() => {
+                  setSimulateError(false);
+                  handleStartPull();
+                }}
+                className="flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-700 font-medium transition-colors cursor-pointer"
+              >
+                <ArrowsClockwise size={13} />
+                <span>Retry Connection</span>
+              </button>
+            )}
+          </div>
+
+          <CollectorLogStream logs={logs} state={state} targetHost={host} />
+
+          {state === 'completed' && (
+            <div
+              className="p-4 rounded-lg border flex items-center justify-between shadow-2xs"
+              style={{
+                backgroundColor: 'var(--status-pass-bg)',
+                borderColor: 'var(--status-pass-border)',
+              }}
+            >
+              <div className="flex items-center gap-2.5 text-xs text-emerald-800 font-medium">
+                <CheckCircle size={18} weight="fill" style={{ color: 'var(--status-pass)' }} />
+                <span>Device configuration captured and sanitized. Ready for compliance evaluation.</span>
               </div>
             </div>
           )}
-        </aside>
-
-        {/* Console */}
-        <div className="lg:col-span-8 mt-8 lg:mt-0">
-          <p className="font-mono text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-tertiary)' }}>
-            Collector Log
-          </p>
-          <div
-            className="rounded-lg overflow-hidden"
-            style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}
-          >
-            {/* Terminal chrome */}
-            <div
-              className="flex items-center gap-2 px-4 py-2.5"
-              style={{ borderBottom: '1px solid var(--border-subtle)' }}
-            >
-              <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--border-strong)' }} />
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--border-strong)' }} />
-                <div
-                  className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: pulling ? 'var(--warn)' : done ? 'var(--pass)' : 'var(--border-strong)' }}
-                />
-              </div>
-              <span className="font-mono text-[10px] ml-2" style={{ color: 'var(--text-tertiary)' }}>
-                netmiko-collector@sandbox:~$
-              </span>
-            </div>
-
-            <div className="p-5 font-mono text-xs leading-relaxed space-y-1.5 min-h-[280px]">
-              {logs.map((line, i) => (
-                <div key={i} style={{ color: logColor(line.level) }}>
-                  {line.text}
-                </div>
-              ))}
-              {pulling && (
-                <div className="animate-pulse" style={{ color: 'var(--text-tertiary)' }}>_</div>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </div>

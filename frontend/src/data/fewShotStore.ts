@@ -1,4 +1,4 @@
-﻿import { FewShotExemplar, TrainingItem } from '../types/audit';
+import { FewShotExemplar, TrainingItem } from '../types/audit';
 
 export const INITIAL_FEW_SHOT_EXEMPLARS: FewShotExemplar[] = [
   {
@@ -52,7 +52,7 @@ export const INITIAL_TRAINING_QUEUE: TrainingItem[] = [
   {
     id: 'train-juniper-03',
     vendor: 'juniper_junos',
-    rawCommandBlock: 'telnet {\n    /* VULNERABILITY INJECTED FOR COMPLIANCE TEST */\n}',
+    rawCommandBlock: 'telnet {\n    /* legacy remote console */\n}',
     lineNumbers: 'Lines 33-35',
     suggestedField: 'telnet_disabled',
     confidence: 0.61,

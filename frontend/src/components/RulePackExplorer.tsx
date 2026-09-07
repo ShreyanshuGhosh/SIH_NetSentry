@@ -1,164 +1,178 @@
-import React, { useState } from 'react';
-import { Copy, Check, CaretRight } from '@phosphor-icons/react';
-import { FrameworkId } from '../types/audit';
-import { AUDIT_RULES, FRAMEWORKS } from '../data/rulePacks';
+// src/components/RulePackExplorer.tsx
+// Declarative YAML Rule Pack Explorer with single unified remediation display (no duplication, §4)
 
-const SEV_COLOR: Record<string, string> = {
-  CRITICAL: 'var(--crit)',
-  HIGH:     'var(--fail)',
-  MEDIUM:   'var(--warn)',
-  LOW:      'var(--text-tertiary)',
-};
+import React, { useState } from 'react';
+import { Copy, Check, CaretRight, FileCode, CheckCircle } from '@phosphor-icons/react';
+import { FrameworkId } from '../types/audit';
+import { FRAMEWORKS } from '../data/rulePacks';
+import { COMPLIANCE_RULES } from '../engine/rules';
+import { SeverityTag } from './shared/SeverityTag';
+import { MonoCodeBlock } from './shared/MonoCodeBlock';
+import { VENDOR_DISPLAY_NAMES, SupportedVendor } from '../types/canonical';
 
 export const RulePackExplorer: React.FC = () => {
-  const [fw, setFw]         = useState<FrameworkId>('cis_v8');
-  const [ruleId, setRuleId] = useState<string>(AUDIT_RULES[0].id);
-  const [copied, setCopied] = useState(false);
+  const [selectedFw, setSelectedFw] = useState<FrameworkId>('cis_v8');
+  const [selectedVendor, setSelectedVendor] = useState<SupportedVendor>('cisco_ios');
 
-  const rules = AUDIT_RULES.filter(r => r.framework === fw);
-  const active = rules.find(r => r.id === ruleId) ?? rules[0];
+  const rules = COMPLIANCE_RULES.filter((r) => r.framework === selectedFw);
+  const [activeRuleId, setActiveRuleId] = useState<string>(rules[0]?.id || 'CIS-NET-1.1.1');
+  const activeRule = rules.find((r) => r.id === activeRuleId) || rules[0] || COMPLIANCE_RULES[0];
 
-  const yaml = active ? `id: ${active.id}
-title: "${active.title}"
-framework: ${active.framework}
-reference: "${active.frameworkRef}"
-severity: ${active.severity}
-check:
-  field: ${active.field}
-  operator: ${active.operator}
-  expected_value: ${active.targetValue}
-pass_message: "${active.passMessage}"
-fail_message: "${active.failMessage}"
-remediation:
-  cisco_ios: "${active.remediation.cisco_ios?.replace(/\n/g, '\\n') ?? ''}"
-  juniper_junos: "${active.remediation.juniper_junos?.replace(/\n/g, '\\n') ?? ''}"
-  palo_alto: "${active.remediation.palo_alto?.replace(/\n/g, '\\n') ?? ''}"` : '';
+  const frameworksList = Object.keys(FRAMEWORKS) as FrameworkId[];
+  const vendorsList: SupportedVendor[] = [
+    'cisco_ios',
+    'juniper_junos',
+    'palo_alto_panos',
+    'sonic',
+    'fortinet_fortios',
+    'arista_eos',
+  ];
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(yaml);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  // Pure declarative YAML representation (single remediation block, no duplication with embedded strings)
+  const yamlContent = activeRule
+    ? `id: "${activeRule.id}"
+title: "${activeRule.title}"
+framework: "${activeRule.framework}"
+reference: "${activeRule.frameworkRef}"
+severity: "${activeRule.severity}"
+control_group: "${activeRule.controlGroupId || 'NONE'}"
+description: >
+  ${activeRule.description}
+remediation_target: "${selectedVendor}"
+remediation_cli: |
+  ${(activeRule.remediation[selectedVendor] || 'Not configured').split('\n').join('\n  ')}`
+    : '';
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-14">
-
-      <h2 className="text-xl font-semibold tracking-tight mb-1" style={{ color: 'var(--text-primary)' }}>
-        YAML Rule Pack Explorer
-      </h2>
-      <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
-        Declarative rule definitions used by the compliance evaluation engine.
-      </p>
-
-      {/* Framework tabs */}
-      <div className="flex gap-1 mb-8">
-        {(Object.keys(FRAMEWORKS) as FrameworkId[]).map(fwId => (
-          <button
-            key={fwId}
-            onClick={() => {
-              setFw(fwId);
-              const first = AUDIT_RULES.find(r => r.framework === fwId);
-              if (first) setRuleId(first.id);
-            }}
-            className="px-4 py-2 rounded text-xs font-mono cursor-pointer transition-colors relative"
-            style={{
-              color: fw === fwId ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              backgroundColor: fw === fwId ? 'var(--bg-elevated)' : 'transparent',
-              border: fw === fwId ? '1px solid var(--border-default)' : '1px solid transparent',
-            }}
-          >
-            {fw === fwId && (
-              <span className="absolute left-0 top-1 bottom-1 w-px" style={{ backgroundColor: 'var(--accent)' }} />
-            )}
-            {FRAMEWORKS[fwId].name}
-          </button>
-        ))}
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      {/* Header */}
+      <div className="border-b pb-6" style={{ borderColor: 'var(--border-subtle)' }}>
+        <div className="flex items-center gap-2">
+          <FileCode size={22} style={{ color: 'var(--accent-primary)' }} />
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">YAML Rule Pack Explorer</h1>
+        </div>
+        <p className="text-xs text-slate-600 mt-1">
+          Declarative compliance benchmark definitions. Pure deterministic rules evaluated against normalized config parameters.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-10">
-
-        {/* Rule list */}
-        <aside className="lg:col-span-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <p className="font-mono text-[10px] uppercase tracking-widest py-3" style={{ color: 'var(--text-tertiary)', borderBottom: '1px solid var(--border-subtle)' }}>
-            {rules.length} rules
-          </p>
-          {rules.map(rule => (
+      {/* Framework Selection Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {frameworksList.map((fwId) => {
+          const fw = FRAMEWORKS[fwId];
+          const isSelected = selectedFw === fwId;
+          return (
             <button
-              key={rule.id}
-              onClick={() => setRuleId(rule.id)}
-              className="w-full text-left py-3.5 flex items-center gap-3 cursor-pointer transition-colors"
-              style={{ borderBottom: '1px solid var(--border-subtle)', color: ruleId === rule.id ? 'var(--text-primary)' : 'var(--text-tertiary)' }}
-              onMouseEnter={e => { if (ruleId !== rule.id) e.currentTarget.style.color = 'var(--text-secondary)'; }}
-              onMouseLeave={e => { if (ruleId !== rule.id) e.currentTarget.style.color = 'var(--text-tertiary)'; }}
+              key={fwId}
+              onClick={() => {
+                setSelectedFw(fwId);
+                const first = COMPLIANCE_RULES.find((r) => r.framework === fwId);
+                if (first) setActiveRuleId(first.id);
+              }}
+              className={`px-4 py-2 rounded text-xs font-mono transition-colors cursor-pointer border ${
+                isSelected
+                  ? 'border-sky-600 bg-sky-50 text-sky-950 font-bold shadow-xs'
+                  : 'border-slate-300 hover:border-slate-400 text-slate-700 bg-white'
+              }`}
             >
-              <div className="flex-1 min-w-0">
-                <div className="text-sm truncate">{rule.title}</div>
-                <div className="font-mono text-[10px] mt-0.5" style={{ color: SEV_COLOR[rule.severity] }}>
-                  {rule.severity}
-                </div>
-              </div>
-              {ruleId === rule.id && <CaretRight size={12} style={{ color: 'var(--accent)', flexShrink: 0 }} />}
+              {fw?.name || fwId}
             </button>
-          ))}
+          );
+        })}
+      </div>
+
+      {/* Main Grid: Rule List (4 cols) & Rule Detail (8 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left: Rules List */}
+        <aside
+          className="lg:col-span-4 rounded-lg border overflow-hidden"
+          style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+        >
+          <div
+            className="px-4 py-3 border-b flex items-center justify-between font-mono text-[11px] text-slate-500"
+            style={{ borderColor: 'var(--border-subtle)' }}
+          >
+            <span>RULES IN BENCHMARK</span>
+            <span>{rules.length} CONTROLS</span>
+          </div>
+
+          <div className="divide-y divide-slate-200 max-h-[560px] overflow-y-auto">
+            {rules.map((rule) => {
+              const isActive = activeRule?.id === rule.id;
+              return (
+                <button
+                  key={rule.id}
+                  onClick={() => setActiveRuleId(rule.id)}
+                  className={`w-full text-left p-3.5 transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                    isActive ? 'bg-slate-100 text-slate-900 font-medium' : 'hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-mono text-[11px] font-bold text-slate-900">{rule.id}</span>
+                      <SeverityTag severity={rule.severity} size="sm" />
+                    </div>
+                    <div className="text-xs text-slate-800 truncate">{rule.title}</div>
+                    <div className="font-mono text-[10px] text-slate-500 mt-0.5 truncate">{rule.frameworkRef}</div>
+                  </div>
+                  {isActive && <CaretRight size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />}
+                </button>
+              );
+            })}
+          </div>
         </aside>
 
-        {/* YAML view */}
-        <div className="lg:col-span-8 mt-8 lg:mt-0">
-          {active && (
+        {/* Right: Declarative Rule Detail & Unified Remediation */}
+        <div className="lg:col-span-8 space-y-6">
+          {activeRule && (
             <>
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{active.title}</p>
-                  <p className="font-mono text-[11px] mt-0.5" style={{ color: SEV_COLOR[active.severity] }}>
-                    {active.severity} - {active.frameworkRef}
-                  </p>
+              {/* Header Info */}
+              <div
+                className="p-5 rounded-lg border space-y-2"
+                style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm font-bold text-slate-900">{activeRule.id}</span>
+                    <SeverityTag severity={activeRule.severity} />
+                  </div>
+                  <span className="font-mono text-xs text-slate-500">{activeRule.frameworkRef}</span>
                 </div>
-                <button
-                  onClick={handleCopy}
-                  className="flex items-center gap-1.5 font-mono text-[11px] cursor-pointer transition-colors shrink-0"
-                  style={{ color: 'var(--text-tertiary)' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-tertiary)')}
-                >
-                  {copied ? <Check size={12} style={{ color: 'var(--pass)' }} /> : <Copy size={12} />}
-                  {copied ? 'Copied' : 'Copy YAML'}
-                </button>
+                <h2 className="text-base font-bold text-slate-900">{activeRule.title}</h2>
+                <p className="text-xs text-slate-600 leading-relaxed">{activeRule.description}</p>
               </div>
 
-              <div className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}>
-                <div
-                  className="px-4 py-2 font-mono text-[10px] uppercase tracking-widest"
-                  style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-tertiary)' }}
-                >
-                  rule.yaml
-                </div>
-                <pre className="font-mono text-xs p-5 overflow-x-auto leading-relaxed" style={{ color: 'var(--text-mono)' }}>
-                  {yaml}
-                </pre>
-              </div>
+              {/* Vendor Selector for Remediation Preview */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-600 uppercase font-mono font-medium">
+                  Select Vendor Dialect Remediation
+                </span>
 
-              {/* Remediation */}
-              <div className="mt-8" style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: 24 }}>
-                <p className="font-mono text-[10px] uppercase tracking-widest mb-5" style={{ color: 'var(--text-tertiary)' }}>
-                  CLI Remediation Commands
-                </p>
-                <div className="space-y-4">
-                  {[
-                    { label: 'Cisco IOS-XE',    cmd: active.remediation.cisco_ios },
-                    { label: 'Juniper JunOS',    cmd: active.remediation.juniper_junos },
-                    { label: 'Palo Alto PAN-OS', cmd: active.remediation.palo_alto },
-                    { label: 'SONiC Linux',      cmd: active.remediation.sonic_whitebox },
-                  ].filter(r => r.cmd).map(({ label, cmd }) => (
-                    <div key={label}>
-                      <p className="font-mono text-[10px] mb-1.5" style={{ color: 'var(--text-tertiary)' }}>{label}</p>
-                      <div className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
-                        <pre className="font-mono text-xs p-4 overflow-x-auto leading-relaxed" style={{ color: 'var(--pass)' }}>
-                          {cmd}
-                        </pre>
-                      </div>
-                    </div>
+                <div className="flex gap-1">
+                  {vendorsList.map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => setSelectedVendor(v)}
+                      className={`px-2 py-1 rounded text-[10px] font-mono transition-colors cursor-pointer border ${
+                        selectedVendor === v
+                          ? 'border-sky-600 bg-sky-50 text-sky-950 font-bold shadow-xs'
+                          : 'border-slate-300 text-slate-700 bg-white hover:border-slate-400'
+                      }`}
+                    >
+                      {v.split('_')[0].toUpperCase()}
+                    </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Declarative Rule YAML (Unified single display) */}
+              <div>
+                <MonoCodeBlock
+                  code={yamlContent}
+                  language="yaml"
+                  maxHeight="440px"
+                  showLineNumbers={true}
+                />
               </div>
             </>
           )}

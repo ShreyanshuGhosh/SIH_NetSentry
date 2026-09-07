@@ -1,136 +1,236 @@
-import React, { useState } from 'react';
-import { BrandLanding } from './components/BrandLanding';
-import { Navbar } from './components/Navbar';
-import { HeroLanding } from './components/HeroLanding';
+// src/App.tsx
+// Authoritative Consolidated NetSentry Platform Application
+// Zero-Slop Architecture with Persistent NavRail, TopBar, and Phase 0 Pipeline Integration
+
+import React, { useState, useCallback, useMemo } from 'react';
+import { NavRail, ActiveNavTab } from './components/shell/NavRail';
+import { TopBar } from './components/shell/TopBar';
+import { PublicLandingPage } from './components/landing/PublicLandingPage';
+import { DashboardView } from './components/dashboard/DashboardView';
 import { IngestionConsole } from './components/IngestionConsole';
-import { DualLaneEngine } from './components/DualLaneEngine';
 import { AuditResultsView } from './components/AuditResultsView';
 import { TrainingUI } from './components/TrainingUI';
 import { RulePackExplorer } from './components/RulePackExplorer';
+import { TacticalRemediationScanner, ScannerDialect } from './components/TacticalRemediationScanner';
 import { LivePullSimulator } from './components/LivePullSimulator';
-import { Footer } from './components/Footer';
+import { DualLaneEngine } from './components/DualLaneEngine';
+import { SettingsView } from './components/settings/SettingsView';
 
 import { FrameworkId, ParsingLane, SampleDeviceConfig } from './types/audit';
 import { SAMPLE_CONFIGS } from './data/sampleConfigs';
-import { AuditRunResult, evaluateAudit } from './utils/auditEngine';
+import { runCompliancePipeline, PipelineExecutionResult } from './engine/pipeline';
+import { exemplarStore } from './engine/exemplarStore';
+import { BulkConfigFile } from './components/ingest/BulkDropzone';
+import { SupportedVendor } from './types/canonical';
 
 export function App() {
-  // Top-level mode: 'landing' (the influential brand experience) or 'product' (the live audit workspace)
-  const [viewMode, setViewMode] = useState<'landing' | 'product'>('landing');
+  // Top-level mode: 'landing' (public gateway) or 'console' (authenticated operations)
+  const [viewMode, setViewMode] = useState<'landing' | 'console'>('landing');
+  const [activeTab, setActiveTab] = useState<ActiveNavTab>('dashboard');
 
-  const [activeTab, setActiveTab] = useState<string>('pipeline');
+  // Active configuration & audit state
   const [selectedConfig, setSelectedConfig] = useState<SampleDeviceConfig>(SAMPLE_CONFIGS[0]);
   const [selectedFramework, setSelectedFramework] = useState<FrameworkId>('cis_v8');
   const [selectedLane, setSelectedLane] = useState<ParsingLane | 'auto'>('auto');
-  const [isAuditing, setIsAuditing] = useState<boolean>(false);
+  const [isAuditing, setIsAuditing] = useState(false);
 
-  const [auditResult, setAuditResult] = useState<AuditRunResult>(() =>
-    evaluateAudit(SAMPLE_CONFIGS[0], 'cis_v8')
+  // Initial audit execution using Phase 0 canonical pipeline
+  const [pipelineResult, setPipelineResult] = useState<PipelineExecutionResult>(() =>
+    runCompliancePipeline(SAMPLE_CONFIGS[0].rawText, {
+      deviceId: SAMPLE_CONFIGS[0].id,
+      vendorOverride: SAMPLE_CONFIGS[0].vendor as any,
+      frameworks: ['cis_v8'],
+    })
   );
 
-  const handleLaunchFromLanding = (vendorId?: string) => {
-    if (vendorId) {
-      const found = SAMPLE_CONFIGS.find((c) => c.id === vendorId);
-      if (found) {
-        setSelectedConfig(found);
-        const result = evaluateAudit(found, selectedFramework);
-        setAuditResult(result);
-      }
-    }
-    setViewMode('product');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // Training queue counter from store
+  const [pendingTrainingCount, setPendingTrainingCount] = useState<number>(() =>
+    exemplarStore.getQueue(0.80).length
+  );
 
-  const handleExecuteAudit = () => {
+  // Recent audits cache for Dashboard fleet overview
+  const [recentAudits, setRecentAudits] = useState<any[]>(() => {
+    return SAMPLE_CONFIGS.slice(0, 4).map((cfg) => {
+      const res = runCompliancePipeline(cfg.rawText, {
+        deviceId: cfg.id,
+        vendorOverride: cfg.vendor as any,
+        frameworks: ['cis_v8'],
+      });
+      return {
+        deviceId: cfg.id,
+        deviceName: cfg.name,
+        vendor: cfg.vendor as SupportedVendor,
+        model: cfg.model,
+        score: res.auditResult.summary.complianceScore,
+        pass: res.auditResult.summary.passed,
+        fail: res.auditResult.summary.failed,
+        auditResult: res.auditResult,
+      };
+    });
+  });
+
+  // Execute compliance audit through Phase 0 pipeline
+  const handleExecuteAudit = useCallback(() => {
     setIsAuditing(true);
     setTimeout(() => {
-      const result = evaluateAudit(
-        selectedConfig,
-        selectedFramework,
-        selectedLane === 'auto' ? undefined : selectedLane
-      );
-      setAuditResult(result);
+      const res = runCompliancePipeline(selectedConfig.rawText, {
+        deviceId: selectedConfig.id,
+        vendorOverride: selectedConfig.vendor as any,
+        frameworks: [selectedFramework],
+        forceLane: selectedLane === 'auto' ? undefined : (selectedLane as any),
+      });
+
+      setPipelineResult(res);
       setIsAuditing(false);
-      setActiveTab('audit');
+      setActiveTab('results');
+
+      // Update recent audits list
+      setRecentAudits((prev) => {
+        const filtered = prev.filter((a) => a.deviceId !== selectedConfig.id);
+        return [
+          {
+            deviceId: selectedConfig.id,
+            deviceName: selectedConfig.name,
+            vendor: selectedConfig.vendor as SupportedVendor,
+            model: selectedConfig.model,
+            score: res.auditResult.summary.complianceScore,
+            pass: res.auditResult.summary.passed,
+            fail: res.auditResult.summary.failed,
+            auditResult: res.auditResult,
+          },
+          ...filtered,
+        ];
+      });
     }, 450);
-  };
+  }, [selectedConfig, selectedFramework, selectedLane]);
 
-  const handleSelectVendorFromHero = (vendorConfigId: string) => {
-    const found = SAMPLE_CONFIGS.find((c) => c.id === vendorConfigId);
-    if (found) {
-      setSelectedConfig(found);
-      const result = evaluateAudit(found, selectedFramework);
-      setAuditResult(result);
-      setActiveTab('audit');
-    }
-  };
+  // Handle batch audit execution from BulkDropzone
+  const handleBatchAudit = useCallback(
+    (files: BulkConfigFile[]) => {
+      if (files.length === 0) return;
+      setIsAuditing(true);
 
-  const handleIngestFromLivePull = (config: SampleDeviceConfig) => {
-    setSelectedConfig(config);
-    const result = evaluateAudit(config, selectedFramework);
-    setAuditResult(result);
-    setActiveTab('audit');
-  };
+      setTimeout(() => {
+        const batchEvaluations = files.map((file) => {
+          return runCompliancePipeline(file.rawText, {
+            deviceId: file.id,
+            vendorOverride: file.detectedVendor,
+            frameworks: [selectedFramework],
+          });
+        });
 
-  // Derive score/pass/fail for persistent status strip in the product console
-  const pass = auditResult.findings.filter((f) => f.status === 'PASS').length;
-  const fail = auditResult.findings.filter((f) => f.status === 'FAIL').length;
-  const total = auditResult.findings.length;
-  const score = total > 0 ? Math.round((pass / total) * 100) : 0;
+        // Set the first evaluated file as active in Results
+        setPipelineResult(batchEvaluations[0]);
+
+        // Merge all into recent audits
+        const newAudits = files.map((file, idx) => ({
+          deviceId: file.id,
+          deviceName: file.fileName,
+          vendor: file.detectedVendor,
+          model: file.dialect,
+          score: batchEvaluations[idx].auditResult.summary.complianceScore,
+          pass: batchEvaluations[idx].auditResult.summary.passed,
+          fail: batchEvaluations[idx].auditResult.summary.failed,
+          auditResult: batchEvaluations[idx].auditResult,
+        }));
+
+        setRecentAudits(newAudits);
+        setIsAuditing(false);
+        setActiveTab('results');
+      }, 650);
+    },
+    [selectedFramework]
+  );
+
+  // Live pull ingestion handoff
+  const handleIngestFromLivePull = useCallback(
+    (config: SampleDeviceConfig) => {
+      setSelectedConfig(config);
+      const res = runCompliancePipeline(config.rawText, {
+        deviceId: config.id,
+        vendorOverride: config.vendor as any,
+        frameworks: [selectedFramework],
+      });
+      setPipelineResult(res);
+      setActiveTab('results');
+    },
+    [selectedFramework]
+  );
+
+  // Callback when Training GUI updates few-shot store (demonstrates Test 2: Mapping reuse!)
+  const handleTrainingUpdated = useCallback(() => {
+    setPendingTrainingCount(exemplarStore.getQueue(0.80).length);
+    // Re-run pipeline on current device to reflect the newly learned exemplar
+    const updated = runCompliancePipeline(selectedConfig.rawText, {
+      deviceId: selectedConfig.id,
+      vendorOverride: selectedConfig.vendor as any,
+      frameworks: [selectedFramework],
+      forceLane: 'llm_fallback',
+    });
+    setPipelineResult(updated);
+  }, [selectedConfig, selectedFramework]);
+
+  // Telemetry metrics for top bar
+  const currentSummary = pipelineResult.auditResult.summary;
 
   return (
     <div
-      className="min-h-screen flex flex-col selection:bg-zinc-800 selection:text-white"
+      className="min-h-screen flex flex-col selection:bg-sky-100 selection:text-sky-900"
       style={{
-        backgroundColor: 'var(--bg-base)',
-        color: 'var(--text-secondary)',
+        backgroundColor: 'var(--bg-canvas)',
+        color: 'var(--text-primary)',
         fontFamily: 'var(--font-sans)',
       }}
     >
-      {/* VIEW 1: BRAND LANDING PAGE (Influential, 3D WebGL Particle Mesh, Authority Storytelling) */}
+      {/* MODE 1: PUBLIC LANDING OVERVIEW (Single page, calm, zero slop, 1 CTA, §1, C4) */}
       {viewMode === 'landing' ? (
-        <BrandLanding onLaunchProduct={handleLaunchFromLanding} />
+        <PublicLandingPage onLaunchConsole={() => setViewMode('console')} />
       ) : (
-        /* VIEW 2: PRODUCT AUDIT PLATFORM & WORKSPACE (Under 'Try Our Product') */
-        <div className="flex-1 flex flex-col" data-no-tracker="true">
-          <Navbar
+        /* MODE 2: AUTHENTICATED CONSOLE (Persistent NavRail + TopBar) */
+        <div className="flex-1 flex min-h-screen">
+          {/* Persistent Nav Rail */}
+          <NavRail
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            onQuickAudit={handleExecuteAudit}
-            onBackToLanding={() => {
-              setViewMode('landing');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            auditScore={score}
-            passCount={pass}
-            failCount={fail}
+            onSelectTab={setActiveTab}
+            pendingTrainingCount={pendingTrainingCount}
           />
 
-          <main className="flex-1">
-            {activeTab === 'pipeline' && (
-              <div>
-                <HeroLanding
-                  onStartAudit={() => setActiveTab('audit')}
-                  onExploreTraining={() => setActiveTab('training')}
-                  onSelectVendorConfig={handleSelectVendorFromHero}
-                />
-                <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                  <IngestionConsole
-                    selectedConfig={selectedConfig}
-                    onSelectConfig={setSelectedConfig}
-                    selectedFramework={selectedFramework}
-                    onSelectFramework={setSelectedFramework}
-                    selectedLane={selectedLane}
-                    onSelectLane={setSelectedLane}
-                    onExecuteAudit={handleExecuteAudit}
-                    isAuditing={isAuditing}
-                  />
-                </div>
-              </div>
-            )}
+          {/* Right Main Content Area */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Persistent Top Bar */}
+            <TopBar
+              currentDeviceName={selectedConfig.name}
+              currentVendor={pipelineResult.detectedVendor}
+              complianceScore={currentSummary.complianceScore}
+              passCount={currentSummary.passed}
+              failCount={currentSummary.failed}
+              isAuditing={isAuditing}
+              onExecuteAudit={handleExecuteAudit}
+              onViewPublicOverview={() => setViewMode('landing')}
+            />
 
-            {activeTab === 'audit' && (
-              <div>
+            {/* View Router */}
+            <main className="flex-1 overflow-y-auto">
+              {activeTab === 'dashboard' && (
+                <DashboardView
+                  recentAudits={recentAudits}
+                  pendingTrainingCount={pendingTrainingCount}
+                  onNavigate={setActiveTab}
+                  onSelectAuditResult={(device) => {
+                    const found = SAMPLE_CONFIGS.find((c) => c.id === device.deviceId);
+                    if (found) setSelectedConfig(found);
+                    if (device.auditResult) {
+                      setPipelineResult((prev) => ({
+                        ...prev,
+                        auditResult: device.auditResult,
+                        detectedVendor: device.vendor,
+                      }));
+                    }
+                  }}
+                />
+              )}
+
+              {activeTab === 'ingest' && (
                 <IngestionConsole
                   selectedConfig={selectedConfig}
                   onSelectConfig={setSelectedConfig}
@@ -139,41 +239,42 @@ export function App() {
                   selectedLane={selectedLane}
                   onSelectLane={setSelectedLane}
                   onExecuteAudit={handleExecuteAudit}
+                  onBatchAudit={handleBatchAudit}
                   isAuditing={isAuditing}
                 />
-                <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                  <DualLaneEngine
-                    auditResult={auditResult}
-                    onOpenTraining={() => setActiveTab('training')}
-                  />
-                </div>
-                <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                  <AuditResultsView
-                    result={auditResult}
-                    onReAudit={handleExecuteAudit}
-                    onOpenTraining={() => setActiveTab('training')}
-                  />
-                </div>
-              </div>
-            )}
+              )}
 
-            {activeTab === 'training' && (
-              <TrainingUI
-                onTrainingUpdated={() => {
-                  const res = evaluateAudit(selectedConfig, selectedFramework);
-                  setAuditResult(res);
-                }}
-              />
-            )}
+              {activeTab === 'results' && (
+                <AuditResultsView
+                  result={pipelineResult.auditResult}
+                  deviceName={selectedConfig.name}
+                  platform={selectedConfig.model}
+                  osVersion={selectedConfig.osVersion}
+                  onReAudit={handleExecuteAudit}
+                  onOpenRemediation={() => setActiveTab('remediation')}
+                  onOpenTraining={() => setActiveTab('training')}
+                />
+              )}
 
-            {activeTab === 'rules' && <RulePackExplorer />}
+              {activeTab === 'training' && (
+                <TrainingUI onTrainingUpdated={handleTrainingUpdated} />
+              )}
 
-            {activeTab === 'telemetry' && (
-              <LivePullSimulator onIngestPulledConfig={handleIngestFromLivePull} />
-            )}
-          </main>
+              {activeTab === 'rules' && <RulePackExplorer />}
 
-          <Footer />
+              {activeTab === 'remediation' && <TacticalRemediationScanner />}
+
+              {activeTab === 'live-pull' && (
+                <LivePullSimulator onIngestPulledConfig={handleIngestFromLivePull} />
+              )}
+
+              {activeTab === 'architecture' && (
+                <DualLaneEngine onOpenTraining={() => setActiveTab('training')} />
+              )}
+
+              {activeTab === 'settings' && <SettingsView />}
+            </main>
+          </div>
         </div>
       )}
     </div>

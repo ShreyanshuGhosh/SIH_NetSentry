@@ -1,3 +1,6 @@
+// src/components/TacticalRemediationScanner.tsx
+// Drag-to-compare before/after remediation diff scrubber wired for ALL 6 VENDORS (§5, Phase 5)
+
 import React, { useState, useRef, useCallback } from 'react';
 import {
   ShieldCheck,
@@ -7,17 +10,17 @@ import {
   Terminal,
   Cpu,
   ArrowRight,
+  Copy,
+  Check,
 } from '@phosphor-icons/react';
 
-type ScannerDialect = 'cisco' | 'juniper' | 'paloalto';
+export type ScannerDialect = 'cisco' | 'juniper' | 'paloalto' | 'sonic' | 'fortinet' | 'arista';
 
 interface DiffLine {
   lineNum: number;
-  // Vulnerable side representation
   vulnText: string;
   vulnHighlight?: string;
   vulnRule?: string;
-  // Hardened side representation
   hardText: string;
   hardHighlight?: string;
   hardRule?: string;
@@ -120,116 +123,203 @@ const SCANNER_CONFIGS: Record<
   },
   juniper: {
     name: 'Juniper JunOS',
-    model: 'SRX-345 Security Boundary Gateway',
-    os: 'Junos OS 22.4R1-S2',
-    benchmark: 'DISA STIG Junos Router NDM v2r1',
+    model: 'SRX345 Enterprise Firewall Gateway',
+    os: 'JunOS 22.4R2-S2.5',
+    benchmark: 'CIS Juniper JunOS Benchmark v1.1.0',
     lines: [
       {
-        lineNum: 14,
-        vulnText: 'set system root-authentication plain-text-password-value "admin123"',
-        vulnHighlight: 'plain-text-password-value "admin123"',
-        vulnRule: 'STIG-NET-0065',
-        hardText: 'set system root-authentication encrypted-password "$6$kL81$..."',
-        hardHighlight: 'encrypted-password "$6$kL81$..."',
-        hardRule: 'SHA512_SALTED [PASS]',
+        lineNum: 4,
+        vulnText: 'services { telnet; }',
+        vulnHighlight: 'telnet;',
+        vulnRule: 'CIS-JUNOS-2.1 [CRIT]',
+        hardText: '/* telnet service deleted */',
+        hardHighlight: '/* telnet service deleted */',
+        hardRule: 'TELNET_PURGED [PASS]',
       },
       {
-        lineNum: 15,
-        vulnText: 'set system services telnet',
-        vulnHighlight: 'set system services telnet',
-        vulnRule: 'STIG-NET-0001',
-        hardText: 'delete system services telnet',
-        hardHighlight: 'delete system services telnet',
-        hardRule: 'UNBOUND_DAEMON [PASS]',
+        lineNum: 5,
+        vulnText: 'services { ssh { protocol-version v1; } }',
+        vulnHighlight: 'protocol-version v1;',
+        vulnRule: 'CIS-JUNOS-2.2 [HIGH]',
+        hardText: 'services { ssh { protocol-version v2; } }',
+        hardHighlight: 'protocol-version v2;',
+        hardRule: 'SSH_V2_SET [PASS]',
       },
       {
-        lineNum: 16,
-        vulnText: 'set system services ssh protocol-version v1',
-        vulnHighlight: 'protocol-version v1',
-        vulnRule: 'STIG-NET-0030',
-        hardText: 'set system services ssh protocol-version v2',
-        hardHighlight: 'protocol-version v2',
-        hardRule: 'SSH_V2_ENFORCED [PASS]',
+        lineNum: 6,
+        vulnText: 'web-management { http; }',
+        vulnHighlight: 'http;',
+        vulnRule: 'CIS-JUNOS-2.4 [HIGH]',
+        hardText: 'web-management { https { port 443; } }',
+        hardHighlight: 'https { port 443; }',
+        hardRule: 'TLS_WEB_MGMT [PASS]',
       },
       {
-        lineNum: 17,
-        vulnText: 'set snmp community public authorization read-only',
+        lineNum: 7,
+        vulnText: 'snmp { community public { authorization read-only; } }',
         vulnHighlight: 'community public',
-        vulnRule: 'STIG-NET-0020',
-        hardText: 'set snmp v3 usm local-engine user secoper auth-sha priv-aes256',
-        hardHighlight: 'auth-sha priv-aes256',
-        hardRule: 'FIPS_CRYPTO [PASS]',
+        vulnRule: 'CIS-JUNOS-3.1 [CRIT]',
+        hardText: 'snmp { v3 { usm { local-engine { user sec-admin { ... } } } } }',
+        hardHighlight: 'v3 { usm { local-engine',
+        hardRule: 'SNMPV3_USM [PASS]',
       },
       {
-        lineNum: 18,
-        vulnText: 'set system services web-management http port 80',
-        vulnHighlight: 'http port 80',
-        vulnRule: 'STIG-NET-0080',
-        hardText: 'delete system services web-management http',
-        hardHighlight: 'delete system services web-management http',
-        hardRule: 'HTTP_TERMINATED [PASS]',
-      },
-      {
-        lineNum: 19,
-        vulnText: 'set system login idle-timeout 120',
-        vulnHighlight: 'idle-timeout 120',
-        vulnRule: 'STIG-NET-0060',
-        hardText: 'set system login idle-timeout 10',
-        hardHighlight: 'idle-timeout 10',
-        hardRule: 'POLICY_TIMEOUT [PASS]',
+        lineNum: 8,
+        vulnText: '/* no syslog host configured */',
+        vulnHighlight: 'no syslog host',
+        vulnRule: 'NIST-AU-3',
+        hardText: 'syslog { host 10.14.5.50 { any warning; } }',
+        hardHighlight: 'host 10.14.5.50',
+        hardRule: 'SYSLOG_ACTIVE [PASS]',
       },
     ],
   },
   paloalto: {
     name: 'Palo Alto PAN-OS',
-    model: 'PA-3220 Perimeter Next-Gen Firewall',
+    model: 'PA-3220 Next-Gen Perimeter Firewall',
     os: 'PAN-OS 11.0.2-h3',
-    benchmark: 'NIST SP 800-53 Rev. 5 / SC-7 Boundary Protection',
+    benchmark: 'CIS Palo Alto Firewall 11 Benchmark v1.0.0',
     lines: [
       {
-        lineNum: 21,
+        lineNum: 5,
         vulnText: 'set deviceconfig system service disable-telnet no',
         vulnHighlight: 'disable-telnet no',
-        vulnRule: 'NIST-AC-3.1',
+        vulnRule: 'CIS-PAN-1.1 [CRIT]',
         hardText: 'set deviceconfig system service disable-telnet yes',
         hardHighlight: 'disable-telnet yes',
-        hardRule: 'TELNET_BLOCKED [PASS]',
+        hardRule: 'TELNET_OFF [PASS]',
       },
       {
-        lineNum: 22,
+        lineNum: 6,
         vulnText: 'set deviceconfig system service disable-http no',
         vulnHighlight: 'disable-http no',
-        vulnRule: 'NIST-SC-13.1',
+        vulnRule: 'CIS-PAN-1.2 [HIGH]',
         hardText: 'set deviceconfig system service disable-http yes',
         hardHighlight: 'disable-http yes',
-        hardRule: 'HTTPS_MANDATORY [PASS]',
+        hardRule: 'HTTP_OFF [PASS]',
       },
       {
-        lineNum: 23,
-        vulnText: 'set deviceconfig system snmp-setting snmp-version-v2c yes',
-        vulnHighlight: 'snmp-version-v2c yes',
-        vulnRule: 'NIST-SC-8.1',
-        hardText: 'set deviceconfig system snmp-setting snmp-version-v3 yes',
-        hardHighlight: 'snmp-version-v3 yes',
-        hardRule: 'AUTHTYPE_PRIV [PASS]',
+        lineNum: 7,
+        vulnText: 'set deviceconfig system ssh-version 1',
+        vulnHighlight: 'ssh-version 1',
+        vulnRule: 'CIS-PAN-1.3 [HIGH]',
+        hardText: 'set deviceconfig system ssh-version 2',
+        hardHighlight: 'ssh-version 2',
+        hardRule: 'SSH_V2 [PASS]',
       },
       {
-        lineNum: 24,
+        lineNum: 8,
         vulnText: 'set deviceconfig system idle-timeout 0',
         vulnHighlight: 'idle-timeout 0',
-        vulnRule: 'NIST-AC-12.1',
+        vulnRule: 'CIS-PAN-2.1 [MED]',
         hardText: 'set deviceconfig system idle-timeout 10',
         hardHighlight: 'idle-timeout 10',
-        hardRule: 'AUTO_LOCK_10M [PASS]',
+        hardRule: 'TIMEOUT_10M [PASS]',
+      },
+    ],
+  },
+  sonic: {
+    name: 'SONiC Linux',
+    model: 'Edgecore AS7712-32X Leaf Switch',
+    os: 'SONiC.202311.0',
+    benchmark: 'Open Compute Project (OCP) Hardening Profile',
+    lines: [
+      {
+        lineNum: 14,
+        vulnText: '"TELNET": { "global": { "status": "enabled" } }',
+        vulnHighlight: '"status": "enabled"',
+        vulnRule: 'CIS-SONIC-1.1 [CRIT]',
+        hardText: '"TELNET": { "global": { "status": "disabled" } }',
+        hardHighlight: '"status": "disabled"',
+        hardRule: 'DAEMON_STOPPED [PASS]',
       },
       {
-        lineNum: 25,
-        vulnText: 'set shared authentication-profile LOCAL-ONLY method local-database',
-        vulnHighlight: 'LOCAL-ONLY method local-database',
-        vulnRule: 'NIST-IA-2.1',
-        hardText: 'set shared authentication-profile CENTRAL-TACACS method tacacs-plus',
-        hardHighlight: 'CENTRAL-TACACS method tacacs-plus',
-        hardRule: 'AAA_CENTRALIZED [PASS]',
+        lineNum: 15,
+        vulnText: '"SSH": { "global": { "protocol": "1", "idle_timeout": "0" } }',
+        vulnHighlight: '"protocol": "1"',
+        vulnRule: 'CIS-SONIC-1.2 [HIGH]',
+        hardText: '"SSH": { "global": { "protocol": "2", "idle_timeout": "600" } }',
+        hardHighlight: '"protocol": "2", "idle_timeout": "600"',
+        hardRule: 'SSH2_600S [PASS]',
+      },
+      {
+        lineNum: 16,
+        vulnText: '/* no remote syslog server in config_db.json */',
+        vulnHighlight: 'no remote syslog',
+        vulnRule: 'NIST-AU-3',
+        hardText: '"SYSLOG_SERVER": { "10.14.5.50": { "port": "514", "facility": "local6" } }',
+        hardHighlight: '"SYSLOG_SERVER": { "10.14.5.50"',
+        hardRule: 'SIEM_FORWARD [PASS]',
+      },
+    ],
+  },
+  fortinet: {
+    name: 'Fortinet FortiOS',
+    model: 'FortiGate 60F Edge Appliance',
+    os: 'FortiOS v7.4.2',
+    benchmark: 'CIS Fortinet FortiOS 7.x Benchmark',
+    lines: [
+      {
+        lineNum: 3,
+        vulnText: 'set admin-telnet-service enable',
+        vulnHighlight: 'admin-telnet-service enable',
+        vulnRule: 'CIS-FGT-1.1 [CRIT]',
+        hardText: 'set admin-telnet-service disable',
+        hardHighlight: 'admin-telnet-service disable',
+        hardRule: 'TELNET_OFF [PASS]',
+      },
+      {
+        lineNum: 4,
+        vulnText: 'set admin-http-service enable',
+        vulnHighlight: 'admin-http-service enable',
+        vulnRule: 'CIS-FGT-1.2 [HIGH]',
+        hardText: 'set admin-http-service disable',
+        hardHighlight: 'admin-http-service disable',
+        hardRule: 'HTTP_OFF [PASS]',
+      },
+      {
+        lineNum: 5,
+        vulnText: 'set admintimeout 0',
+        vulnHighlight: 'admintimeout 0',
+        vulnRule: 'CIS-FGT-1.3 [MED]',
+        hardText: 'set admintimeout 10',
+        hardHighlight: 'admintimeout 10',
+        hardRule: '10M_LOCK [PASS]',
+      },
+    ],
+  },
+  arista: {
+    name: 'Arista EOS',
+    model: 'Arista 7050X Data Center Leaf Switch',
+    os: 'EOS 4.30.2F',
+    benchmark: 'CIS Arista EOS Benchmark v1.0.0',
+    lines: [
+      {
+        lineNum: 8,
+        vulnText: 'management telnet',
+        vulnHighlight: 'management telnet',
+        vulnRule: 'CIS-EOS-1.1 [CRIT]',
+        hardText: 'no management telnet',
+        hardHighlight: 'no management telnet',
+        hardRule: 'TELNET_PURGED [PASS]',
+      },
+      {
+        lineNum: 9,
+        vulnText: 'management ssh\n protocol version 1',
+        vulnHighlight: 'protocol version 1',
+        vulnRule: 'CIS-EOS-1.2 [HIGH]',
+        hardText: 'management ssh\n protocol version 2',
+        hardHighlight: 'protocol version 2',
+        hardRule: 'SSH_V2 [PASS]',
+      },
+      {
+        lineNum: 10,
+        vulnText: 'management api http-commands\n no shutdown',
+        vulnHighlight: 'http-commands\n no shutdown',
+        vulnRule: 'CIS-EOS-1.3 [HIGH]',
+        hardText: 'no management api http-commands',
+        hardHighlight: 'no management api http-commands',
+        hardRule: 'HTTP_API_OFF [PASS]',
       },
     ],
   },
@@ -239,64 +329,61 @@ interface TacticalRemediationScannerProps {
   onLaunchConsole?: () => void;
 }
 
-export const TacticalRemediationScanner: React.FC<TacticalRemediationScannerProps> = ({
-  onLaunchConsole,
-}) => {
-  const [activeDialect, setActiveDialect] = useState<ScannerDialect>('cisco');
-  // Scrubber position in percentage (0 to 100)
-  const [splitPercent, setSplitPercent] = useState<number>(48.5);
-  const [isHovering, setIsHovering] = useState<boolean>(false);
-
+export const TacticalRemediationScanner: React.FC<TacticalRemediationScannerProps> = ({ onLaunchConsole }) => {
+  const [dialect, setDialect] = useState<ScannerDialect>('cisco');
+  const [sliderPos, setSliderPos] = useState<number>(50); // 0 to 100%
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [copied, setCopied] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const config = SCANNER_CONFIGS[activeDialect];
 
-  // Mouse scrubbing handler: strictly zero transition latency
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const cfg = SCANNER_CONFIGS[dialect];
+
+  const updateSliderFromEvent = useCallback((clientX: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setSplitPercent(percent);
+    const x = clientX - rect.left;
+    const pct = Math.min(100, Math.max(0, (x / rect.width) * 100));
+    setSliderPos(Math.round(pct));
   }, []);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (!containerRef.current || e.touches.length === 0) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.touches[0].clientX - rect.left;
-    const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setSplitPercent(percent);
-  }, []);
+  const handleMouseDown = () => setIsDragging(true);
+  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) updateSliderFromEvent(e.clientX);
+  };
 
-  const isScrubberFarLeft = splitPercent < 22;
-  const isScrubberFarRight = splitPercent > 78;
+  const handleCopyRemediation = () => {
+    const commands = cfg.lines.map((l) => l.hardText).join('\n');
+    navigator.clipboard.writeText(commands);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="w-full">
-      {/* ── Section Header ── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 select-none">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6" style={{ borderColor: 'var(--border-subtle)' }}>
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 mb-1 flex items-center gap-2">
-            <span className="inline-block w-1.5 h-1.5 bg-emerald-400" />
-            <span>INTERACTIVE DIFF LEXER :: REAL-TIME REMEDIATION</span>
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={22} style={{ color: 'var(--accent-primary)' }} />
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Tactical Remediation Scanner</h1>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 tracking-tight font-sans">
-            Tactical Remediation Scanner
-          </h2>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-2xl font-sans">
-            Scrub horizontally across the configuration stream to observe deterministic line-level remediation. Drag the laser divider to switch between vulnerable states and hardened baselines.
+          <p className="text-xs text-slate-600 mt-1">
+            Drag the scrub handle to compare non-compliant configurations against certified hardening playbooks across all 6 dialects.
           </p>
         </div>
 
-        {/* Dialect Switcher Tabs */}
-        <div className="flex items-center gap-1 p-1 border border-zinc-800 bg-[#0A0B0E] font-mono text-xs">
-          {(['cisco', 'juniper', 'paloalto'] as ScannerDialect[]).map((d) => (
+        {/* Vendor Selector Tabs (All 6 dialects) */}
+        <div className="flex gap-1 overflow-x-auto p-1 rounded border border-slate-200 bg-slate-100 font-mono text-[11px]">
+          {(['cisco', 'juniper', 'paloalto', 'sonic', 'fortinet', 'arista'] as const).map((d) => (
             <button
               key={d}
-              onClick={() => setActiveDialect(d)}
-              className={`px-3 py-1.5 rounded-none uppercase tracking-wider text-[11px] transition-none cursor-pointer ${
-                activeDialect === d
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-600'
-                  : 'text-zinc-500 hover:text-zinc-300 border border-transparent'
+              onClick={() => {
+                setDialect(d);
+                setSliderPos(50);
+              }}
+              className={`px-3 py-1.5 rounded cursor-pointer transition-colors ${
+                dialect === d ? 'bg-slate-900 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {SCANNER_CONFIGS[d].name}
@@ -305,206 +392,124 @@ export const TacticalRemediationScanner: React.FC<TacticalRemediationScannerProp
         </div>
       </div>
 
-      {/* ── Border-Collapsed Terminal Container ── */}
+      {/* Target Device Telemetry Strip */}
+      <div
+        className="p-4 rounded-lg border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+        style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+      >
+        <div>
+          <span className="font-semibold text-slate-900">{cfg.name}</span>
+          <span className="text-slate-400 mx-2">•</span>
+          <span className="text-slate-600">{cfg.model}</span>
+          <span className="text-slate-400 mx-2">•</span>
+          <span className="font-mono text-slate-600">{cfg.os}</span>
+        </div>
+
+        <button
+          onClick={handleCopyRemediation}
+          className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono border border-slate-300 bg-white text-slate-700 hover:text-slate-900 hover:border-slate-400 transition-colors cursor-pointer shadow-xs w-fit"
+        >
+          {copied ? (
+            <>
+              <Check size={12} style={{ color: 'var(--status-pass)' }} />
+              <span style={{ color: 'var(--status-pass)' }}>Hardening Script Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy size={12} />
+              <span>Copy Remediated Script</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Meaningful Scrub Indicator (§5 Phase 5) */}
+      <div className="flex items-center justify-between text-xs font-mono px-1">
+        <div className="flex items-center gap-2 text-rose-700 font-semibold">
+          <span className="w-2 h-2 rounded-full bg-rose-600" />
+          <span>VULNERABLE BASELINE (0%)</span>
+        </div>
+
+        <div className="text-slate-600 font-semibold">
+          Scrub Position: <span className="text-slate-900 font-bold">{sliderPos}% Hardened</span>
+        </div>
+
+        <div className="flex items-center gap-2 text-emerald-700 font-semibold">
+          <span>COMPLIANT POSTURE (100%)</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-600" />
+        </div>
+      </div>
+
+      {/* Interactive Diff-Scrubber Container */}
       <div
         ref={containerRef}
         onMouseMove={handleMouseMove}
-        onTouchMove={handleTouchMove}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-        className="relative rounded-none border border-zinc-800 bg-[#0D0E12] overflow-hidden select-none cursor-ew-resize"
-        style={{ touchAction: 'none' }}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        className="relative rounded-lg border overflow-hidden cursor-ew-resize select-none bg-rose-50/30"
+        style={{
+          borderColor: 'var(--border-subtle)',
+          minHeight: '440px',
+        }}
       >
-        {/* Terminal Header Bar */}
-        <div className="px-4 py-2.5 border-b border-zinc-800 bg-[#08090C] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
-          <div className="flex items-center gap-2 text-zinc-300">
-            <Terminal size={14} className="text-cyan-400" />
-            <span className="font-semibold text-zinc-200">{config.model}</span>
-            <span className="text-zinc-600">::</span>
-            <span className="text-zinc-400">{config.os}</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-[10px]">
-            <span className="hidden sm:inline text-zinc-500 font-mono">
-              TARGET: {config.benchmark}
-            </span>
-            <span className="px-2 py-0.5 border border-zinc-800 bg-[#0A0B0E] text-zinc-300 tabular-nums font-mono">
-              SCRUBBER: {splitPercent.toFixed(1)}%
-            </span>
-          </div>
-        </div>
-
-        {/* ── Split Code Display Container ── */}
-        <div className="relative font-mono text-xs leading-relaxed p-6 overflow-hidden min-h-[340px] bg-[#07080B]">
-          {/* Guide hint at bottom */}
-          <div className="absolute bottom-2 right-4 z-20 pointer-events-none text-[10px] font-mono text-zinc-600 uppercase tracking-wider flex items-center gap-1.5">
-            <ArrowsLeftRight size={12} className="text-emerald-400" />
-            <span>DRAG / HOVER HORIZONTALLY TO SCRUB DIFF</span>
-          </div>
-
-          {/* ══════════════════════════════════════════════════════════════════════
-              LAYER 1 (LEFT / BASE): VULNERABLE STATE
-              Clip path restricts rendering to 0 -> splitPercent%
-              ══════════════════════════════════════════════════════════════════════ */}
-          <div
-            className="absolute inset-0 p-6 overflow-hidden select-none"
-            style={{
-              clipPath: `polygon(0 0, ${splitPercent}% 0, ${splitPercent}% 100%, 0 100%)`,
-              transition: 'none',
-            }}
-          >
-            <div className="space-y-2">
-              {config.lines.map((line) => {
-                return (
-                  <div key={line.lineNum} className="flex items-center justify-between group">
-                    <div className="flex items-center gap-4 min-w-0 pr-4">
-                      <span className="w-6 text-right tabular-nums text-zinc-600 text-[11px] shrink-0">
-                        {line.lineNum}
-                      </span>
-                      <span className="truncate text-zinc-300">
-                        {line.vulnHighlight ? (
-                          <>
-                            <span className="text-rose-400/90 font-semibold bg-rose-950/40 border border-rose-900/60 px-1 py-0.5">
-                              {line.vulnHighlight}
-                            </span>
-                            <span className="text-zinc-400">
-                              {line.vulnText.replace(line.vulnHighlight, '')}
-                            </span>
-                          </>
-                        ) : (
-                          line.vulnText
-                        )}
-                      </span>
-                    </div>
-
-                    {line.vulnRule && (
-                      <span className="shrink-0 text-[10px] font-mono font-bold text-rose-400 bg-rose-950/60 border border-rose-800/80 px-1.5 py-0.5">
-                        {line.vulnRule}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* ══════════════════════════════════════════════════════════════════════
-              LAYER 2 (RIGHT / OVERLAY): HARDENED STATE
-              Clip path reveals rendering from splitPercent% -> 100%
-              ══════════════════════════════════════════════════════════════════════ */}
-          <div
-            className="absolute inset-0 p-6 overflow-hidden select-none"
-            style={{
-              clipPath: `polygon(${splitPercent}% 0, 100% 0, 100% 100%, ${splitPercent}% 100%)`,
-              transition: 'none',
-            }}
-          >
-            <div className="space-y-2">
-              {config.lines.map((line) => {
-                return (
-                  <div key={line.lineNum} className="flex items-center justify-between group">
-                    <div className="flex items-center gap-4 min-w-0 pr-4">
-                      <span className="w-6 text-right tabular-nums text-zinc-600 text-[11px] shrink-0">
-                        {line.lineNum}
-                      </span>
-                      <span className="truncate text-zinc-200">
-                        {line.hardHighlight ? (
-                          <>
-                            <span className="text-emerald-400 font-bold bg-emerald-950/50 border border-emerald-700/80 px-1 py-0.5">
-                              {line.hardHighlight}
-                            </span>
-                            <span className="text-zinc-300">
-                              {line.hardText.replace(line.hardHighlight, '')}
-                            </span>
-                          </>
-                        ) : (
-                          line.hardText
-                        )}
-                      </span>
-                    </div>
-
-                    {line.hardRule && (
-                      <span className="shrink-0 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-700/80 px-1.5 py-0.5 flex items-center gap-1">
-                        <CheckCircle size={11} weight="fill" />
-                        <span>{line.hardRule}</span>
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* ══════════════════════════════════════════════════════════════════════
-              VERTICAL SCRUBBER LASER LINE (Phosphor Emerald #10B981)
-              Zero transition latency; follows mouse cursor strictly
-              ══════════════════════════════════════════════════════════════════════ */}
-          <div
-            className="absolute top-0 bottom-0 pointer-events-none z-30 flex flex-col items-center"
-            style={{
-              left: `${splitPercent}%`,
-              transform: 'translateX(-50%)',
-              transition: 'none',
-            }}
-          >
-            {/* Top Anchor: Dual Telemetry Badges */}
-            <div className="absolute top-2 flex items-center gap-2 pointer-events-none select-none">
-              {!isScrubberFarLeft && (
-                <div className="px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-rose-400 bg-rose-950/90 border border-rose-700 shadow-none whitespace-nowrap -translate-x-full mr-1">
-                  [STATE: VULNERABLE]
-                </div>
-              )}
-              {!isScrubberFarRight && (
-                <div className="px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/90 border border-emerald-700 shadow-none whitespace-nowrap translate-x-1">
-                  [STATE: HARDENED]
-                </div>
+        {/* Left Side: Vulnerable Lines (Rose Tinted) */}
+        <div className="p-6 font-mono text-xs leading-relaxed space-y-3 bg-rose-50/20">
+          {cfg.lines.map((line, idx) => (
+            <div key={idx} className="flex items-start gap-4">
+              <span className="text-slate-400 select-none w-8 text-right shrink-0">L{line.lineNum}</span>
+              <span className="flex-1 text-rose-800 font-mono font-medium">
+                {line.vulnText}
+              </span>
+              {line.vulnRule && (
+                <span className="text-[10px] px-1.5 py-0.2 rounded border border-rose-200 bg-rose-100 text-rose-700 shrink-0 font-bold">
+                  {line.vulnRule}
+                </span>
               )}
             </div>
-
-            {/* Sharp 1px Phosphor Emerald Line */}
-            <div
-              className="w-[1px] h-full"
-              style={{
-                backgroundColor: '#10B981',
-                boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)',
-              }}
-            />
-
-            {/* Central Scrubber Node Ring */}
-            <div className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-none border border-emerald-400 bg-[#07080B] flex items-center justify-center">
-              <div className="w-1.5 h-1.5 bg-emerald-400" />
-            </div>
-
-            {/* Bottom Anchor: Position Pin */}
-            <div className="absolute bottom-2 font-mono text-[9px] text-emerald-400 bg-[#07080B] border border-emerald-600/80 px-1 py-0.2 whitespace-nowrap">
-              SCRUB: {splitPercent.toFixed(0)}%
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* ── Terminal Action & Verification Status Strip ── */}
-        <div className="px-4 py-3 border-t border-zinc-800 bg-[#08090C] flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
-          <div className="flex items-center gap-4 text-zinc-400 text-[11px]">
-            <span className="flex items-center gap-1.5 text-rose-400">
-              <WarningCircle size={13} weight="bold" />
-              <span>Left: Raw Ingested Config (Non-Compliant)</span>
-            </span>
-            <span className="text-zinc-700">|</span>
-            <span className="flex items-center gap-1.5 text-emerald-400">
-              <CheckCircle size={13} weight="fill" />
-              <span>Right: Line-by-Line Synthesized Remediation</span>
-            </span>
-          </div>
+        {/* Right Side Overlay: Hardened Remediated Lines (Emerald Tinted) */}
+        <div
+          className="absolute inset-0 p-6 font-mono text-xs leading-relaxed space-y-3 overflow-hidden bg-emerald-50/30"
+          style={{
+            clipPath: `inset(0 0 0 ${sliderPos}%)`,
+          }}
+        >
+          {cfg.lines.map((line, idx) => (
+            <div key={idx} className="flex items-start gap-4">
+              <span className="text-slate-400 select-none w-8 text-right shrink-0">L{line.lineNum}</span>
+              <span className="flex-1 text-emerald-800 font-mono font-medium">
+                {line.hardText}
+              </span>
+              {line.hardRule && (
+                <span className="text-[10px] px-1.5 py-0.2 rounded border border-emerald-200 bg-emerald-100 text-emerald-700 shrink-0 font-bold">
+                  {line.hardRule}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
 
-          <button
-            onClick={onLaunchConsole}
-            className="px-4 py-1.5 rounded-none font-mono font-semibold text-xs tracking-wider uppercase transition-all cursor-pointer text-cyan-300 bg-cyan-950 border border-cyan-800 hover:bg-cyan-900 hover:border-cyan-400 flex items-center gap-1.5 active:scale-95"
+        {/* The Scrub Divider Line and Handle */}
+        <div
+          className="absolute top-0 bottom-0 w-0.5 pointer-events-none z-10 shadow-lg"
+          style={{
+            left: `${sliderPos}%`,
+            backgroundColor: 'var(--accent-primary)',
+          }}
+        >
+          <div
+            onMouseDown={handleMouseDown}
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full border border-sky-600 bg-sky-600 flex items-center justify-center text-white cursor-ew-resize pointer-events-auto shadow-md"
           >
-            <Cpu size={13} weight="bold" />
-            <span>Execute Remediation in Console</span>
-            <ArrowRight size={12} weight="bold" />
-          </button>
+            <ArrowsLeftRight size={14} weight="bold" />
+          </div>
         </div>
+      </div>
+
+      <div className="text-[11px] text-slate-500 text-center font-mono">
+        Click and drag the center handle left or right to inspect line-by-line configuration changes before applying them to production infrastructure.
       </div>
     </div>
   );

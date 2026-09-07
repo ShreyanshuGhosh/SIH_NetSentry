@@ -32,16 +32,30 @@
 
 ## Overview
 
-Modern enterprise networks are heterogeneous by nature — Cisco, Juniper, Palo Alto, SONiC white-box, and dozens of others, each with incompatible CLI syntax. Auditing them against security frameworks (CIS Benchmarks, NIST SP 800-53, DISA STIGs, ISO 27001) today means either manual, checklist-based work or expensive vendor-locked tools that cannot cover the full estate.
+Modern enterprise networks are heterogeneous by nature — Cisco, Juniper, Palo Alto, SONiC white-box, Fortinet, Arista, and others, each with incompatible CLI syntax. Auditing them against security frameworks (CIS Benchmarks, NIST SP 800-53, DISA STIGs, ISO 27001) today means either manual, checklist-based work or expensive vendor-locked tools that cannot cover the full estate.
 
-**NetSentry** is a vendor-agnostic compliance auditing platform that:
+**NetSentry** is an authoritative, vendor-agnostic compliance auditing platform that:
 
-1. Accepts configuration files from any network device
-2. Normalises them into a common **Security Baseline Model** (vendor-neutral JSON schema)
-3. Evaluates that schema against versioned, framework-specific rule packs
-4. Generates a PDF report with every finding evidenced by its exact source line
+1. Ingests heterogeneous configuration files or connects live via read-only driver sessions across **6 major vendor dialects**:
+   - **Cisco IOS-XE** (Catalyst 9000, ISR, ASR)
+   - **Juniper JunOS** (SRX series, MX routers)
+   - **Palo Alto PAN-OS** (PA-3200, PA-5200 series)
+   - **SONiC** (Open-source disaggregated white-box switching / `config_db.json`)
+   - **Fortinet FortiOS** (FortiGate firewalls)
+   - **Arista EOS** (7050X / 7280R data center switches)
+2. Sanitises and cryptographically seals each configuration client-side (`SHA-256` provenance) while actively masking sensitive secrets (passwords, tokens, SNMP community strings).
+3. Normalises syntax into an extensible, open **Security Baseline Model** decoupled from vendor-specific CLI idioms.
+4. Evaluates that schema against versioned, framework-specific rule packs with cross-framework control deduplication (`controlGroupId`).
+5. Powers an administrator-in-the-loop **Few-Shot Exemplar Store** where an unknown command mapped once immediately generalizes across all other devices.
+6. Delivers line-level evidence, before/after tactical remediation diff scrubbing, and government-grade audit-ready PDF reports.
 
-The system uses a **two-lane processing engine** — a deterministic parser for known vendors and an LLM fallback lane for unknown ones — so it never silently guesses. `UNKNOWN` is a first-class audit result, not a missing entry.
+The system uses a **Dual-Lane Architecture** — a deterministic Green Lane for known vendor grammars (< 15ms latency) and an Amber Lane for unknown syntax with confidence scoring and an active human review gate.
+
+---
+
+## The Defensible Novelty Claim (§1)
+
+> "Existing tools can parse known vendors or verify modeled network behavior. Our contribution is an administrator-in-the-loop AI normalization and compliance-mapping layer that learns new configuration syntax without backend redeployment, while preserving evidence, confidence, framework references, and remediation traceability."
 
 ---
 
@@ -263,14 +277,28 @@ alembic upgrade head
 
 ---
 
-### Frontend Setup
+### Frontend Setup & Automated Verification
 
 ```bash
 cd netsentry/frontend
 
-# Install dependencies
+# 1. Install dependencies
 npm install
+
+# 2. Run automated Phase 0/0.5 canonical correctness test suite
+npx tsx src/engine/__tests__/correctnessTests.ts
+
+# 3. Verify TypeScript strict type-checking
+npx tsc --noEmit
+
+# 4. Compile production distribution
+npm run build
+
+# 5. Start development server with live HMR
+npm run dev
 ```
+
+The frontend runs locally on `http://localhost:3000` with the **Institutional Clearance Gateway** as its primary entry point.
 
 ---
 

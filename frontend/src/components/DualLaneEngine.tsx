@@ -1,220 +1,208 @@
-import React, { useState } from 'react';
-import { Cpu, Robot, CheckCircle, WarningCircle, Users, ArrowRight } from '@phosphor-icons/react';
-import { AuditRunResult } from '../utils/auditEngine';
+// src/components/DualLaneEngine.tsx
+// Architecture, Trust Boundary, and Competitive Positioning Table (§1, Phase 5)
+
+import React from 'react';
+import {
+  Cpu,
+  Brain,
+  ShieldCheck,
+  CheckCircle,
+  Scales,
+  LockSimple,
+  Table,
+} from '@phosphor-icons/react';
 
 interface DualLaneEngineProps {
-  auditResult: AuditRunResult;
-  onOpenTraining: () => void;
+  onOpenTraining?: () => void;
 }
 
-const FIELD_LABELS: Record<string, string> = {
-  ssh_version: 'SSH Protocol Version',
-  telnet_disabled: 'Telnet Daemon',
-  snmp_version: 'SNMP Security Level',
-  aaa_authentication_enabled: 'AAA Centralized Auth',
-  remote_syslog_enabled: 'Remote SIEM Syslog',
-  session_idle_timeout_minutes: 'Session Idle Timeout (min)',
-  insecure_http_server_disabled: 'HTTP Web Management',
-  login_banner_present: 'Warning Login Banner',
-};
-
-export const DualLaneEngine: React.FC<DualLaneEngineProps> = ({ auditResult, onOpenTraining }) => {
-  const [tab, setTab] = useState<'schema' | 'comparison'>('schema');
-  const { baseline, lane, device } = auditResult;
-
-  const isGreen = lane === 'deterministic';
+export const DualLaneEngine: React.FC<DualLaneEngineProps> = ({ onOpenTraining }) => {
+  const competitors = [
+    {
+      name: 'Batfish (AWS / UCLA / USC)',
+      does: 'Model-based network behavior, data-plane simulation, ACL & firewall verification.',
+      lacks: 'No LLM normalization of previously unseen vendor syntax; no admin-in-the-loop few-shot training.',
+    },
+    {
+      name: 'FireMon',
+      does: 'Multi-vendor firewall policy management across 600+ network platforms, audit reporting.',
+      lacks: 'Fixed static vendor drivers; no adaptive/learning layer for arbitrary or newly deployed NOS syntax.',
+    },
+    {
+      name: 'Tufin',
+      does: 'Continuous compliance automation for PCI DSS, SOX, NERC CIP, and HIPAA.',
+      lacks: 'Not architected around vendor-neutral AI interpretation of unknown command lines.',
+    },
+    {
+      name: 'Itential',
+      does: 'Visual workflow orchestration, multi-cloud lifecycle management, approval gates.',
+      lacks: 'Orchestration-first platform, not specialized in deterministic compliance-reasoning.',
+    },
+    {
+      name: 'Public GitHub Firewall Tools',
+      does: 'Client-side regex parsers for a fixed vendor list (Cisco ASA, FortiOS, Versa).',
+      lacks: 'No extensible baseline schema mapping, no confidence gating, no unknown-syntax adaptation.',
+    },
+    {
+      name: 'StackGuardian',
+      does: 'Open-source IaC config management and drift detection concept.',
+      lacks: 'Early single-commit prototype, lacks verifiable end-to-end evidence pipeline.',
+    },
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-14">
-
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight mb-1" style={{ color: 'var(--text-primary)' }}>
-            Dual-Lane Parsing Engine
-          </h2>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Normalized baseline extracted from{' '}
-            <span className="font-mono" style={{ color: 'var(--text-mono)' }}>{device.name}</span>
-            {' '}via{' '}
-            <span
-              className="font-mono font-semibold"
-              style={{ color: isGreen ? 'var(--pass)' : 'var(--warn)' }}
-            >
-              {isGreen ? 'Green Lane' : 'Amber Lane'}
-            </span>
+      <div className="border-b pb-6" style={{ borderColor: 'var(--border-subtle)' }}>
+        <div className="flex items-center gap-2">
+          <Cpu size={22} style={{ color: 'var(--accent-primary)' }} />
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Trust Boundary & Dual-Lane Architecture
+          </h1>
+        </div>
+        <p className="text-xs text-slate-600 mt-1">
+          Strict separation of concerns: AI extracts and normalizes syntax into a canonical model,
+          but a deterministic rules engine, never the LLM, decides compliance verdicts.
+        </p>
+      </div>
+
+      {/* Novelty Statement Box (§1) */}
+      <div
+        className="p-6 rounded-lg border text-sm leading-relaxed"
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          borderColor: 'var(--border-subtle)',
+          borderLeft: '4px solid var(--accent-primary)',
+        }}
+      >
+        <div className="font-mono text-xs font-semibold text-slate-900 uppercase tracking-wider mb-1">
+          The Defensible Novelty Claim (SIH26155 / NTRO)
+        </div>
+        <p className="text-slate-700">
+          "Existing tools can parse known vendors or verify modeled network behavior. Our contribution is an
+          administrator-in-the-loop AI normalization and compliance-mapping layer that learns new configuration
+          syntax without backend redeployment, while preserving evidence, confidence, framework references,
+          and remediation traceability."
+        </p>
+      </div>
+
+      {/* Two-Column Dual-Lane Explainer (§5 Phase 5) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Green Lane Card */}
+        <div
+          className="p-6 rounded-lg border space-y-4"
+          style={{
+            backgroundColor: 'var(--bg-surface)',
+            borderColor: 'var(--border-subtle)',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--status-pass)' }} />
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider font-mono">
+              Green Lane: Deterministic Parser
+            </h2>
+          </div>
+
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Compiled syntactic lexers parse known vendor grammars (Cisco IOS-XE, JunOS, PAN-OS, SONiC, FortiOS, Arista EOS)
+            with zero latency overhead (&lt; 15ms) and 100% deterministic reproducibility.
           </p>
+
+          <div className="space-y-2 text-xs border-t border-slate-200 pt-3 font-mono">
+            <div className="flex items-center gap-2 text-slate-700">
+              <CheckCircle size={14} style={{ color: 'var(--status-pass)' }} />
+              <span>Zero LLM cost or latency for known dialects</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-700">
+              <CheckCircle size={14} style={{ color: 'var(--status-pass)' }} />
+              <span>Full cryptographic SHA-256 line provenance</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-700">
+              <CheckCircle size={14} style={{ color: 'var(--status-pass)' }} />
+              <span>Client-side secret masking active</span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-3 text-sm font-mono" style={{ color: 'var(--text-tertiary)' }}>
-          {isGreen
-            ? <Cpu size={16} weight="duotone" style={{ color: 'var(--pass)' }} />
-            : <Robot size={16} weight="duotone" style={{ color: 'var(--warn)' }} />
-          }
-          {isGreen ? 'Deterministic AST parser' : 'LLM extraction + Pydantic validation'}
+
+        {/* Amber Lane Card */}
+        <div
+          className="p-6 rounded-lg border space-y-4"
+          style={{
+            backgroundColor: 'var(--bg-surface)',
+            borderColor: 'var(--border-subtle)',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--status-warn)' }} />
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider font-mono">
+              Amber Lane: AI Normalization Layer
+            </h2>
+          </div>
+
+          <p className="text-xs text-slate-600 leading-relaxed">
+            When previously unencountered vendor syntax or custom Linux network commands are ingested, the system
+            invokes the Few-Shot Exemplar Store to map raw lines into canonical schema parameters.
+          </p>
+
+          <div className="space-y-2 text-xs border-t border-slate-200 pt-3 font-mono">
+            <div className="flex items-center gap-2 text-slate-700">
+              <CheckCircle size={14} style={{ color: 'var(--status-warn)' }} />
+              <span>Extracts into extensible canonical parameters</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-700">
+              <CheckCircle size={14} style={{ color: 'var(--status-warn)' }} />
+              <span>Routes items below 80% confidence to Review Queue</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-700">
+              <CheckCircle size={14} style={{ color: 'var(--status-warn)' }} />
+              <span>Learned mappings generalize cross-device immediately</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 mb-8" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-        {(['schema', 'comparison'] as const).map(t => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className="pb-3 px-1 text-sm font-medium transition-colors cursor-pointer capitalize mr-5 border-b-2 -mb-px"
-            style={{
-              color: tab === t ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              borderColor: tab === t ? 'var(--accent)' : 'transparent',
-            }}
-          >
-            {t === 'schema' ? 'Normalized Schema' : 'Lane Comparison'}
-          </button>
-        ))}
+      {/* Competitive Positioning Table (§1) */}
+      <div
+        className="rounded-lg border overflow-hidden"
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          borderColor: 'var(--border-subtle)',
+        }}
+      >
+        <div
+          className="px-5 py-4 border-b flex items-center justify-between"
+          style={{ borderColor: 'var(--border-subtle)' }}
+        >
+          <div className="flex items-center gap-2">
+            <Table size={16} style={{ color: 'var(--accent-primary)' }} />
+            <h2 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+              Competitive Positioning Against Existing Enterprise Audit Solutions (§1)
+            </h2>
+          </div>
+          <span className="font-mono text-[10px] text-slate-500">Defense Audit Matrix</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-slate-200 font-mono text-[11px] text-slate-600 bg-slate-50">
+                <th className="p-4 w-1/4 font-semibold">Existing Tool / Platform</th>
+                <th className="p-4 w-3/8 font-semibold">What It Already Does</th>
+                <th className="p-4 w-3/8 text-sky-700 font-semibold">What It Does NOT Do (NetSentry Opening)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 text-slate-700">
+              {competitors.map((c, i) => (
+                <tr key={i} className="hover:bg-slate-50 transition-colors">
+                  <td className="p-4 font-semibold text-slate-900 font-mono">{c.name}</td>
+                  <td className="p-4 text-slate-600">{c.does}</td>
+                  <td className="p-4 text-sky-900 leading-relaxed font-sans">{c.lacks}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      {tab === 'schema' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16">
-
-          {/* Field list */}
-          <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
-            {Object.entries(FIELD_LABELS).map(([key, label]) => {
-              const extraction = (baseline as unknown as Record<string, { value: unknown; confidence: number }>)[key];
-              const val = extraction?.value;
-              const conf = extraction?.confidence ?? 1;
-              const isNull = val === null || val === undefined;
-              const isBool = typeof val === 'boolean';
-              const isPassing = isBool ? val === true : val !== null && val !== 'none' && val !== 'v1';
-
-              return (
-                <div
-                  key={key}
-                  className="flex items-center justify-between py-4"
-                  style={{ borderBottom: '1px solid var(--border-subtle)' }}
-                >
-                  <div>
-                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{label}</div>
-                    <div className="font-mono text-[10px] mt-0.5" style={{ color: 'var(--text-tertiary)' }}>{key}</div>
-                  </div>
-                  <div className="text-right">
-                    {isNull ? (
-                      <span className="font-mono text-[11px]" style={{ color: 'var(--text-tertiary)' }}>not detected</span>
-                    ) : isBool ? (
-                      <div className="flex items-center gap-1.5">
-                        {val
-                          ? <CheckCircle size={13} weight="fill" style={{ color: 'var(--pass)' }} />
-                          : <WarningCircle size={13} weight="fill" style={{ color: 'var(--fail)' }} />
-                        }
-                        <span className="font-mono text-xs" style={{ color: val ? 'var(--pass)' : 'var(--fail)' }}>
-                          {String(val)}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5">
-                        {isPassing
-                          ? <CheckCircle size={13} weight="fill" style={{ color: 'var(--pass)' }} />
-                          : <WarningCircle size={13} weight="fill" style={{ color: 'var(--warn)' }} />
-                        }
-                        <span className="font-mono text-xs" style={{ color: 'var(--text-mono)' }}>{String(val)}</span>
-                      </div>
-                    )}
-                    {!isNull && (
-                      <div className="font-mono text-[10px] mt-0.5" style={{ color: conf < 0.80 ? 'var(--warn)' : 'var(--text-tertiary)' }}>
-                        {(conf * 100).toFixed(0)}% conf
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Confidence + CTA */}
-          <div className="mt-8 lg:mt-0">
-            <p className="font-mono text-[11px] uppercase tracking-[0.12em] mb-5" style={{ color: 'var(--text-tertiary)' }}>
-              Field Confidence
-            </p>
-            <div className="space-y-4 mb-10">
-              {Object.keys(FIELD_LABELS).map(key => {
-                const conf = isGreen ? 0.96 + Math.random() * 0.03 : 0.68 + Math.random() * 0.24;
-                const w = Math.round(conf * 100);
-                const isLow = conf < 0.80;
-                return (
-                  <div key={key}>
-                    <div className="flex justify-between font-mono text-[11px] mb-1.5">
-                      <span style={{ color: 'var(--text-tertiary)' }} className="truncate max-w-[28ch]">{key}</span>
-                      <span style={{ color: isLow ? 'var(--warn)' : 'var(--pass)' }}>{w}%</span>
-                    </div>
-                    <div className="h-px" style={{ backgroundColor: 'var(--border-subtle)' }}>
-                      <div
-                        className="h-px transition-all"
-                        style={{ width: `${w}%`, backgroundColor: isLow ? 'var(--warn)' : 'var(--pass)' }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {!isGreen && (
-              <div style={{ borderTop: '1px solid var(--border-subtle)' }} className="pt-5">
-                <p className="text-sm leading-relaxed mb-3 max-w-[40ch]" style={{ color: 'var(--text-secondary)' }}>
-                  Low-confidence fields are queued for human labeling to improve future extractions.
-                </p>
-                <button
-                  onClick={onOpenTraining}
-                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-                  style={{ color: 'var(--accent)' }}
-                >
-                  <Users size={14} weight="bold" />
-                  Open Training UI
-                  <ArrowRight size={12} />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {tab === 'comparison' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-10">
-          {[
-            {
-              icon: Cpu, lane: 'Green Lane', color: 'var(--pass)',
-              points: [
-                'AST + regex parser for known CLI dialects',
-                'Zero LLM involvement - zero hallucination risk',
-                'Sub-millisecond extraction latency',
-                'Requires prior dialect library fingerprint',
-                'Confidence always 0.96-1.00',
-              ],
-            },
-            {
-              icon: Robot, lane: 'Amber Lane', color: 'var(--warn)',
-              points: [
-                'Handles any vendor CLI not in library',
-                'Pydantic schema validates all output fields',
-                'Confidence gate: below 0.80 routes to human',
-                'Correct labels saved to few-shot store',
-                'Confidence typically 0.70-0.92',
-              ],
-            },
-          ].map(({ icon: Icon, lane: laneLabel, color, points }) => (
-            <div key={laneLabel}>
-              <div className="flex items-center gap-2 mb-4">
-                <Icon size={15} weight="duotone" style={{ color }} />
-                <span className="text-sm font-semibold" style={{ color }}>{laneLabel}</span>
-              </div>
-              <div style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                {points.map(p => (
-                  <div key={p} className="flex items-start gap-3 py-3 text-sm" style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
-                    <CheckCircle size={13} weight="fill" style={{ color, marginTop: 2, flexShrink: 0 }} />
-                    {p}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };

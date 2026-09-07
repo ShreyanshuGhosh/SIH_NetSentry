@@ -1,4 +1,4 @@
-﻿import { SampleDeviceConfig } from '../types/audit';
+import { SampleDeviceConfig } from '../types/audit';
 
 export const SAMPLE_CONFIGS: SampleDeviceConfig[] = [
   {
@@ -112,7 +112,7 @@ system {
             rate-limit 3;
         }
         telnet {
-            /* VULNERABILITY INJECTED FOR COMPLIANCE TEST */
+            /* legacy remote console */
         }
         web-management {
             https {
@@ -159,7 +159,7 @@ snmp {
   {
     id: 'paloalto-pa3220-dc',
     name: 'Palo Alto PA-3220 Perimeter Firewall',
-    vendor: 'palo_alto',
+    vendor: 'palo_alto_panos',
     vendorName: 'Palo Alto PAN-OS',
     deviceType: 'Firewall',
     model: 'PA-3220',
@@ -184,7 +184,7 @@ set mgt-config users secadmin password $1$REDACTED_PASSWORD_HASH`
   {
     id: 'sonic-whitebox-leaf',
     name: 'White-Box Leaf Switch (SONiC Network OS)',
-    vendor: 'sonic_whitebox',
+    vendor: 'sonic',
     vendorName: 'SONiC (Open Disaggregated Linux)',
     deviceType: 'White-Box',
     model: 'Edgecore AS7712-32X (Tomahawk)',
