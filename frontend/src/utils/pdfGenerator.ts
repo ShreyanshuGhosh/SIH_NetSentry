@@ -1,4 +1,4 @@
-﻿import jsPDF from 'jspdf';
+import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { AuditRunResult } from './auditEngine';
 import { FRAMEWORKS } from '../data/rulePacks';
@@ -10,7 +10,17 @@ export function generateAuditPdf(result: AuditRunResult): void {
     format: 'a4'
   });
 
-  const frameworkMeta = FRAMEWORKS[result.framework];
+  const frameworkMeta = FRAMEWORKS[result.framework] || {
+    id: result.framework,
+    name: 'CIS Network Benchmarks',
+    version: 'v8.0.0',
+    fullName: 'Center for Internet Security Network Benchmark',
+    authority: 'CIS',
+    totalControls: 9,
+    description: 'Security baseline audit',
+    badgeColor: 'emerald'
+  };
+
   const primaryColor: [number, number, number] = [15, 23, 42]; // Slate 900
   const accentEmerald: [number, number, number] = [16, 185, 129]; // Emerald 500
   const alertRose: [number, number, number] = [244, 63, 94]; // Rose 500
@@ -30,7 +40,7 @@ export function generateAuditPdf(result: AuditRunResult): void {
   doc.setTextColor(148, 163, 184); // Slate 400
   doc.text('SIH 2026 | Problem Statement: SIH26155 | Organisation: NTRO (Govt of India)', 14, 22);
   doc.text(`Evaluation Framework: ${frameworkMeta.name} (${frameworkMeta.version})`, 14, 28);
-  doc.text(`Generated: ${new Date(result.evaluatedAt).toLocaleString()} | Engine: NetSentry Dual-Lane Core v1.0`, 14, 34);
+  doc.text(`Generated: ${new Date(result.evaluatedAt).toLocaleString()} | Engine: NetSentry Dual-Lane Core v1.1.0`, 14, 34);
 
   // Score Badge in Header Right
   const scoreColor = result.summary.complianceScore >= 80 ? accentEmerald : (result.summary.complianceScore >= 60 ? amberTone : alertRose);
@@ -61,11 +71,13 @@ export function generateAuditPdf(result: AuditRunResult): void {
     startY: 52,
     body: deviceData,
     theme: 'grid',
+    margin: { left: 14, right: 14 },
+    tableWidth: 182,
     styles: { fontSize: 8, cellPadding: 2, textColor: [30, 41, 59] },
     columnStyles: {
-      0: { fontStyle: 'bold', fillColor: [241, 245, 249], cellWidth: 40 },
+      0: { fontStyle: 'bold', fillColor: [241, 245, 249], cellWidth: 36 },
       1: { cellWidth: 55 },
-      2: { fontStyle: 'bold', fillColor: [241, 245, 249], cellWidth: 40 },
+      2: { fontStyle: 'bold', fillColor: [241, 245, 249], cellWidth: 36 },
       3: { cellWidth: 55 }
     }
   });
@@ -88,10 +100,12 @@ export function generateAuditPdf(result: AuditRunResult): void {
     startY: afterDeviceY + 4,
     body: summaryData,
     theme: 'plain',
+    margin: { left: 14, right: 14 },
+    tableWidth: 182,
     styles: { fontSize: 8, cellPadding: 2 },
     columnStyles: {
-      0: { fontStyle: 'bold', textColor: [51, 65, 85], cellWidth: 80 },
-      1: { fontStyle: 'bold', textColor: [15, 23, 42], cellWidth: 30 }
+      0: { fontStyle: 'bold', textColor: [51, 65, 85], cellWidth: 90 },
+      1: { fontStyle: 'bold', textColor: [15, 23, 42], cellWidth: 92 }
     }
   });
 
@@ -101,33 +115,54 @@ export function generateAuditPdf(result: AuditRunResult): void {
   doc.setFont('helvetica', 'bold');
   doc.text('3. Detailed Audit Findings & Line Evidence', 14, afterSummaryY);
 
-  const findingsRows = result.findings.map(f => [
-    f.ruleId,
-    f.title,
-    f.severity,
-    f.status,
-    `L#${f.evidenceLine}: ${f.evidenceSnippet.slice(0, 45)}...`,
-    `${Math.round(f.confidence * 100)}%`
-  ]);
+  const findingsRows = (result.findings || []).map((f) => {
+    const title = (f as any).ruleTitle || (f as any).title || 'Security Requirement';
+    const severity = String(f.severity || 'MEDIUM').toUpperCase();
+    const status = String(f.status || 'PASS').toUpperCase();
+
+    let evidenceStr = 'Negative check / absence of command';
+    if ((f as any).evidenceLines && Array.isArray((f as any).evidenceLines) && (f as any).evidenceLines.length > 0) {
+      const first = (f as any).evidenceLines[0];
+      const rawText = String(first.raw || '').trim();
+      evidenceStr = `L#${first.line}: ${rawText.slice(0, 40)}`;
+    } else if ((f as any).evidenceSnippet) {
+      evidenceStr = `L#${(f as any).evidenceLine || 1}: ${String((f as any).evidenceSnippet).slice(0, 40)}`;
+    }
+
+    const conf = typeof (f as any).confidence === 'number'
+      ? `${Math.round((f as any).confidence * 100)}%`
+      : '100%';
+
+    return [
+      f.ruleId || 'CTRL',
+      title,
+      severity,
+      status,
+      evidenceStr,
+      conf
+    ];
+  });
 
   autoTable(doc, {
     startY: afterSummaryY + 4,
     head: [['Control ID', 'Security Requirement', 'Severity', 'Verdict', 'Line-Level Evidence', 'Confidence']],
     body: findingsRows,
     theme: 'striped',
+    margin: { left: 14, right: 14 },
+    tableWidth: 182,
     headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
     styles: { fontSize: 7, cellPadding: 2.5 },
     columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 25 },
-      1: { cellWidth: 55 },
-      2: { cellWidth: 20 },
-      3: { fontStyle: 'bold', cellWidth: 20 },
-      4: { cellWidth: 50 },
-      5: { cellWidth: 20 }
+      0: { fontStyle: 'bold', cellWidth: 26 },
+      1: { cellWidth: 50 },
+      2: { cellWidth: 18 },
+      3: { fontStyle: 'bold', cellWidth: 18 },
+      4: { cellWidth: 52 },
+      5: { cellWidth: 18 }
     },
     didParseCell: (data) => {
       if (data.column.index === 3 && data.section === 'body') {
-        const text = data.cell.raw as string;
+        const text = String(data.cell.raw || '').toUpperCase();
         if (text === 'PASS') data.cell.styles.textColor = [16, 185, 129];
         else if (text === 'FAIL') data.cell.styles.textColor = [244, 63, 94];
         else if (text === 'UNKNOWN') data.cell.styles.textColor = [245, 158, 11];
@@ -149,7 +184,10 @@ export function generateAuditPdf(result: AuditRunResult): void {
   doc.setFont('helvetica', 'bold');
   doc.text('4. Actionable Hardening CLI Commands (Device-Specific)', 14, 28);
 
-  const failFindings = result.findings.filter(f => f.status === 'FAIL' || f.status === 'UNKNOWN');
+  const failFindings = (result.findings || []).filter((f) => {
+    const s = String(f.status || '').toUpperCase();
+    return s === 'FAIL' || s === 'UNKNOWN';
+  });
 
   if (failFindings.length === 0) {
     doc.setFontSize(9);
@@ -157,11 +195,11 @@ export function generateAuditPdf(result: AuditRunResult): void {
     doc.setTextColor(16, 185, 129);
     doc.text('Zero compliance violations detected. All evaluated controls satisfy the security baseline.', 14, 38);
   } else {
-    const remediationRows = failFindings.map(f => [
-      f.ruleId,
-      f.title,
-      f.remediationCommand,
-      f.remediationRationale
+    const remediationRows = failFindings.map((f) => [
+      f.ruleId || 'CTRL',
+      (f as any).ruleTitle || (f as any).title || 'Non-Compliant Control',
+      (f as any).remediationCommand || (f as any).remediation || 'Consult vendor hardening guide',
+      (f as any).remediationRationale || (f as any).frameworkRef || 'Mandatory security baseline requirement'
     ]);
 
     autoTable(doc, {
@@ -169,12 +207,14 @@ export function generateAuditPdf(result: AuditRunResult): void {
       head: [['Control ID', 'Non-Compliant Control', 'Device CLI Fix Sequence', 'Hardening Rationale']],
       body: remediationRows,
       theme: 'grid',
+      margin: { left: 14, right: 14 },
+      tableWidth: 182,
       headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
       styles: { fontSize: 7, cellPadding: 3 },
       columnStyles: {
         0: { fontStyle: 'bold', cellWidth: 26 },
-        1: { cellWidth: 42 },
-        2: { fontStyle: 'italic', fillColor: [248, 250, 252], cellWidth: 62 },
+        1: { cellWidth: 46 },
+        2: { fontStyle: 'italic', fillColor: [248, 250, 252], cellWidth: 60 },
         3: { cellWidth: 50 }
       }
     });
@@ -196,6 +236,7 @@ export function generateAuditPdf(result: AuditRunResult): void {
   }
 
   // Trigger download
-  const cleanName = result.device.name.replace(/[^a-zA-Z0-9]/g, '_');
-  doc.save(`NetSentry_Audit_${cleanName}_${result.framework}.pdf`);
+  const cleanName = (result.device?.name || 'Device').replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `NetSentry_Audit_${cleanName}_${result.framework || 'audit'}.pdf`;
+  doc.save(filename);
 }

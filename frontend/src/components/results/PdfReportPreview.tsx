@@ -22,10 +22,13 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
   osVersion,
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const summary = auditResult.summary;
 
   const handleDownload = () => {
     setIsGenerating(true);
+    setDownloadError(null);
     try {
       // Build bridge object for existing PDF generator
       generateAuditPdf({
@@ -59,6 +62,11 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
         durationMs: 14,
         evaluatedAt: auditResult.evaluatedAt,
       });
+      setDownloadSuccess(true);
+      setTimeout(() => setDownloadSuccess(false), 3500);
+    } catch (err: any) {
+      console.error('PDF Generation Failed:', err);
+      setDownloadError(err?.message || 'Error generating PDF report');
     } finally {
       setIsGenerating(false);
     }
@@ -87,15 +95,33 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={handleDownload}
-          disabled={isGenerating}
-          className="flex items-center gap-2 px-4 py-2 rounded text-xs font-semibold text-white transition-all cursor-pointer shadow-sm hover:brightness-110 active:scale-95 disabled:opacity-50"
-          style={{ backgroundColor: 'var(--accent-primary)' }}
-        >
-          <DownloadSimple size={14} weight="bold" />
-          <span>{isGenerating ? 'Rendering PDF...' : 'Download Full Audit Report (PDF)'}</span>
-        </button>
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+          {downloadError && (
+            <span className="text-[11px] font-mono text-rose-600">
+              {downloadError}
+            </span>
+          )}
+          <button
+            onClick={handleDownload}
+            disabled={isGenerating}
+            className={`flex items-center gap-2 px-4 py-2 rounded text-xs font-semibold text-white transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-50 ${
+              downloadSuccess ? 'bg-emerald-600' : 'hover:brightness-110'
+            }`}
+            style={{ backgroundColor: downloadSuccess ? '#059669' : 'var(--accent-primary)' }}
+          >
+            {downloadSuccess ? (
+              <>
+                <ShieldCheck size={14} weight="bold" />
+                <span>Downloaded PDF Report</span>
+              </>
+            ) : (
+              <>
+                <DownloadSimple size={14} weight="bold" />
+                <span>{isGenerating ? 'Rendering PDF...' : 'Download Full Audit Report (PDF)'}</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Realistic Page 1 Document Mock Preview (§6.6 C2) - Authentic Paper Style */}
