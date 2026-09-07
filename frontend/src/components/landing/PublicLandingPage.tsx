@@ -74,14 +74,14 @@ const PIPELINE_STAGES: PipelineStage[] = [
     title: 'On-Demand Amber Lane',
     lane: 'AMBER',
     icon: Robot,
-    headline: 'Administrator-Gated Gemini 2.5 Normalization',
-    description: 'When unfamiliar or non-standard syntax is encountered, the administrator can opt-in to request Gemini AI suggestions. Synthesized mappings must be reviewed and approved by human operators.',
+    headline: 'Administrator-Gated LLM Normalization',
+    description: 'When unfamiliar or non-standard syntax is encountered, the administrator can opt-in to request LLM suggestions. Synthesized mappings must be reviewed and approved by human operators.',
     technicalSpecs: [
       'Strict manual invocation: zero automated background LLM billing or rate-limit consumption',
       'Confidence scoring with strict 0.80 acceptance threshold',
       'Structured Pydantic JSON schema verification with zero arbitrary execution',
     ],
-    sampleEvidence: 'GEMINI_ASSIST: fast_reboot_watchdog enabled -> service_hardening (0.94)',
+    sampleEvidence: 'LLM_ASSIST: fast_reboot_watchdog enabled -> service_hardening (0.94)',
   },
   {
     num: '04',
@@ -387,7 +387,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                 </div>
                 <div>
                   <div className="text-xs font-bold text-amber-900">Administrator-in-the-Loop Amber Lane</div>
-                  <div className="text-[11px] text-amber-700">Unseen vendor commands queued for manual or Gemini-assisted review, saved permanently to few-shot store.</div>
+                  <div className="text-[11px] text-amber-700">Unseen vendor commands queued for manual or LLM-assisted review, saved permanently to few-shot store.</div>
                 </div>
               </div>
             </div>

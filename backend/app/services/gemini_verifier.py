@@ -77,7 +77,7 @@ Return ONLY a valid JSON object with NO markdown formatting, matching this exact
                 "suggested_field": parsed.get("suggested_field"),
                 "suggested_value": parsed.get("suggested_value"),
                 "confidence": float(parsed.get("confidence", 0.75)),
-                "reasoning": parsed.get("reasoning", "Suggested by Gemini AI verification engine.")
+                "reasoning": parsed.get("reasoning", "Suggested by LLM verification engine.")
             }
         except Exception as e:
             last_err = e

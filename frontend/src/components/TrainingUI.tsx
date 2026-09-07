@@ -167,15 +167,29 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
     try {
       const res = await api.askAI(selectedItem.rawCommandBlock, selectedItem.vendor);
       setAiSuggestion(res);
-      if (res.suggested_field) {
-        setSelectedFieldKey(res.suggested_field);
+      const hasValidField = Boolean(
+        res.suggested_field &&
+        res.suggested_field !== 'null' &&
+        res.suggested_field !== 'None'
+      );
+      if (hasValidField) {
+        setSelectedFieldKey(res.suggested_field!);
       }
-      if (res.suggested_value !== undefined && res.suggested_value !== null) {
+      if (
+        res.suggested_value !== undefined &&
+        res.suggested_value !== null &&
+        String(res.suggested_value) !== 'null' &&
+        String(res.suggested_value) !== 'None'
+      ) {
         setMappedValue(String(res.suggested_value));
       }
-      showToast('success', `Gemini suggested: ${res.suggested_field} (${Math.round(res.confidence * 100)}% confidence)`);
+      if (hasValidField) {
+        showToast('success', `LLM suggested: ${res.suggested_field} (${Math.round(res.confidence * 100)}% confidence)`);
+      } else {
+        showToast('reject', `LLM analyzed command: Out of baseline scope (${Math.round(res.confidence * 100)}% confidence)`);
+      }
     } catch (err: any) {
-      showToast('reject', err.message || 'Gemini inference failed');
+      showToast('reject', err.message || 'LLM inference failed');
     } finally {
       setIsAiLoading(false);
     }
@@ -196,7 +210,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
         queue_id: selectedItem.id,
         mapped_field_key: selectedFieldKey,
         mapped_value: parsedVal,
-        approved_by: 'SecOps Admin (Opt-In Gemini Assisted)',
+        approved_by: 'SecOps Admin (Opt-In LLM Assisted)',
       });
       const [q, ex] = await Promise.all([api.getTrainingQueue(), api.getExemplars()]);
       setQueue(
@@ -500,7 +514,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                 <div>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-950">
                     <Sparkle size={15} className="text-indigo-600" weight="fill" />
-                    <span>Opt-In AI Assist (Gemini 3.1 Flash-Lite)</span>
+                    <span>Opt-In LLM Normalization</span>
                   </div>
                   <div className="text-[11px] text-indigo-800/80 mt-0.5">
                     Trigger on-demand inference to inspect raw syntax and auto-suggest the baseline mapping.
@@ -520,37 +534,82 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                   {isAiLoading ? (
                     <>
                       <CircleNotch size={14} className="animate-spin" />
-                      <span>Analyzing with Gemini...</span>
+                      <span>Analyzing with LLM...</span>
                     </>
                   ) : (
                     <>
                       <Sparkle size={14} weight="bold" />
-                      <span>✨ Auto-Map with Gemini</span>
+                      <span>Auto-Map with LLM</span>
                     </>
                   )}
                 </button>
               </div>
 
               {/* AI Suggestion Card if available */}
-              {aiSuggestion && (
-                <div className="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-xs space-y-1.5 animate-fade-in shadow-xs">
-                  <div className="flex items-center justify-between text-emerald-900 font-semibold">
-                    <span className="flex items-center gap-1.5">
-                      <Sparkle size={14} className="text-emerald-600" weight="fill" />
-                      <span>Gemini Recommendation ({Math.round(aiSuggestion.confidence * 100)}% Confidence)</span>
-                    </span>
-                    <span className="font-mono text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200 font-bold">
-                      AI SUGGESTED
-                    </span>
+              {aiSuggestion && (() => {
+                const hasValidField = Boolean(
+                  aiSuggestion.suggested_field &&
+                  aiSuggestion.suggested_field !== 'null' &&
+                  aiSuggestion.suggested_field !== 'None'
+                );
+                const hasValidValue = Boolean(
+                  aiSuggestion.suggested_value !== null &&
+                  aiSuggestion.suggested_value !== undefined &&
+                  String(aiSuggestion.suggested_value) !== 'null' &&
+                  String(aiSuggestion.suggested_value) !== 'None'
+                );
+
+                if (hasValidField) {
+                  return (
+                    <div className="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-xs space-y-1.5 animate-fade-in shadow-xs">
+                      <div className="flex items-center justify-between text-emerald-900 font-semibold">
+                        <span className="flex items-center gap-1.5">
+                          <Sparkle size={14} className="text-emerald-600" weight="fill" />
+                          <span>LLM Recommendation ({Math.round(aiSuggestion.confidence * 100)}% Confidence)</span>
+                        </span>
+                        <span className="font-mono text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200 font-bold">
+                          LLM SUGGESTED
+                        </span>
+                      </div>
+                      <div className="text-emerald-950 font-medium">
+                        Mapped to: <strong className="font-mono text-emerald-800">{aiSuggestion.suggested_field}</strong>
+                        {hasValidValue && (
+                          <> = <strong className="font-mono text-emerald-800">{String(aiSuggestion.suggested_value)}</strong></>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-emerald-800 italic leading-snug">
+                        "{aiSuggestion.reasoning}"
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="p-3.5 rounded-lg border border-amber-200 bg-amber-50/70 text-xs space-y-2 animate-fade-in shadow-xs">
+                    <div className="flex items-center justify-between text-amber-900 font-semibold">
+                      <span className="flex items-center gap-1.5">
+                        <Sparkle size={14} className="text-amber-600" weight="fill" />
+                        <span>LLM Analysis ({Math.round(aiSuggestion.confidence * 100)}% Confidence)</span>
+                      </span>
+                      <span className="font-mono text-[10px] text-amber-800 bg-white px-1.5 py-0.5 rounded border border-amber-300 font-bold">
+                        OUT OF BASELINE SCOPE
+                      </span>
+                    </div>
+                    <div className="text-amber-950 font-medium flex flex-wrap items-center gap-1.5">
+                      <span>Classification:</span>
+                      <span className="font-mono font-semibold text-amber-900 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 text-[11px]">
+                        Non-Security / Operational Parameter
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-normal">
+                        (No canonical security control mapping required)
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-700 italic leading-snug">
+                      "{aiSuggestion.reasoning}"
+                    </div>
                   </div>
-                  <div className="text-emerald-950 font-medium">
-                    Mapped to: <strong className="font-mono text-emerald-800">{aiSuggestion.suggested_field}</strong> = <strong className="font-mono text-emerald-800">{String(aiSuggestion.suggested_value)}</strong>
-                  </div>
-                  <div className="text-[11px] text-emerald-800 italic leading-snug">
-                    "{aiSuggestion.reasoning}"
-                  </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* Mapping Form */}
               <form onSubmit={handleApprove} className="space-y-4 pt-2">
