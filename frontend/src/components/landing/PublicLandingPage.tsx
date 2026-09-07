@@ -28,19 +28,17 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
       >
         <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded flex items-center justify-center border"
-            style={{
-              backgroundColor: 'rgba(2, 132, 199, 0.08)',
-              borderColor: 'rgba(2, 132, 199, 0.25)',
-              color: 'var(--accent-primary)',
-            }}
+            className="w-9 h-9 rounded-md flex items-center justify-center border border-sky-200 bg-sky-50 text-sky-600"
           >
-            <ShieldCheck size={22} weight="bold" />
+            <ShieldCheck size={20} weight="bold" />
           </div>
           <div>
-            <div className="text-sm font-bold tracking-tight text-slate-900">NetSentry</div>
-            <div className="text-[11px] text-slate-500 font-mono">
-              NTRO, Government of India • SIH26155
+            <div className="text-sm font-bold tracking-tight text-slate-900 flex items-baseline gap-1.5">
+              <span>NetSentry</span>
+              <span className="text-[10px] font-mono text-slate-400 font-normal">v1.1.0</span>
+            </div>
+            <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+              NTRO, Government of India <span className="text-slate-300">/</span> SIH26155
             </div>
           </div>
         </div>

@@ -223,7 +223,7 @@ class ExemplarStoreManager {
   public enqueueItem(item: Omit<TrainingQueueItem, "id" | "status" | "timestamp">): TrainingQueueItem {
     const newItem: TrainingQueueItem = {
       ...item,
-      id: `tq-${item.vendor}-${Date.now()}`,
+      id: `tq-${item.vendor}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       status: "pending",
       timestamp: new Date().toISOString(),
     };

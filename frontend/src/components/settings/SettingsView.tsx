@@ -126,7 +126,7 @@ export const SettingsView: React.FC = () => {
       >
         <div className="text-slate-800 font-semibold">NETSENTRY DUAL-LANE CORE COMPLIANCE ENGINE</div>
         <div className="text-slate-600 text-[11px]">
-          Build: v2.0.4-sih26155-ntro • Engine: Deterministic Lexer + Few-Shot Store
+          Build: v1.1.0-sih26155-ntro • Engine: Deterministic Lexer + Few-Shot Store
         </div>
         <div className="text-slate-600 text-[11px] truncate">
           Engine Integrity Checksum: sha256:e8b7a42c91fd3c098ab901fe23145da

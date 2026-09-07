@@ -76,24 +76,19 @@ export const NavRail: React.FC<NavRailProps> = ({
           style={{ borderColor: 'var(--border-subtle)' }}
         >
           <div
-            className="w-8 h-8 rounded flex items-center justify-center shrink-0 border"
-            style={{
-              backgroundColor: 'rgba(47, 168, 255, 0.1)',
-              borderColor: 'rgba(47, 168, 255, 0.3)',
-              color: 'var(--accent-primary)',
-            }}
+            className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 border border-sky-200 bg-sky-50 text-sky-600"
           >
-            <Shield size={18} weight="bold" />
+            <Shield size={17} weight="bold" />
           </div>
           <div className="hidden md:block overflow-hidden">
-            <div className="text-xs font-semibold text-slate-900 tracking-tight flex items-center gap-1.5">
-              NetSentry
-              <span className="font-mono text-[9px] px-1 py-0.2 rounded border text-slate-500 border-slate-300 bg-slate-50">
-                v2.0
-              </span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xs font-bold text-slate-900 tracking-tight">NetSentry</span>
+              <span className="font-mono text-[10px] text-slate-400 font-normal">v1.1.0</span>
             </div>
-            <div className="text-[10px] text-slate-500 truncate">
-              SIH26155 • NTRO
+            <div className="text-[10px] font-mono text-slate-500 tracking-tight flex items-center gap-1 mt-0.5">
+              <span>NTRO</span>
+              <span className="text-slate-300 select-none">/</span>
+              <span>SIH26155</span>
             </div>
           </div>
         </div>
