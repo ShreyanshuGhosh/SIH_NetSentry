@@ -1,0 +1,107 @@
+[
+  {
+    "key": "sshVersion",
+    "label": "SSH Protocol Version",
+    "frameworks": [
+      "cis_v8",
+      "nist_800_53",
+      "disa_stig"
+    ],
+    "value_type": "number",
+    "created_by": "system"
+  },
+  {
+    "key": "telnetEnabled",
+    "label": "Insecure Telnet Protocol",
+    "frameworks": [
+      "cis_v8",
+      "nist_800_53",
+      "iso_27001"
+    ],
+    "value_type": "boolean",
+    "created_by": "system"
+  },
+  {
+    "key": "httpServerEnabled",
+    "label": "Cleartext HTTP Web Management",
+    "frameworks": [
+      "cis_v8",
+      "nist_800_53",
+      "disa_stig"
+    ],
+    "value_type": "boolean",
+    "created_by": "system"
+  },
+  {
+    "key": "passwordEncryptionEnabled",
+    "label": "Local Credential Reversible Encryption",
+    "frameworks": [
+      "cis_v8",
+      "disa_stig"
+    ],
+    "value_type": "boolean",
+    "created_by": "system"
+  },
+  {
+    "key": "aaaAuthEnabled",
+    "label": "AAA Authentication / RADIUS / TACACS+",
+    "frameworks": [
+      "cis_v8",
+      "nist_800_53",
+      "iso_27001"
+    ],
+    "value_type": "boolean",
+    "created_by": "system"
+  },
+  {
+    "key": "snmpVersion",
+    "label": "SNMP Protocol Security Version",
+    "frameworks": [
+      "cis_v8",
+      "disa_stig"
+    ],
+    "value_type": "number",
+    "created_by": "system"
+  },
+  {
+    "key": "syslogServers",
+    "label": "Centralized Syslog SIEM Export",
+    "frameworks": [
+      "cis_v8",
+      "nist_800_53",
+      "iso_27001"
+    ],
+    "value_type": "boolean",
+    "created_by": "system"
+  },
+  {
+    "key": "sessionIdleTimeoutMinutes",
+    "label": "Administrative Console Inactivity Timeout",
+    "frameworks": [
+      "cis_v8",
+      "disa_stig"
+    ],
+    "value_type": "number",
+    "created_by": "system"
+  },
+  {
+    "key": "ntpConfigured",
+    "label": "NTP Synchronized Time Reference",
+    "frameworks": [
+      "cis_v8",
+      "nist_800_53"
+    ],
+    "value_type": "boolean",
+    "created_by": "system"
+  },
+  {
+    "key": "loginBannerConfigured",
+    "label": "Statutory Authorized Access Warning Banner",
+    "frameworks": [
+      "cis_v8",
+      "disa_stig"
+    ],
+    "value_type": "boolean",
+    "created_by": "system"
+  }
+]

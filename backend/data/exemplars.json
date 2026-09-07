@@ -1,0 +1,42 @@
+[
+  {
+    "id": "fse-cisco_ios-1788790746273",
+    "vendor": "cisco_ios",
+    "raw_line_pattern": "custom_inactivity_watchdog timer 12",
+    "mapped_field_key": "sessionIdleTimeoutMinutes",
+    "mapped_value": 12,
+    "approved_by": "SecOps Lead Admin",
+    "approved_at": "2026-09-07 19:49:06",
+    "times_reused": 2
+  },
+  {
+    "id": "fse-sonic-01",
+    "vendor": "sonic",
+    "raw_line_pattern": "idle_timeout",
+    "mapped_field_key": "sessionIdleTimeoutMinutes",
+    "mapped_value": 10,
+    "approved_by": "SecOps Admin (NTRO)",
+    "approved_at": "2026-08-28 10:14:22",
+    "times_reused": 3
+  },
+  {
+    "id": "fse-forti-02",
+    "vendor": "fortinet_fortios",
+    "raw_line_pattern": "set admin-telnet-service disable",
+    "mapped_field_key": "telnetEnabled",
+    "mapped_value": false,
+    "approved_by": "Lead Network Engineer",
+    "approved_at": "2026-08-29 16:30:11",
+    "times_reused": 2
+  },
+  {
+    "id": "fse-junos-03",
+    "vendor": "juniper_junos",
+    "raw_line_pattern": "protocol-version v2",
+    "mapped_field_key": "sshVersion",
+    "mapped_value": 2,
+    "approved_by": "Compliance Auditor",
+    "approved_at": "2026-09-01 09:05:44",
+    "times_reused": 4
+  }
+]

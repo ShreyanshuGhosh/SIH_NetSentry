@@ -1,0 +1,54 @@
+[
+  {
+    "id": "tq-cisco_ios-1788790737614",
+    "device_id": "dev-leaf-a",
+    "vendor": "cisco_ios",
+    "raw_command_block": "custom_inactivity_watchdog timer 12",
+    "line_numbers": "Line 4",
+    "suggested_field": null,
+    "suggested_value": null,
+    "confidence": 0.5,
+    "status": "approved",
+    "timestamp": "2026-09-07T14:18:57.614629+00:00",
+    "rejection_reason": null
+  },
+  {
+    "id": "tq-sonic-01",
+    "device_id": "sonic-leaf-01",
+    "vendor": "sonic",
+    "raw_command_block": "\"fast_reboot_watchdog\": \"enabled\"",
+    "line_numbers": "Line 41",
+    "suggested_field": "httpServerEnabled",
+    "suggested_value": false,
+    "confidence": 0.48,
+    "status": "pending",
+    "timestamp": "2026-09-07T08:15:00Z",
+    "rejection_reason": null
+  },
+  {
+    "id": "tq-arista-02",
+    "device_id": "arista-leaf-02",
+    "vendor": "arista_eos",
+    "raw_command_block": "transceiver qsfp default-mode 4x10G",
+    "line_numbers": "Line 4",
+    "suggested_field": "loginBannerConfigured",
+    "suggested_value": true,
+    "confidence": 0.52,
+    "status": "pending",
+    "timestamp": "2026-09-07T08:22:00Z",
+    "rejection_reason": null
+  },
+  {
+    "id": "tq-junos-03",
+    "device_id": "juniper-srx345-gateway",
+    "vendor": "juniper_junos",
+    "raw_command_block": "telnet {\n    /* legacy maintenance port */\n}",
+    "line_numbers": "Lines 33-35",
+    "suggested_field": "telnetEnabled",
+    "suggested_value": true,
+    "confidence": 0.65,
+    "status": "pending",
+    "timestamp": "2026-09-07T08:30:00Z",
+    "rejection_reason": null
+  }
+]

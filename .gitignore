@@ -26,3 +26,8 @@ skills-lock.json
 *.pem
 *.key
 !README.md
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+backend/netsentry.db

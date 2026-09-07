@@ -2,7 +2,7 @@
 // AI Training GUI (Human-in-the-Loop) Rebuilt for Zero Slop (§6.1, §6.2, §6.8)
 // 3-Part Architecture: Review Queue -> Raw CLI & Extensible Mapping Form -> Few-Shot Store
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Brain,
   CheckCircle,
@@ -15,8 +15,11 @@ import {
   CaretRight,
   Archive,
   LockSimple,
+  Sparkle,
+  CircleNotch,
 } from '@phosphor-icons/react';
 import { exemplarStore } from '../engine/exemplarStore';
+import { api, AskAIResult } from '../services/api';
 import {
   BaselineFieldDefinition,
   FewShotExemplar,
@@ -55,11 +58,76 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
   const [toast, setToast] = useState<{ type: 'success' | 'reject'; message: string } | null>(null);
   const [bottomTab, setBottomTab] = useState<'exemplars' | 'rejected'>('exemplars');
 
+  // Opt-In AI Assist State (§4.B)
+  const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
+  const [aiSuggestion, setAiSuggestion] = useState<AskAIResult | null>(null);
+
   // §6.1 New field creation state
   const [isCreatingField, setIsCreatingField] = useState(false);
   const [newFieldKey, setNewFieldKey] = useState('');
   const [newFieldLabel, setNewFieldLabel] = useState('');
   const [newFieldType, setNewFieldType] = useState<'boolean' | 'number' | 'string'>('boolean');
+
+  // Sync state with FastAPI backend on mount
+  useEffect(() => {
+    async function loadBackendData() {
+      try {
+        const [q, ex, f] = await Promise.all([
+          api.getTrainingQueue(),
+          api.getExemplars(),
+          api.getBaselineFields(),
+        ]);
+        if (q && q.length > 0) {
+          const mappedQueue: TrainingQueueItem[] = q.map((item) => ({
+            id: item.id,
+            deviceId: item.device_id,
+            vendor: item.vendor as any,
+            rawCommandBlock: item.raw_command_block,
+            lineNumbers: item.line_numbers,
+            suggestedField: item.suggested_field,
+            suggestedValue: item.suggested_value,
+            confidence: item.confidence,
+            status: item.status as any,
+            timestamp: item.timestamp,
+          }));
+          setQueue(mappedQueue);
+          if (!selectedItem && mappedQueue.length > 0) {
+            setSelectedItem(mappedQueue[0]);
+          }
+        }
+        if (ex && ex.length > 0) {
+          setExemplars(
+            ex.map((e) => ({
+              id: e.id,
+              vendor: e.vendor as any,
+              rawLinePattern: e.raw_line_pattern,
+              mappedFieldKey: e.mapped_field_key,
+              mappedValue: e.mapped_value,
+              approvedBy: e.approved_by,
+              approvedAt: e.approved_at,
+              timesReused: e.times_reused,
+            }))
+          );
+        }
+        if (f && f.length > 0) {
+          setBaselineFields(
+            f.map((field) => ({
+              key: field.key,
+              label: field.label,
+              framework: field.frameworks as any,
+              valueType: field.value_type as any,
+              createdBy: field.created_by as any,
+              createdAt: new Date().toISOString(),
+              description: field.label,
+            }))
+          );
+        }
+      } catch (err) {
+        console.warn('Backend connection fallback in TrainingUI:', err);
+      }
+    }
+    loadBackendData();
+  }, []);
 
   // Filtered queue items based on confidence gate and vendor
   const pendingItems = queue.filter((q) => {
@@ -83,6 +151,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
 
   const handleSelectQueueItem = (item: TrainingQueueItem) => {
     setSelectedItem(item);
+    setAiSuggestion(null);
     if (item.suggestedField) {
       setSelectedFieldKey(item.suggestedField);
     }
@@ -91,67 +160,158 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
     }
   };
 
-  // §6.2 Approve and save exemplar
-  const handleApprove = (e: React.FormEvent) => {
+  // Opt-In AI Assist Handler (Calls POST /api/training/ask-ai)
+  const handleAskAi = async () => {
+    if (!selectedItem) return;
+    setIsAiLoading(true);
+    try {
+      const res = await api.askAI(selectedItem.rawCommandBlock, selectedItem.vendor);
+      setAiSuggestion(res);
+      if (res.suggested_field) {
+        setSelectedFieldKey(res.suggested_field);
+      }
+      if (res.suggested_value !== undefined && res.suggested_value !== null) {
+        setMappedValue(String(res.suggested_value));
+      }
+      showToast('success', `Gemini suggested: ${res.suggested_field} (${Math.round(res.confidence * 100)}% confidence)`);
+    } catch (err: any) {
+      showToast('reject', err.message || 'Gemini inference failed');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  // §6.2 Approve and save exemplar (Backend API + Local Store)
+  const handleApprove = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItem) return;
 
-    let parsedVal: boolean | number | string = mappedValue;
+    let parsedVal: any = mappedValue;
     if (mappedValue === 'true') parsedVal = true;
     else if (mappedValue === 'false') parsedVal = false;
     else if (!isNaN(Number(mappedValue)) && mappedValue.trim() !== '') parsedVal = Number(mappedValue);
 
-    const saved = exemplarStore.approveAndSaveExemplar(
-      selectedItem.id,
-      selectedFieldKey,
-      parsedVal,
-      'SecOps Admin (NTRO Active Learning)'
-    );
-
-    if (saved) {
-      setExemplars(exemplarStore.getExemplars());
-      setQueue(exemplarStore.getAllQueueItems());
+    try {
+      await api.approveTrainingItem({
+        queue_id: selectedItem.id,
+        mapped_field_key: selectedFieldKey,
+        mapped_value: parsedVal,
+        approved_by: 'SecOps Admin (Opt-In Gemini Assisted)',
+      });
+      const [q, ex] = await Promise.all([api.getTrainingQueue(), api.getExemplars()]);
+      setQueue(
+        q.map((item) => ({
+          id: item.id,
+          deviceId: item.device_id,
+          vendor: item.vendor as any,
+          rawCommandBlock: item.raw_command_block,
+          lineNumbers: item.line_numbers,
+          suggestedField: item.suggested_field,
+          suggestedValue: item.suggested_value,
+          confidence: item.confidence,
+          status: item.status as any,
+          timestamp: item.timestamp,
+        }))
+      );
+      setExemplars(
+        ex.map((e) => ({
+          id: e.id,
+          vendor: e.vendor as any,
+          rawLinePattern: e.raw_line_pattern,
+          mappedFieldKey: e.mapped_field_key,
+          mappedValue: e.mapped_value,
+          approvedBy: e.approved_by,
+          approvedAt: e.approved_at,
+          timesReused: e.times_reused,
+        }))
+      );
+      setAiSuggestion(null);
       showToast('success', `Saved exemplar for ${selectedFieldKey}. Generalized to future audits.`);
 
-      // Select next pending item
-      const nextPending = exemplarStore.getQueue(confidenceGate).find((q) => q.id !== selectedItem.id);
-      setSelectedItem(nextPending || null);
+      const nextPending = q.find((it) => it.id !== selectedItem.id && it.status === 'pending');
+      if (nextPending) {
+        setSelectedItem({
+          id: nextPending.id,
+          deviceId: nextPending.device_id,
+          vendor: nextPending.vendor as any,
+          rawCommandBlock: nextPending.raw_command_block,
+          lineNumbers: nextPending.line_numbers,
+          suggestedField: nextPending.suggested_field,
+          suggestedValue: nextPending.suggested_value,
+          confidence: nextPending.confidence,
+          status: nextPending.status as any,
+          timestamp: nextPending.timestamp,
+        });
+      } else {
+        setSelectedItem(null);
+      }
       onTrainingUpdated?.();
+    } catch (err: any) {
+      showToast('reject', err.message || 'Failed to save exemplar');
     }
   };
 
   // §6.8 Reject item flow (retained in audit log)
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!selectedItem) return;
-
-    exemplarStore.rejectQueueItem(selectedItem.id, 'Spurious syntax block');
-    setQueue(exemplarStore.getAllQueueItems());
-    showToast('reject', `Marked item as non-compliance-relevant. Retained in rejection audit log.`);
-
-    const nextPending = exemplarStore.getQueue(confidenceGate).find((q) => q.id !== selectedItem.id);
-    setSelectedItem(nextPending || null);
-    onTrainingUpdated?.();
+    try {
+      await api.rejectTrainingItem(selectedItem.id, 'Spurious syntax block');
+      const q = await api.getTrainingQueue();
+      setQueue(
+        q.map((item) => ({
+          id: item.id,
+          deviceId: item.device_id,
+          vendor: item.vendor as any,
+          rawCommandBlock: item.raw_command_block,
+          lineNumbers: item.line_numbers,
+          suggestedField: item.suggested_field,
+          suggestedValue: item.suggested_value,
+          confidence: item.confidence,
+          status: item.status as any,
+          timestamp: item.timestamp,
+        }))
+      );
+      setAiSuggestion(null);
+      showToast('reject', 'Marked item as non-compliance-relevant. Retained in rejection audit log.');
+      const nextPending = q.find((it) => it.id !== selectedItem.id && it.status === 'pending');
+      setSelectedItem(nextPending ? (nextPending as any) : null);
+      onTrainingUpdated?.();
+    } catch (err: any) {
+      showToast('reject', err.message || 'Failed to reject queue item');
+    }
   };
 
   // §6.1 Register new baseline field
-  const handleCreateNewField = (e: React.FormEvent) => {
+  const handleCreateNewField = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newFieldKey.trim() || !newFieldLabel.trim()) return;
-
-    const created = exemplarStore.registerBaselineField({
-      key: newFieldKey.trim().replace(/\s+/g, '_'),
-      label: newFieldLabel.trim(),
-      framework: ['cis_v8'],
-      valueType: newFieldType,
-      description: 'Admin-registered baseline security control.',
-    });
-
-    setBaselineFields(exemplarStore.getBaselineFields());
-    setSelectedFieldKey(created.key);
-    setIsCreatingField(false);
-    setNewFieldKey('');
-    setNewFieldLabel('');
-    showToast('success', `Registered new baseline field: ${created.label}`);
+    try {
+      const created = await api.registerBaselineField({
+        key: newFieldKey.trim().replace(/\s+/g, '_'),
+        label: newFieldLabel.trim(),
+        frameworks: ['cis_v8'],
+        value_type: newFieldType,
+      });
+      const f = await api.getBaselineFields();
+      setBaselineFields(
+        f.map((field) => ({
+          key: field.key,
+          label: field.label,
+          framework: field.frameworks as any,
+          valueType: field.value_type as any,
+          createdBy: field.created_by as any,
+          createdAt: new Date().toISOString(),
+          description: field.label,
+        }))
+      );
+      setSelectedFieldKey(created.key);
+      setIsCreatingField(false);
+      setNewFieldKey('');
+      setNewFieldLabel('');
+      showToast('success', `Registered new baseline field: ${created.label}`);
+    } catch (err: any) {
+      showToast('reject', err.message || 'Failed to register baseline field');
+    }
   };
 
   return (
@@ -334,6 +494,63 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                   showLineNumbers={false}
                 />
               </div>
+
+              {/* Opt-In AI Assist Bar (§4.B) */}
+              <div className="p-3.5 rounded-lg border border-indigo-200 bg-indigo-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-950">
+                    <Sparkle size={15} className="text-indigo-600" weight="fill" />
+                    <span>Opt-In AI Assist (Gemini 3.1 Flash-Lite)</span>
+                  </div>
+                  <div className="text-[11px] text-indigo-800/80 mt-0.5">
+                    Trigger on-demand inference to inspect raw syntax and auto-suggest the baseline mapping.
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isAiLoading}
+                  onClick={handleAskAi}
+                  className={`shrink-0 flex items-center gap-2 px-3.5 py-1.5 rounded text-xs font-semibold text-white transition-all cursor-pointer shadow-xs ${
+                    isAiLoading
+                      ? 'bg-indigo-400 cursor-not-allowed'
+                      : 'bg-indigo-600 hover:bg-indigo-500 active:scale-95'
+                  }`}
+                >
+                  {isAiLoading ? (
+                    <>
+                      <CircleNotch size={14} className="animate-spin" />
+                      <span>Analyzing with Gemini...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkle size={14} weight="bold" />
+                      <span>✨ Auto-Map with Gemini</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* AI Suggestion Card if available */}
+              {aiSuggestion && (
+                <div className="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-xs space-y-1.5 animate-fade-in shadow-xs">
+                  <div className="flex items-center justify-between text-emerald-900 font-semibold">
+                    <span className="flex items-center gap-1.5">
+                      <Sparkle size={14} className="text-emerald-600" weight="fill" />
+                      <span>Gemini Recommendation ({Math.round(aiSuggestion.confidence * 100)}% Confidence)</span>
+                    </span>
+                    <span className="font-mono text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200 font-bold">
+                      AI SUGGESTED
+                    </span>
+                  </div>
+                  <div className="text-emerald-950 font-medium">
+                    Mapped to: <strong className="font-mono text-emerald-800">{aiSuggestion.suggested_field}</strong> = <strong className="font-mono text-emerald-800">{String(aiSuggestion.suggested_value)}</strong>
+                  </div>
+                  <div className="text-[11px] text-emerald-800 italic leading-snug">
+                    "{aiSuggestion.reasoning}"
+                  </div>
+                </div>
+              )}
 
               {/* Mapping Form */}
               <form onSubmit={handleApprove} className="space-y-4 pt-2">
