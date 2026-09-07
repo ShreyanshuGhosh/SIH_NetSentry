@@ -18,7 +18,7 @@ import {
   FileCode,
   LockKey,
 } from '@phosphor-icons/react';
-import { MousePointerTracker } from './MousePointerTracker';
+
 
 interface PublicLandingPageProps {
   onLaunchConsole: (configId?: string, targetTab?: string) => void;
@@ -229,8 +229,6 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
         backgroundSize: '24px 24px',
       }}
     >
-      {/* Tactical Precision Reticle (Active on Desktop Pointer Devices) */}
-      <MousePointerTracker />
 
       {/* ── TOP INSTITUTIONAL HEADER ── */}
       <header className="sticky top-0 z-40 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 lg:px-12 flex items-center justify-between shadow-xs">
