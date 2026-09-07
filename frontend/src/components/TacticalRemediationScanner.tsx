@@ -500,62 +500,80 @@ export const TacticalRemediationScanner: React.FC<TacticalRemediationScannerProp
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        className="relative rounded-lg border overflow-hidden cursor-ew-resize select-none bg-rose-50/25"
+        className="relative rounded-lg border border-slate-800 overflow-hidden cursor-ew-resize select-none bg-[#0B0F14]"
         style={{
-          borderColor: 'var(--border-subtle)',
           minHeight: '440px',
         }}
       >
-        {/* Left Side: Vulnerable Lines (Rose Tinted) */}
-        <div className="p-6 font-mono text-xs leading-relaxed space-y-3 bg-rose-50/20">
-          {cfg.lines.map((line, idx) => (
-            <div key={idx} className="flex items-start gap-4">
-              <span className="text-slate-400 select-none w-8 text-right shrink-0">L{line.lineNum}</span>
-              <span className="flex-1 text-rose-800 font-mono font-medium whitespace-pre-wrap">
-                {line.vulnText}
-              </span>
-              {line.vulnRule && (
-                <span className="text-[10px] px-2 py-0.5 rounded border border-rose-200 bg-rose-100 text-rose-700 shrink-0 font-bold">
-                  {line.vulnRule}
-                </span>
-              )}
-            </div>
-          ))}
+        {/* Left Side: Vulnerable Lines (Rose Tinted Base Layer) */}
+        <div className="p-6 font-mono text-xs leading-[1.5rem] space-y-3 text-rose-400 w-full h-full">
+          {cfg.lines.map((line, idx) => {
+            const lineCount = Math.max(
+              line.vulnText.split('\n').length,
+              line.hardText.split('\n').length
+            );
+            return (
+              <div 
+                key={idx} 
+                className="grid grid-cols-[3rem_1fr_8rem] gap-4 items-start"
+                style={{ minHeight: `${lineCount * 1.5}rem` }}
+              >
+                <span className="text-slate-600 select-none text-right shrink-0">L{line.lineNum}</span>
+                <span className="whitespace-pre-wrap font-medium">{line.vulnText}</span>
+                <div className="text-right">
+                  {line.vulnRule && (
+                    <span className="text-[10px] px-2 py-0.5 rounded border border-rose-900/50 bg-rose-950/40 text-rose-300 font-bold whitespace-nowrap">
+                      {line.vulnRule}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Right Side Overlay: Exact Executable CLI Remediation Commands (Emerald Tinted) */}
         <div
-          className="absolute inset-0 p-6 font-mono text-xs leading-relaxed space-y-3 overflow-hidden bg-emerald-50/40"
+          className="absolute inset-0 p-6 font-mono text-xs leading-[1.5rem] space-y-3 text-emerald-400 bg-[#0B0F14] pointer-events-none"
           style={{
-            clipPath: `inset(0 0 0 ${sliderPos}%)`,
+            clipPath: `polygon(${sliderPos}% 0, 100% 0, 100% 100%, ${sliderPos}% 100%)`,
           }}
         >
-          {cfg.lines.map((line, idx) => (
-            <div key={idx} className="flex items-start gap-4">
-              <span className="text-slate-400 select-none w-8 text-right shrink-0">L{line.lineNum}</span>
-              <span className="flex-1 text-emerald-900 font-mono font-semibold whitespace-pre-wrap">
-                {line.hardText}
-              </span>
-              {line.hardRule && (
-                <span className="text-[10px] px-2 py-0.5 rounded border border-emerald-300 bg-emerald-100 text-emerald-800 shrink-0 font-bold">
-                  {line.hardRule}
-                </span>
-              )}
-            </div>
-          ))}
+          {cfg.lines.map((line, idx) => {
+            const lineCount = Math.max(
+              line.vulnText.split('\n').length,
+              line.hardText.split('\n').length
+            );
+            return (
+              <div 
+                key={idx} 
+                className="grid grid-cols-[3rem_1fr_8rem] gap-4 items-start"
+                style={{ minHeight: `${lineCount * 1.5}rem` }}
+              >
+                <span className="text-slate-600 select-none text-right shrink-0">L{line.lineNum}</span>
+                <span className="whitespace-pre-wrap font-medium">{line.hardText}</span>
+                <div className="text-right">
+                  {line.hardRule && (
+                    <span className="text-[10px] px-2 py-0.5 rounded border border-emerald-900/50 bg-emerald-950/40 text-emerald-300 font-bold whitespace-nowrap">
+                      {line.hardRule}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* The Scrub Divider Line and Handle */}
         <div
-          className="absolute top-0 bottom-0 w-0.5 pointer-events-none z-10 shadow-lg"
+          className="absolute top-0 bottom-0 w-0.5 pointer-events-none z-10 shadow-lg bg-sky-500"
           style={{
             left: `${sliderPos}%`,
-            backgroundColor: 'var(--accent-primary)',
           }}
         >
           <div
             onMouseDown={handleMouseDown}
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full border border-sky-600 bg-sky-600 flex items-center justify-center text-white cursor-ew-resize pointer-events-auto shadow-md"
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full border border-sky-400 bg-[#0B0F14] flex items-center justify-center text-sky-400 cursor-ew-resize pointer-events-auto shadow-[0_0_15px_rgba(14,165,233,0.3)]"
           >
             <ArrowsLeftRight size={14} weight="bold" />
           </div>

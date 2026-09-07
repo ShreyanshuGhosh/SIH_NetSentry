@@ -430,6 +430,9 @@ Severity:   HIGH
 Fix:        (already compliant — no action required)
 ```
 
+**Tactical Remediation Scanner UI**:
+When resolving failed controls, administrators can use the **Tactical Remediation Scanner**—an interactive before/after diff scrubber that visually overlays your vulnerable configuration syntax (red base layer) with the exact, executable CLI commands (green overlay) required to achieve benchmark compliance. This component provides zero-slop CLI sequences across all 6 supported vendor dialects with strict grid-aligned syntax highlighting.
+
 For `UNKNOWN` findings:
 
 ```
