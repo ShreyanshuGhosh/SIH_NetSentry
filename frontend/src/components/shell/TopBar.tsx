@@ -96,7 +96,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Target Node Details */}
         <div className="flex items-center gap-1.5 shrink-0">
           <span className="text-[#A89F92] text-xs hidden lg:inline shrink-0">Target Node:</span>
-          <span className="text-xs font-semibold text-[#2E2B28] truncate font-mono max-w-[100px] sm:max-w-[160px] md:max-w-[200px]" title={currentDeviceName}>
+          <span className="text-xs font-semibold text-[#2E2B28] truncate font-mono max-w-[65px] xs:max-w-[100px] sm:max-w-[160px] md:max-w-[200px]" title={currentDeviceName}>
             {currentDeviceName}
           </span>
           <span

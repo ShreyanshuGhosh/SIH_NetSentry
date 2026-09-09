@@ -125,14 +125,14 @@ export const HeroLanding: React.FC<HeroLandingProps> = ({
         </div>
 
         {/* ── PIPELINE: vertical numbered list, not equal cards ── */}
-        <section style={{ borderTop: '1px solid var(--border-subtle)' }} className="py-16">
+        <section style={{ borderTop: '1px solid var(--border-subtle)' }} className="py-12 sm:py-16">
           <h2
-            className="text-lg font-semibold tracking-tight mb-1"
+            className="text-base sm:text-lg font-semibold tracking-tight mb-1"
             style={{ color: 'var(--text-primary)' }}
           >
             Five-Stage Processing Pipeline
           </h2>
-          <p className="text-sm mb-10" style={{ color: 'var(--text-tertiary)' }}>
+          <p className="text-xs sm:text-sm mb-8 sm:mb-10" style={{ color: 'var(--text-tertiary)' }}>
             Two parsing lanes with deterministic YAML evaluation. No compliance verdict ever touches the LLM.
           </p>
 
@@ -142,11 +142,11 @@ export const HeroLanding: React.FC<HeroLandingProps> = ({
               return (
                 <div
                   key={stage.num}
-                  className="flex items-start gap-8 py-5"
-                  style={{ borderBottom: '1px solid var(--border-subtle)', paddingLeft: `${i * 16}px` }}
+                  className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 py-4 sm:py-5 border-b"
+                  style={{ borderColor: 'var(--border-subtle)' }}
                 >
                   {/* Number + lane */}
-                  <div className="shrink-0 w-36">
+                  <div className="shrink-0 w-full sm:w-36 flex sm:block items-center justify-between">
                     <div
                       className="font-mono text-[11px] tabular"
                       style={{ color: 'var(--text-tertiary)' }}
@@ -164,20 +164,21 @@ export const HeroLanding: React.FC<HeroLandingProps> = ({
                   </div>
 
                   {/* Label + detail */}
-                  <div className="flex items-start gap-4 flex-1">
+                  <div className="flex items-start gap-3 sm:gap-4 flex-1">
                     <Icon
                       size={16}
                       weight="duotone"
                       style={{ color: stage.lane ? LANE_COLOR[stage.lane] : 'var(--text-tertiary)', marginTop: 2 }}
+                      className="shrink-0"
                     />
                     <div>
                       <div
-                        className="text-sm font-semibold mb-1"
+                        className="text-xs sm:text-sm font-semibold mb-1"
                         style={{ color: 'var(--text-primary)' }}
                       >
                         {stage.label}
                       </div>
-                      <p className="text-sm leading-relaxed max-w-[60ch]" style={{ color: 'var(--text-secondary)' }}>
+                      <p className="text-xs sm:text-sm leading-relaxed max-w-[60ch]" style={{ color: 'var(--text-secondary)' }}>
                         {stage.detail}
                       </p>
                     </div>
@@ -189,9 +190,9 @@ export const HeroLanding: React.FC<HeroLandingProps> = ({
         </section>
 
         {/* ── VENDOR MATRIX: sparse grid, text only ── */}
-        <section style={{ borderTop: '1px solid var(--border-subtle)' }} className="py-16">
-          <div className="flex items-baseline justify-between mb-8">
-            <h2 className="text-lg font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+        <section style={{ borderTop: '1px solid var(--border-subtle)' }} className="py-12 sm:py-16">
+          <div className="flex items-baseline justify-between mb-6 sm:mb-8">
+            <h2 className="text-base sm:text-lg font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>
               Preloaded Device Configurations
             </h2>
             <span className="font-mono text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
@@ -199,30 +200,20 @@ export const HeroLanding: React.FC<HeroLandingProps> = ({
             </span>
           </div>
 
-          <div
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
-            style={{ borderTop: '1px solid var(--border-subtle)' }}
-          >
-            {VENDORS.map((v, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 pt-4 border-t border-[var(--border-subtle)]">
+            {VENDORS.map((v) => (
               <button
                 key={v.id}
                 onClick={() => onSelectVendorConfig(v.id)}
-                className="group px-0 py-5 text-left transition-colors cursor-pointer"
-                style={{
-                  paddingLeft: i % 6 === 0 ? 0 : '20px',
-                  borderLeft: i % 6 !== 0 ? '1px solid var(--border-subtle)' : 'none',
-                  borderBottom: '1px solid var(--border-subtle)',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--bg-surface)')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                className="group p-3 sm:p-4 text-left transition-all cursor-pointer rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-default)] hover:bg-[var(--bg-surface)]"
               >
                 <div
-                  className="text-sm font-medium mb-0.5 transition-colors"
+                  className="text-xs sm:text-sm font-medium mb-0.5 transition-colors group-hover:text-[var(--accent)]"
                   style={{ color: 'var(--text-secondary)' }}
                 >
                   {v.label}
                 </div>
-                <div className="font-mono text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
+                <div className="font-mono text-[10px] sm:text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
                   {v.sub}
                 </div>
               </button>

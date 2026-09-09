@@ -91,10 +91,10 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
               {/* Row Summary */}
               <div
                 onClick={() => setExpandedId(isExpanded ? null : finding.ruleId)}
-                className="p-4 flex items-center justify-between gap-4 cursor-pointer"
+                className="p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-4 cursor-pointer"
               >
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="flex items-center gap-2 shrink-0 w-36">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                  <div className="flex items-center gap-2 shrink-0 sm:w-36">
                     <StatusBadge status={finding.status} />
                     <SeverityTag severity={finding.severity} />
                   </div>

@@ -303,19 +303,19 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
 
   return (
     <div
-      className="min-h-[100dvh] flex flex-col selection:bg-[rgba(200,131,10,0.18)] selection:text-[#1E1C1A]"
+      className="w-full max-w-full overflow-x-hidden min-h-[100dvh] flex flex-col selection:bg-[rgba(200,131,10,0.18)] selection:text-[#1E1C1A]"
       style={{ backgroundColor: '#F5F0E8' }}
     >
 
       {/* ─── TRUST STRIP ─── */}
       <div
-        className="w-full py-2 px-4 text-center text-[11px] font-mono flex items-center justify-center gap-3"
+        className="w-full py-2 px-3 sm:px-4 text-center text-[10px] sm:text-[11px] font-mono flex flex-wrap items-center justify-center gap-1.5 sm:gap-3"
         style={{ backgroundColor: 'rgba(200,131,10,0.10)', borderBottom: '1px solid rgba(200,131,10,0.18)', color: '#7C4F04' }}
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#C8830A] inline-block" />
+        <span className="w-1.5 h-1.5 rounded-full bg-[#C8830A] inline-block shrink-0" />
         <span className="font-semibold uppercase tracking-wider">Authorized Use Only</span>
-        <span className="text-[#C8830A] opacity-40">·</span>
-        <span>National Technical Research Organisation (NTRO) · Government of India · SIH 2026 · Project SIH26155</span>
+        <span className="text-[#C8830A] opacity-40 hidden sm:inline">·</span>
+        <span className="text-center">National Technical Research Organisation (NTRO) · Government of India · SIH 2026 · Project SIH26155</span>
       </div>
 
       {/* ─── NAV ─── */}
@@ -323,7 +323,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
         initial={reduce ? false : { opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="sticky top-0 z-40 h-[58px] flex items-center justify-between px-6 lg:px-12 backdrop-blur-md border-b"
+        className="sticky top-0 z-40 h-[58px] flex items-center justify-between px-4 sm:px-6 lg:px-12 backdrop-blur-md border-b"
         style={{ backgroundColor: 'rgba(245,240,232,0.94)', borderColor: '#E4E0D8' }}
       >
         {/* Logo wordmark */}
@@ -360,7 +360,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
           </div>
           <button
             onClick={() => onLaunchConsole(undefined, 'ingest')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold text-white bg-[#1E1C1A] hover:bg-[#2E2B28] active:scale-[0.97] transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white bg-[#1E1C1A] hover:bg-[#2E2B28] active:scale-[0.97] transition-all cursor-pointer"
           >
             Launch Console
             <ArrowRight size={13} weight="bold" />
@@ -369,19 +369,19 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
       </motion.header>
 
       {/* ─── HERO ─── */}
-      <section className="max-w-7xl mx-auto w-full px-6 lg:px-12 pt-16 pb-0">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 pt-10 sm:pt-16 pb-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
 
           {/* Left: big display type */}
           <motion.div
-            className="lg:col-span-6 pt-4"
+            className="lg:col-span-6 pt-2 sm:pt-4"
             variants={stagger}
             initial={reduce ? false : 'hidden'}
             animate="show"
           >
-            <motion.div variants={rise} className="mb-6">
+            <motion.div variants={rise} className="mb-4 sm:mb-6">
               <span
-                className="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold uppercase tracking-widest"
+                className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-widest"
                 style={{ color: '#C8830A' }}
               >
                 <SealCheck size={12} weight="bold" />
@@ -391,13 +391,13 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
 
             <motion.h1
               variants={rise}
-              className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-[#1E1C1A] leading-[0.95] tracking-tight mb-3"
+              className="text-3xl sm:text-5xl lg:text-7xl font-extrabold text-[#1E1C1A] leading-[1.0] tracking-tight mb-2 sm:mb-3"
             >
               Upload once.
             </motion.h1>
             <motion.h1
               variants={rise}
-              className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[0.95] tracking-tight mb-8"
+              className="text-3xl sm:text-5xl lg:text-7xl font-extrabold leading-[1.0] tracking-tight mb-6 sm:mb-8"
               style={{ color: '#C8830A' }}
             >
               Audit everything.
@@ -405,22 +405,22 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
 
             <motion.p
               variants={rise}
-              className="text-base text-[#7C7269] leading-relaxed max-w-[48ch] mb-8"
+              className="text-sm sm:text-base text-[#7C7269] leading-relaxed max-w-[48ch] mb-6 sm:mb-8"
             >
               Drop any vendor config. ApexNet detects the dialect, redacts secrets, runs deterministic compliance evaluation against CIS, NIST, DISA STIG, and ISO 27001, and emits a cryptographically signed PDF — under 15ms.
             </motion.p>
 
-            <motion.div variants={rise} className="flex flex-wrap items-center gap-3 mb-10">
+            <motion.div variants={rise} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:mb-10">
               <button
                 onClick={() => onLaunchConsole(undefined, 'ingest')}
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full text-sm font-bold text-white bg-[#C8830A] hover:bg-[#A66A06] active:scale-[0.97] transition-all cursor-pointer shadow-lg shadow-[rgba(200,131,10,0.28)]"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full text-sm font-bold text-white bg-[#C8830A] hover:bg-[#A66A06] active:scale-[0.97] transition-all cursor-pointer shadow-lg shadow-[rgba(200,131,10,0.28)]"
               >
                 <UploadSimple size={16} weight="bold" />
                 Upload Config File
               </button>
               <button
                 onClick={() => onLaunchConsole(undefined, 'dashboard')}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold text-[#1E1C1A] border-2 border-[#D1CBC0] hover:border-[#1E1C1A] transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold text-[#1E1C1A] border-2 border-[#D1CBC0] hover:border-[#1E1C1A] transition-all cursor-pointer"
                 style={{ backgroundColor: 'transparent' }}
               >
                 Open Dashboard
@@ -430,7 +430,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
             {/* Stats row */}
             <motion.div
               variants={rise}
-              className="flex flex-wrap gap-8 pt-6 border-t"
+              className="grid grid-cols-1 xs:grid-cols-3 gap-4 sm:gap-8 pt-6 border-t"
               style={{ borderColor: '#D1CBC0' }}
             >
               {([
@@ -439,7 +439,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                 { val: '<15ms', label: 'Per Audit', note: 'Deterministic engine, zero ML latency' },
               ] as const).map((s) => (
                 <div key={s.label}>
-                  <div className="text-3xl font-extrabold text-[#1E1C1A] tabular">{s.val}</div>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#1E1C1A] tabular">{s.val}</div>
                   <div className="text-xs font-semibold text-[#4A4440] mt-0.5">{s.label}</div>
                   <div className="text-[10px] text-[#A89F92] mt-0.5 font-mono">{s.note}</div>
                 </div>
