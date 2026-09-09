@@ -55,7 +55,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       style={{ backgroundColor: 'rgba(237,234,228,0.95)', borderColor: 'var(--border-default)' }}
     >
       {/* Left: Premium Back Button + Device Context / Brand Hyperlink */}
-      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         
         {/* Stylish Premium Back Button (Only on sub-pages, NOT on Dashboard or Landing) */}
         {showBackButton && (
@@ -94,13 +94,13 @@ export const TopBar: React.FC<TopBarProps> = ({
         </button>
 
         {/* Target Node Details */}
-        <div className="flex items-center gap-1.5 min-w-0 truncate">
+        <div className="flex items-center gap-1.5 shrink-0">
           <span className="text-[#A89F92] text-xs hidden lg:inline shrink-0">Target Node:</span>
-          <span className="text-xs font-semibold text-[#2E2B28] truncate font-mono max-w-[120px] sm:max-w-[180px] md:max-w-[220px]" title={currentDeviceName}>
+          <span className="text-xs font-semibold text-[#2E2B28] truncate font-mono max-w-[100px] sm:max-w-[160px] md:max-w-[200px]" title={currentDeviceName}>
             {currentDeviceName}
           </span>
           <span
-            className="font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded border hidden xl:inline shrink-0"
+            className="font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded border hidden 2xl:inline shrink-0"
             style={{
               backgroundColor: 'rgba(200,131,10,0.08)',
               borderColor: 'rgba(200,131,10,0.25)',
@@ -113,7 +113,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Center: Command Search */}
-      <div className="hidden lg:flex items-center relative max-w-xs w-full mx-2 shrink">
+      <div className="hidden xl:flex items-center relative max-w-xs w-full mx-4 shrink-0">
         <MagnifyingGlass size={13} className="absolute left-3 text-[#A89F92] pointer-events-none" />
         <input
           type="text"
