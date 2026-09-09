@@ -566,7 +566,7 @@ export const IngestionConsole: React.FC<IngestionConsoleProps> = ({
                   Select Compliance Benchmark Frameworks
                 </span>
                 <p className="text-[11px] text-[#7C7269] mt-0.5 font-medium">
-                  Multi-select enabled — select as many benchmark frameworks as desired for a combined deduplicated audit report.
+                  Multi-select enabled - select as many benchmark frameworks as desired for a combined deduplicated audit report.
                 </p>
               </div>
 
@@ -647,7 +647,7 @@ export const IngestionConsole: React.FC<IngestionConsoleProps> = ({
 
           {/* Action buttons */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
-            {/* Continue → Run Audit */}
+            {/* Continue -> Run Audit */}
             <button
               onClick={handleContinue}
               disabled={isAuditing}
@@ -661,7 +661,7 @@ export const IngestionConsole: React.FC<IngestionConsoleProps> = ({
               ) : (
                 <>
                   <Cpu size={16} weight="bold" />
-                  Continue — Run Audit
+                  Continue - Run Audit
                   <ArrowRight size={14} weight="bold" />
                 </>
               )}
@@ -702,7 +702,7 @@ export const IngestionConsole: React.FC<IngestionConsoleProps> = ({
           >
             {[
               { dot: '#2D6A3F', label: 'Secrets redacted before any processing' },
-              { dot: '#C8830A', label: 'Session only — cleared on close' },
+              { dot: '#C8830A', label: 'Session only - cleared on close' },
               { dot: '#A16207', label: 'No data sent to any server' },
             ].map(({ dot, label }) => (
               <span key={label} className="flex items-center gap-1.5">

@@ -80,7 +80,7 @@ export function generateAuditPdf(result: AuditRunResult): void {
     ],
     [
       { content: 'Hardware Model:', styles: { fontStyle: 'bold', fillColor: warmStoneHeader } },
-      { content: `${device.deviceType || 'Network Node'} — ${device.model || 'Enterprise Dialect'}` },
+      { content: `${device.deviceType || 'Network Node'} - ${device.model || 'Enterprise Dialect'}` },
       { content: 'Operator ID:', styles: { fontStyle: 'bold', fillColor: warmStoneHeader } },
       { content: 'operator-admin (admin@apexnet.gov.in)' },
     ],

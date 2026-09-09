@@ -77,7 +77,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         <button
           onClick={handleLandingClick}
           className={`${showBackButton ? 'hidden sm:flex' : 'flex'} items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer text-left shrink-0 group`}
-          title="ApexNet — Return to Public Landing Page"
+          title="ApexNet - Return to Public Landing Page"
         >
           <div
             className="w-7 h-7 rounded-md flex items-center justify-center border shrink-0 bg-[rgba(200,131,10,0.10)] border-[rgba(200,131,10,0.30)] group-hover:scale-105 transition-transform"
@@ -198,7 +198,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         <button
           onClick={handleLandingClick}
           className="hidden sm:flex items-center gap-1.5 text-xs text-[#7C7269] hover:text-[#C8830A] font-bold transition-colors cursor-pointer"
-          title="ApexNet — Return to Landing Page"
+          title="ApexNet - Return to Landing Page"
         >
           <span>Landing Page</span>
           <ArrowSquareOut size={12} weight="bold" />

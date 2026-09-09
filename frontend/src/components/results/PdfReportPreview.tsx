@@ -156,7 +156,7 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
               </tr>
               <tr className="border-b border-[#D1CBC0]">
                 <td className="bg-[#EDE8DF] font-bold px-3 py-1.5 text-[#1E1C1A] border-r border-[#D1CBC0]">Hardware Model:</td>
-                <td className="px-3 py-1.5 text-[#2E2B28] border-r border-[#D1CBC0]">Switch — {platform}</td>
+                <td className="px-3 py-1.5 text-[#2E2B28] border-r border-[#D1CBC0]">Switch - {platform}</td>
                 <td className="bg-[#EDE8DF] font-bold px-3 py-1.5 text-[#1E1C1A] border-r border-[#D1CBC0]">Operator ID:</td>
                 <td className="px-3 py-1.5 text-[#2E2B28]">operator-admin (admin@apexnet.gov.in)</td>
               </tr>

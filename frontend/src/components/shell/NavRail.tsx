@@ -72,7 +72,7 @@ export const NavRail: React.FC<NavRailProps> = ({
           onClick={onViewLandingPage}
           className="w-full h-14 flex items-center px-4 gap-3 border-b text-left hover:bg-[rgba(200,131,10,0.06)] transition-all cursor-pointer group"
           style={{ borderColor: 'var(--border-subtle)' }}
-          title="ApexNet — Return to Public Landing Page"
+          title="ApexNet - Return to Public Landing Page"
         >
           <div
             className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 border group-hover:scale-105 transition-transform"

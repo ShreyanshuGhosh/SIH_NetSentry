@@ -230,7 +230,7 @@ const DualLaneMock: React.FC = () => (
             >
               G
             </div>
-            <span className="text-xs font-bold text-[#1E4D2B]">Green Lane — Deterministic</span>
+            <span className="text-xs font-bold text-[#1E4D2B]">Green Lane - Deterministic</span>
           </div>
           <span className="font-mono text-[9px] text-[#2D6A3F] font-bold">CONFIDENCE: 1.000</span>
         </div>
@@ -265,7 +265,7 @@ const DualLaneMock: React.FC = () => (
             >
               A
             </div>
-            <span className="text-xs font-bold text-[#7C4F04]">Amber Lane — Human-Gated LLM</span>
+            <span className="text-xs font-bold text-[#7C7269]">Amber Lane - Human-Gated LLM</span>
           </div>
           <span className="font-mono text-[9px] text-[#A16207] font-bold">OPT-IN ONLY</span>
         </div>
@@ -283,7 +283,7 @@ const DualLaneMock: React.FC = () => (
           className="mt-2 px-2.5 py-1.5 rounded-md font-mono text-[9px]"
           style={{ backgroundColor: 'rgba(161,98,7,0.08)', color: '#7C4F04' }}
         >
-          LLM_ASSIST: watchdog → service_hardening (0.94) — PENDING REVIEW
+          LLM_ASSIST: watchdog → service_hardening (0.94) - PENDING REVIEW
         </div>
       </div>
     </div>
@@ -407,7 +407,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
               variants={rise}
               className="text-sm sm:text-base text-[#7C7269] leading-relaxed max-w-[48ch] mb-6 sm:mb-8"
             >
-              Drop any vendor config. ApexNet detects the dialect, redacts secrets, runs deterministic compliance evaluation against CIS, NIST, DISA STIG, and ISO 27001, and emits a cryptographically signed PDF — under 15ms.
+              Drop any vendor config. ApexNet detects the dialect, redacts secrets, runs deterministic compliance evaluation against CIS, NIST, DISA STIG, and ISO 27001, and emits a cryptographically signed PDF - under 15ms.
             </motion.p>
 
             <motion.div variants={rise} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:mb-10">
@@ -558,7 +558,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                 transition={{ duration: 0.4, delay: 0.2 }}
                 className="text-sm text-[#7C7269] leading-relaxed mb-10 max-w-[44ch]"
               >
-                Vendor fingerprinting, credential redaction, deterministic parsing with LLM fallback for unknown dialects, and cryptographic report signing — all automated. No account, no data retention.
+                Vendor fingerprinting, credential redaction, deterministic parsing with LLM fallback for unknown dialects, and cryptographic report signing - all automated. No account, no data retention.
               </motion.p>
 
               {/* Vertical step list */}
@@ -574,7 +574,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                     num: '01',
                     icon: UploadSimple,
                     title: 'Drop your config file',
-                    desc: 'Any format — .cfg, .conf, .txt, .log. Secrets are redacted client-side before the engine ever sees the text.',
+                    desc: 'Any format - .cfg, .conf, .txt, .log. Secrets are redacted client-side before the engine ever sees the text.',
                     tab: 'ingest',
                     col: '#C8830A',
                   },
@@ -647,7 +647,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                 transition={{ duration: 0.55, delay: 0.1 }}
               >
                 <div className="text-[10px] font-mono font-bold text-[#A89F92] uppercase tracking-wider mb-3">
-                  STAGE 01 — CONFIG INGESTION
+                  STAGE 01 - CONFIG INGESTION
                 </div>
                 <IngestionMock />
               </motion.div>
@@ -659,7 +659,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                 transition={{ duration: 0.55, delay: 0.2 }}
               >
                 <div className="text-[10px] font-mono font-bold text-[#A89F92] uppercase tracking-wider mb-3">
-                  STAGES 02–04 — DUAL-LANE PARSING ENGINE
+                  STAGES 02-04 - DUAL-LANE PARSING ENGINE
                 </div>
                 <DualLaneMock />
               </motion.div>
@@ -686,7 +686,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
               Four authoritative standards. One engine.
             </h2>
             <p className="text-sm text-[#7C7269] leading-relaxed mb-6">
-              Rules are YAML. Evaluation is pure Python. No LLM touches the compliance decision — ever.
+              Rules are YAML. Evaluation is pure Python. No LLM touches the compliance decision - ever.
             </p>
             <button
               onClick={() => onLaunchConsole(undefined, 'rules')}
@@ -795,12 +795,12 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
               or <span className="text-[#C8830A] font-semibold underline underline-offset-2 cursor-pointer">open the audit workspace</span>
             </p>
             <p className="text-xs font-mono text-[#A89F92]">
-              .cfg · .conf · .txt · .log — Cisco IOS-XE, JunOS, PAN-OS, SONiC, FortiOS, Arista EOS
+              .cfg · .conf · .txt · .log - Cisco IOS-XE, JunOS, PAN-OS, SONiC, FortiOS, Arista EOS
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[11px] font-mono text-[#A89F92]">
               {[
                 { dot: '#2D6A3F', label: 'Credentials redacted client-side before parsing' },
-                { dot: '#C8830A', label: 'Session-only — cleared on tab close' },
+                { dot: '#C8830A', label: 'Session-only - cleared on tab close' },
                 { dot: '#A16207', label: 'No data sent to any server' },
               ].map(({ dot, label }) => (
                 <span key={label} className="flex items-center gap-1.5">
