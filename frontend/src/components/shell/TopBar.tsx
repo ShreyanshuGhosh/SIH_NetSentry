@@ -51,32 +51,32 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header
-      className="h-14 border-b px-3 sm:px-5 flex items-center justify-between shrink-0 select-none z-20 backdrop-blur-sm sticky top-0 gap-2 sm:gap-4 overflow-hidden"
+      className="h-14 border-b px-2.5 sm:px-5 flex items-center justify-between shrink-0 select-none z-20 backdrop-blur-sm sticky top-0 gap-1.5 sm:gap-4 overflow-hidden"
       style={{ backgroundColor: 'rgba(237,234,228,0.95)', borderColor: 'var(--border-default)' }}
     >
       {/* Left: Premium Back Button + Device Context / Brand Hyperlink */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 min-w-0">
         
         {/* Stylish Premium Back Button (Only on sub-pages, NOT on Dashboard or Landing) */}
         {showBackButton && (
           <button
             onClick={onBackToDashboard}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-[#1E1C1A] border transition-all cursor-pointer hover:bg-[#EDE8DF] hover:border-[#1E1C1A] active:scale-95 shadow-xs shrink-0"
+            className="inline-flex items-center gap-1 px-2 py-1.5 sm:px-2.5 rounded-lg text-xs font-bold text-[#1E1C1A] border transition-all cursor-pointer hover:bg-[#EDE8DF] hover:border-[#1E1C1A] active:scale-95 shadow-xs shrink-0"
             style={{
               backgroundColor: 'var(--bg-canvas)',
               borderColor: 'var(--border-default)',
             }}
             title="Back to Fleet Dashboard"
           >
-            <ArrowLeft size={14} weight="bold" className="text-[#C8830A]" />
-            <span>Back</span>
+            <ArrowLeft size={13} weight="bold" className="text-[#C8830A]" />
+            <span className="hidden xs:inline">Back</span>
           </button>
         )}
 
         {/* Hyperlinked ApexNet Brand / Logo */}
         <button
           onClick={handleLandingClick}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer text-left shrink-0 group"
+          className={`${showBackButton ? 'hidden sm:flex' : 'flex'} items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer text-left shrink-0 group`}
           title="ApexNet — Return to Public Landing Page"
         >
           <div
@@ -94,7 +94,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         </button>
 
         {/* Target Node Details */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0 min-w-0">
           <span className="text-[#A89F92] text-xs hidden lg:inline shrink-0">Target Node:</span>
           <span className="text-xs font-semibold text-[#2E2B28] truncate font-mono max-w-[65px] xs:max-w-[100px] sm:max-w-[160px] md:max-w-[200px]" title={currentDeviceName}>
             {currentDeviceName}
@@ -140,10 +140,10 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Right: Telemetry & Actions */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 whitespace-nowrap">
         {/* Pass/Fail counts + Score */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="hidden md:flex items-center gap-1.5 text-xs font-mono shrink-0">
             <span className="flex items-center gap-1 font-semibold" style={{ color: 'var(--status-pass)' }}>
               <CheckCircle size={14} weight="fill" />
               <span>{passCount}</span>
@@ -156,10 +156,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           </div>
 
           <div
-            className="flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-mono shrink-0"
+            className="flex items-center gap-1 px-1.5 py-1 sm:px-2 rounded-md border text-xs font-mono shrink-0"
             style={{ backgroundColor: 'var(--bg-canvas)', borderColor: 'var(--border-default)' }}
           >
-            <span className="text-[#A89F92] text-[10px] uppercase font-sans font-semibold hidden xs:inline">SCORE:</span>
+            <span className="text-[#A89F92] text-[10px] uppercase font-sans font-semibold hidden sm:inline">SCORE:</span>
             <span className="font-bold tabular" style={{ color: scoreColor }}>
               {complianceScore}%
             </span>
@@ -170,11 +170,12 @@ export const TopBar: React.FC<TopBarProps> = ({
         <button
           onClick={onExecuteAudit}
           disabled={isAuditing}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-white transition-all cursor-pointer hover:brightness-95 active:scale-95 disabled:opacity-50 shrink-0 whitespace-nowrap"
+          className="flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold text-white transition-all cursor-pointer hover:brightness-95 active:scale-95 disabled:opacity-50 shrink-0 whitespace-nowrap"
           style={{ backgroundColor: '#C8830A' }}
+          title="Run Compliance Audit"
         >
-          <Play size={12} weight="bold" />
-          <span>{isAuditing ? 'Evaluating...' : 'Run Audit'}</span>
+          <Play size={13} weight="bold" />
+          <span className="hidden sm:inline">{isAuditing ? 'Evaluating...' : 'Run Audit'}</span>
         </button>
 
         {/* Utility Icons */}
