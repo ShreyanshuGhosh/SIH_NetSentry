@@ -22,10 +22,11 @@ export const MonoCodeBlock: React.FC<MonoCodeBlockProps> = ({
   className = '',
 }) => {
   const [copied, setCopied] = useState(false);
-  const lines = code.split('\n');
+  const safeCode = typeof code === 'string' ? code : (code !== null && code !== undefined ? String(code) : '');
+  const lines = safeCode.split('\n');
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(safeCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

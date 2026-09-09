@@ -270,24 +270,23 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
     try {
       await api.rejectTrainingItem(selectedItem.id, 'Spurious syntax block');
       const q = await api.getTrainingQueue();
-      setQueue(
-        q.map((item) => ({
-          id: item.id,
-          deviceId: item.device_id,
-          vendor: item.vendor as any,
-          rawCommandBlock: item.raw_command_block,
-          lineNumbers: item.line_numbers,
-          suggestedField: item.suggested_field,
-          suggestedValue: item.suggested_value,
-          confidence: item.confidence,
-          status: item.status as any,
-          timestamp: item.timestamp,
-        }))
-      );
+      const mappedQueue: TrainingQueueItem[] = q.map((item) => ({
+        id: item.id,
+        deviceId: item.device_id,
+        vendor: item.vendor as any,
+        rawCommandBlock: item.raw_command_block,
+        lineNumbers: item.line_numbers,
+        suggestedField: item.suggested_field,
+        suggestedValue: item.suggested_value,
+        confidence: item.confidence,
+        status: item.status as any,
+        timestamp: item.timestamp,
+      }));
+      setQueue(mappedQueue);
       setAiSuggestion(null);
       showToast('reject', 'Marked item as non-compliance-relevant. Retained in rejection audit log.');
-      const nextPending = q.find((it) => it.id !== selectedItem.id && it.status === 'pending');
-      setSelectedItem(nextPending ? (nextPending as any) : null);
+      const nextPending = mappedQueue.find((it) => it.id !== selectedItem.id && it.status === 'pending');
+      setSelectedItem(nextPending || null);
       onTrainingUpdated?.();
     } catch (err: any) {
       showToast('reject', err.message || 'Failed to reject queue item');
@@ -328,7 +327,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
       {/* Top Header */}
       <div
         className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b pb-6"
@@ -467,13 +466,13 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
         <div className="lg:col-span-8 space-y-6">
           {selectedItem ? (
             <div
-              className="p-6 rounded-lg border space-y-6"
+              className="p-3.5 sm:p-6 rounded-lg border space-y-4 sm:space-y-6"
               style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
             >
               {/* Target Item Header */}
-              <div className="flex items-center justify-between border-b pb-4" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4" style={{ borderColor: 'var(--border-subtle)' }}>
                 <div>
-                  <div className="text-xs font-semibold text-slate-900 flex items-center gap-2">
+                  <div className="text-xs font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
                     <span>Unrecognized Command Block</span>
                     <span className="font-mono text-[10px] text-amber-700 px-2 py-0.5 rounded border border-amber-200 bg-amber-50">
                       Confidence: {Math.round(selectedItem.confidence * 100)}%
@@ -487,7 +486,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                 {/* Reject Action (§6.8) */}
                 <button
                   onClick={handleReject}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-rose-200 text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-rose-200 text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer shrink-0 self-start sm:self-auto"
                   title="Mark as not compliance-relevant"
                 >
                   <XCircle size={14} />

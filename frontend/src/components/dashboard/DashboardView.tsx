@@ -74,7 +74,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   );
 
   return (
-    <div className="p-6 md:p-8 max-w-[1500px] mx-auto space-y-8">
+    <div className="p-3 sm:p-6 md:p-8 max-w-[1500px] mx-auto space-y-6 sm:space-y-8">
       {/* Top Header & Context */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
