@@ -72,7 +72,7 @@ export const PostureSummaryStrip: React.FC<PostureSummaryStripProps> = ({
         </div>
 
         {/* Breakdown Counts (4 cols) */}
-        <div className="md:col-span-4 grid grid-cols-2 gap-3 border-l border-r border-slate-200 px-0 md:px-6">
+        <div className="md:col-span-4 grid grid-cols-2 gap-3 md:border-l md:border-r border-slate-200 px-0 md:px-6">
           <div className="flex items-center gap-2">
             <CheckCircle size={18} weight="fill" style={{ color: 'var(--status-pass)' }} />
             <div>

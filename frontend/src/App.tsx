@@ -272,7 +272,7 @@ export function App() {
             />
 
             {/* View Router */}
-            <main className="flex-1 overflow-y-auto">
+            <main className="flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full">
               {activeTab === 'dashboard' && (
                 <DashboardView
                   recentAudits={recentAudits}

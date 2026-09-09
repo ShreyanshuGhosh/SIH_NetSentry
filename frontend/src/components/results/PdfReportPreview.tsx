@@ -125,9 +125,10 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
       </div>
 
       {/* Reference PDF Authentic Visual Preview Box */}
-      <div className="max-w-4xl mx-auto bg-white rounded-lg border border-[#D1CBC0] shadow-xl overflow-hidden text-[#1E1C1A] text-xs font-sans">
-        
-        {/* 1. Deep Charcoal Top Banner with Saffron Gold Accent Line */}
+      <div className="w-full overflow-x-auto pb-3">
+        <div className="min-w-[640px] max-w-4xl mx-auto bg-white rounded-lg border border-[#D1CBC0] shadow-xl overflow-hidden text-[#1E1C1A] text-xs font-sans">
+          
+          {/* 1. Deep Charcoal Top Banner with Saffron Gold Accent Line */}
         <div className="bg-[#1E1C1A] text-white px-5 py-3 flex items-center justify-between gap-4 border-b-2 border-[#C8830A]">
           <div className="font-extrabold text-sm tracking-tight truncate min-w-0 flex-1" title={`APEXNET | ${deviceName} Security Audit Report`}>
             APEXNET | {deviceName} Security Audit Report
@@ -293,5 +294,6 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };

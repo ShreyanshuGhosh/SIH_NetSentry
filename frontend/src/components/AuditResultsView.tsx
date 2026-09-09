@@ -35,7 +35,7 @@ export const AuditResultsView: React.FC<AuditResultsViewProps> = ({
   const vendorInfo = VENDOR_DISPLAY_NAMES[result.vendor] || { name: result.vendor, dialect: 'Generic' };
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8 overflow-x-hidden">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6" style={{ borderColor: 'var(--border-subtle)' }}>
         <div>
