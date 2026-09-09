@@ -232,6 +232,23 @@ class ExemplarStoreManager {
     return newItem;
   }
 
+  public deleteExemplar(id: string) {
+    this.exemplars = this.exemplars.filter((e) => e.id !== id);
+    this.persist();
+  }
+
+  public deleteQueueItem(id: string) {
+    this.queue = this.queue.filter((q) => q.id !== id);
+    this.persist();
+  }
+
+  public clearAllData() {
+    this.exemplars = [];
+    this.fields = [...INITIAL_BASELINE_FIELDS];
+    this.queue = [];
+    this.persist();
+  }
+
   public resetToDefaults() {
     this.exemplars = [...INITIAL_EXEMPLARS];
     this.fields = [...INITIAL_BASELINE_FIELDS];
