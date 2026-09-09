@@ -55,7 +55,7 @@ export const PostureSummaryStrip: React.FC<PostureSummaryStripProps> = ({
         {/* Large Score Card (4 cols) */}
         <div className="md:col-span-4 flex items-center gap-4">
           <div
-            className="text-6xl font-bold font-mono tabular tracking-tight"
+            className="text-6xl font-bold font-chakra tabular tracking-tight"
             style={{ color: scoreColor }}
           >
             {score}%

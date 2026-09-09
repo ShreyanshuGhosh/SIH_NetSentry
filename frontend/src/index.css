@@ -64,10 +64,17 @@
   --shadow-lg:  0 10px 20px -3px rgba(30, 28, 26, 0.14), 0 4px 8px -4px rgba(30, 28, 26, 0.08);
   --shadow-xl:  0 20px 40px -5px rgba(30, 28, 26, 0.18), 0 8px 16px -6px rgba(30, 28, 26, 0.10);
 
-  /* Typography */
-  --font-sans:    'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-display: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono:    'IBM Plex Mono', 'JetBrains Mono', monospace;
+  /* Typography System — Strictly Mapped per Role */
+  --font-inter:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:     'IBM Plex Mono', 'Roboto Mono', monospace;
+  --font-chakra:   'Chakra Petch', sans-serif;
+  --font-rajdhani: 'Rajdhani', sans-serif;
+  --font-source:   'Source Sans Pro', 'Source Sans 3', sans-serif;
+
+  /* Default App UI Font -> Inter */
+  --font-sans:     var(--font-inter);
+  /* Precision & Enterprise Headers -> Rajdhani */
+  --font-display:  var(--font-rajdhani);
 }
 
 @layer base {
@@ -117,7 +124,7 @@
     --severity-medium:   #A16207;
     --severity-low:      #7C7269;
 
-    /* Bridge aliases (keep existing components working) */
+    /* Bridge aliases */
     --bg-base:       var(--bg-canvas);
     --bg-elevated:   var(--bg-surface-raised);
     --text-mono:     var(--text-primary);
@@ -136,10 +143,11 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--bg-canvas);
     color: var(--text-primary);
+    font-family: var(--font-inter);
   }
 
   body {
-    font-family: var(--font-sans);
+    font-family: var(--font-inter);
     background-color: var(--bg-canvas);
     color: var(--text-primary);
     min-height: 100vh;
@@ -148,13 +156,30 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    font-family: var(--font-rajdhani);
+    letter-spacing: -0.01em;
     color: var(--text-primary);
   }
 
+  /* Utility Font Classes strictly matching specified roles */
+  .font-inter {
+    font-family: var(--font-inter) !important;
+  }
+
   .font-mono {
-    font-family: var(--font-mono);
+    font-family: var(--font-mono) !important;
+  }
+
+  .font-chakra {
+    font-family: var(--font-chakra) !important;
+  }
+
+  .font-rajdhani, .font-display {
+    font-family: var(--font-rajdhani) !important;
+  }
+
+  .font-source {
+    font-family: var(--font-source) !important;
   }
 
   .tabular {

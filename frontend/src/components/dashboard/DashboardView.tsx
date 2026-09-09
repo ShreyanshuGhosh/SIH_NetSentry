@@ -129,12 +129,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-mono font-semibold uppercase text-slate-500 tracking-wider">
+            <span className="text-[11px] font-rajdhani font-semibold uppercase text-slate-500 tracking-wider">
               Fleet Compliance Index
             </span>
             <ShieldCheck size={18} className="text-sky-600" weight="duotone" />
           </div>
-          <div className="text-3xl font-bold font-mono tabular mb-1" style={{ color: avgScoreColor }}>
+          <div className="text-3xl font-bold font-chakra tabular mb-1" style={{ color: avgScoreColor }}>
             {avgScore}%
           </div>
           <div className="text-xs text-slate-500">Mean score across {totalAudited} audited nodes</div>
@@ -145,12 +145,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-mono font-semibold uppercase text-slate-500 tracking-wider">
+            <span className="text-[11px] font-rajdhani font-semibold uppercase text-slate-500 tracking-wider">
               Controls Passed
             </span>
             <CheckCircle size={18} className="text-emerald-600" weight="duotone" />
           </div>
-          <div className="text-3xl font-bold font-mono tabular text-emerald-600 mb-1">
+          <div className="text-3xl font-bold font-chakra tabular text-emerald-600 mb-1">
             {totalPass}
           </div>
           <div className="text-xs text-slate-500">Verified line-level rule matches</div>
@@ -161,12 +161,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-mono font-semibold uppercase text-slate-500 tracking-wider">
+            <span className="text-[11px] font-rajdhani font-semibold uppercase text-slate-500 tracking-wider">
               Controls Failed
             </span>
             <XCircle size={18} className="text-rose-600" weight="duotone" />
           </div>
-          <div className="text-3xl font-bold font-mono tabular text-rose-600 mb-1">
+          <div className="text-3xl font-bold font-chakra tabular text-rose-600 mb-1">
             {totalFail}
           </div>
           <div className="text-xs text-slate-500">Remediation scripts ready</div>
@@ -177,12 +177,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-mono font-semibold uppercase text-slate-500 tracking-wider">
+            <span className="text-[11px] font-rajdhani font-semibold uppercase text-slate-500 tracking-wider">
               Training Queue
             </span>
             <Brain size={18} className="text-amber-600" weight="duotone" />
           </div>
-          <div className="text-3xl font-bold font-mono tabular text-amber-600 mb-1">
+          <div className="text-3xl font-bold font-chakra tabular text-amber-600 mb-1">
             {pendingTrainingCount}
           </div>
           <div className="text-xs text-slate-500">CLI syntax lines awaiting admin mapping</div>

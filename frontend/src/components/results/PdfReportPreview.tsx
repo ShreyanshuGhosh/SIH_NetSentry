@@ -126,7 +126,7 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
 
       {/* Reference PDF Authentic Visual Preview Box */}
       <div className="w-full overflow-x-auto pb-3">
-        <div className="min-w-[640px] max-w-4xl mx-auto bg-white rounded-lg border border-[#D1CBC0] shadow-xl overflow-hidden text-[#1E1C1A] text-xs font-sans">
+        <div className="min-w-[640px] max-w-4xl mx-auto bg-white rounded-lg border border-[#D1CBC0] shadow-xl overflow-hidden text-[#1E1C1A] text-xs font-source">
           
           {/* 1. Deep Charcoal Top Banner with Saffron Gold Accent Line */}
         <div className="bg-[#1E1C1A] text-white px-5 py-3 flex items-center justify-between gap-4 border-b-2 border-[#C8830A]">
