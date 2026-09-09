@@ -1,679 +1,874 @@
 // src/components/landing/PublicLandingPage.tsx
-// Authoritative Institutional Gateway (Light Mode, Tactical Reticle, High-Precision Defense Aesthetic)
+// ApexNet — Premium Institutional Landing Page
+// DESIGN_VARIANCE: 6 / MOTION_INTENSITY: 3 / VISUAL_DENSITY: 5
+// Design language: Editorial · Real product UI illustrations · Raksha-class premium
+// Palette: Warm Stone (#F5F0E8 canvas) + Saffron Gold (#C8830A accent). Zero blue/violet.
 
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
+import { motion, useReducedMotion, type Variants } from 'motion/react';
 import {
-  ShieldCheck,
-  ArrowRight,
-  ShieldCheckered,
-  IdentificationBadge,
-  Cpu,
-  Robot,
-  Database,
-  FilePdf,
-  Fingerprint,
-  CheckCircle,
-  Lightning,
-  Terminal,
-  FileCode,
-  LockKey,
+  ShieldCheck, ArrowRight, UploadSimple, Cpu, FilePdf,
+  CheckCircle, XCircle, LockKey, ArrowLineRight, SealCheck,
+  ShieldWarning, ArrowSquareRight, FileText, Warning,
+  Globe, HardDrives, ArrowUp,
 } from '@phosphor-icons/react';
-
 
 interface PublicLandingPageProps {
   onLaunchConsole: (configId?: string, targetTab?: string) => void;
 }
 
-// ── 5-STAGE PIPELINE DEFINITION ──
-interface PipelineStage {
-  num: string;
-  id: string;
-  title: string;
-  lane: 'GREEN' | 'AMBER' | 'NEUTRAL';
-  icon: React.ElementType;
-  headline: string;
-  description: string;
-  technicalSpecs: string[];
-  sampleEvidence: string;
-}
+const rise: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } },
+};
+const stagger: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+};
 
-const PIPELINE_STAGES: PipelineStage[] = [
-  {
-    num: '01',
-    id: 'ingest-redact',
-    title: 'Ingestion & Redaction',
-    lane: 'NEUTRAL',
-    icon: Fingerprint,
-    headline: 'In-Memory Client-Side Secret Redaction',
-    description: 'Configs ingested via file drop or live SSH Netmiko session. Pre-shared keys, passwords, and TACACS secrets are stripped using compiled regex filters before persistent storage.',
-    technicalSpecs: [
-      'SHA-256 cryptographic provenance calculated before and after redaction',
-      'Matches Cisco Type 5/7/9, JunOS $6$, PAN-OS, and Fortinet encrypted tokens',
-      'Zero plaintext credentials transmitted to normalizers or external APIs',
-    ],
-    sampleEvidence: 'enable secret 9 $9$e7xW...  -->  [REDACTED_ENABLE_SECRET_01]',
-  },
-  {
-    num: '02',
-    id: 'deterministic-green',
-    title: 'Deterministic Green Lane',
-    lane: 'GREEN',
-    icon: Cpu,
-    headline: 'High-Throughput AST & Regex Parsing (<15ms)',
-    description: 'Standardized dialect parsers deterministically extract network configuration statements into the vendor-neutral CanonicalDeviceConfig schema. 100% deterministic, zero hallucination.',
-    technicalSpecs: [
-      'Dedicated deterministic dialect parsers: Cisco IOS-XE, JunOS, PAN-OS, SONiC, FortiOS, Arista EOS',
-      'Generates exact source line number mappings for verifiable audit trails',
-      'Handles multi-line hierarchical blocks, interface definitions, and AAA profiles',
-    ],
-    sampleEvidence: 'AST_RESOLVED: line 36 -> ip ssh version 2 (Confidence: 1.000)',
-  },
-  {
-    num: '03',
-    id: 'opt-in-amber',
-    title: 'On-Demand Amber Lane',
-    lane: 'AMBER',
-    icon: Robot,
-    headline: 'Administrator-Gated LLM Normalization',
-    description: 'When unfamiliar or non-standard syntax is encountered, the administrator can opt-in to request LLM suggestions. Synthesized mappings must be reviewed and approved by human operators.',
-    technicalSpecs: [
-      'Strict manual invocation: zero automated background LLM billing or rate-limit consumption',
-      'Confidence scoring with strict 0.80 acceptance threshold',
-      'Structured Pydantic JSON schema verification with zero arbitrary execution',
-    ],
-    sampleEvidence: 'LLM_ASSIST: fast_reboot_watchdog enabled -> service_hardening (0.94)',
-  },
-  {
-    num: '04',
-    id: 'few-shot-store',
-    title: 'Persistent Exemplar Store',
-    lane: 'AMBER',
-    icon: Database,
-    headline: 'Dynamic Syntax Learning Without Redeployment',
-    description: 'Human-approved mappings are persisted as few-shot exemplars in the thread-safe JSON/database store. The deterministic parser consults this store on subsequent passes to learn new syntax on the fly.',
-    technicalSpecs: [
-      'Permanent knowledge persistence across daemon restarts',
-      'Elevates previously unknown dialect lines into deterministic matches',
-      'Defensible differentiator: system continuously improves through operator feedback',
-    ],
-    sampleEvidence: 'EXEMPLAR_SAVED: sonic.fast_reboot -> sys.watchdog (Persisted to Store)',
-  },
-  {
-    num: '05',
-    id: 'compliance-pdf',
-    title: 'Evaluation & Signed Report',
-    lane: 'GREEN',
-    icon: FilePdf,
-    headline: 'Deterministic Rule Engine & Cryptographic Audit Reports',
-    description: 'Evaluates normalized CanonicalDeviceConfig against CIS, NIST, DISA STIG, and ISO 27001 rule packs. Emits line-level evidence, remediation CLI snippets, and signed ReportLab PDF.',
-    technicalSpecs: [
-      'Rules strictly determine PASS/FAIL verdicts — LLM never decides compliance',
-      'Vendor-specific remediation commands: exact CLI syntax for instant remediation',
-      'Produces audit-ready PDF with SHA-256 report verification checksum',
-    ],
-    sampleEvidence: 'RULE_CIS_2_1: FAIL (Cisco IOS-XE: line 40 missing "ip ssh version 2")',
-  },
-];
+// ─── Inline Product Mock: Audit Report Card ────────────────────────────────────
+const AuditReportMock: React.FC = () => (
+  <div
+    className="rounded-2xl border overflow-hidden shadow-xl"
+    style={{
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E4E0D8',
+      boxShadow: '0 24px 64px rgba(30,28,26,0.14), 0 4px 12px rgba(30,28,26,0.08)',
+    }}
+  >
+    {/* Header bar */}
+    <div
+      className="px-5 py-4 flex items-center justify-between border-b"
+      style={{ backgroundColor: '#FAFAF8', borderColor: '#E4E0D8' }}
+    >
+      <div className="flex items-center gap-2">
+        <div
+          className="w-7 h-7 rounded-md flex items-center justify-center"
+          style={{ backgroundColor: 'rgba(200,131,10,0.12)', border: '1px solid rgba(200,131,10,0.30)' }}
+        >
+          <ShieldCheck size={14} weight="bold" className="text-[#C8830A]" />
+        </div>
+        <span className="text-xs font-bold text-[#1E1C1A]">Audit Report</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span
+          className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border uppercase"
+          style={{
+            backgroundColor: 'rgba(45,106,63,0.10)',
+            borderColor: 'rgba(45,106,63,0.30)',
+            color: '#1E4D2B',
+          }}
+        >
+          SIGNED PDF
+        </span>
+      </div>
+    </div>
 
-// ── PRELOADED DEVICE HARDWARE MATRIX ──
-const PRELOADED_DEVICES = [
-  {
-    id: 'cisco-cat9300-core',
-    vendor: 'Cisco',
-    series: 'Catalyst 9300',
-    model: 'C9300-48UXM',
-    os: 'IOS-XE 17.09.04a',
-    role: 'Enterprise Core Switch',
-    framework: 'CIS Cisco IOS-XE v2.0.0',
-    lane: 'Deterministic Green',
-    redacted: 4,
-  },
-  {
-    id: 'juniper-srx345-gateway',
-    vendor: 'Juniper',
-    series: 'SRX345 Gateway',
-    model: 'SRX345-SYS-JB',
-    os: 'Junos 22.4R2-S2.5',
-    role: 'Security Boundary Firewall',
-    framework: 'DISA STIG Junos NDM v2r1',
-    lane: 'Deterministic Green',
-    redacted: 3,
-  },
-  {
-    id: 'paloalto-pa3220-dc',
-    vendor: 'Palo Alto',
-    series: 'PA-3220 NGFW',
-    model: 'PA-3220',
-    os: 'PAN-OS 11.0.2-h3',
-    role: 'Perimeter Next-Gen Firewall',
-    framework: 'NIST SP 800-53 Rev. 5',
-    lane: 'Deterministic Green',
-    redacted: 2,
-  },
-  {
-    id: 'sonic-whitebox-leaf',
-    vendor: 'SONiC',
-    series: 'White-Box Leaf',
-    model: 'Edgecore AS7712-32X',
-    os: 'Enterprise SONiC 202311',
-    role: 'Datacenter White-Box Leaf',
-    framework: 'CIS Open Network v1.1.0',
-    lane: 'Amber + Few-Shot Store',
-    redacted: 2,
-  },
-  {
-    id: 'fortinet-fortigate-60f',
-    vendor: 'Fortinet',
-    series: 'FortiGate 60F',
-    model: 'FG-60F',
-    os: 'FortiOS v7.4.2 build2573',
-    role: 'Branch Perimeter Firewall',
-    framework: 'ISO/IEC 27001:2022 A.13.1',
-    lane: 'Deterministic Green',
-    redacted: 3,
-  },
-  {
-    id: 'arista-7050x-leaf',
-    vendor: 'Arista',
-    series: '7050X Leaf',
-    model: 'DCS-7050SX3-48YC8',
-    os: 'EOS 4.30.2F',
-    role: 'Datacenter Spine/Leaf',
-    framework: 'CIS Arista EOS v1.2.0',
-    lane: 'Deterministic Green',
-    redacted: 2,
-  },
-];
+    {/* Device identity block */}
+    <div className="px-5 py-4 border-b" style={{ borderColor: '#E4E0D8' }}>
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="text-[10px] font-mono text-[#A89F92] uppercase tracking-wider mb-1">Device Node</div>
+          <div className="text-sm font-bold text-[#1E1C1A] font-mono">EDGE-SW01</div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-[10px] font-mono text-[#7C7269]">IOS-XE 17.6.1</span>
+            <span className="text-[#D1CBC0]">·</span>
+            <span className="text-[10px] font-mono text-[#7C7269]">SN: FCW2142L0BZ</span>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-[10px] font-mono text-[#A89F92] uppercase tracking-wider mb-1">Score</div>
+          <div className="text-2xl font-extrabold font-mono text-[#2D6A3F] tabular">87%</div>
+          <div className="flex items-center gap-1 mt-0.5 justify-end">
+            <CheckCircle size={10} weight="fill" className="text-[#2D6A3F]" />
+            <span className="text-[10px] font-mono text-[#2D6A3F]">10 Pass</span>
+            <XCircle size={10} weight="fill" className="text-[#B91C1C]" />
+            <span className="text-[10px] font-mono text-[#B91C1C]">2 Fail</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-// ── COMPLIANCE FRAMEWORKS ──
-const COMPLIANCE_FRAMEWORKS = [
-  {
-    id: 'cis_v8',
-    title: 'CIS Controls v8',
-    subtitle: 'Network Infrastructure Benchmark',
-    badges: ['Management Plane', 'SSHv2', 'AAA Enforcement', 'Syslog Transport'],
-    scope: 'Essential cyber hygiene baseline for multi-vendor network equipment',
-  },
-  {
-    id: 'nist_800_53',
-    title: 'NIST SP 800-53 Rev. 5',
-    subtitle: 'Federal Information Systems Security',
-    badges: ['SC-7 Boundary Protection', 'AC-3 Access Control', 'IA-2 Identification', 'AU-2 Audit Events'],
-    scope: 'Rigorous federal security controls for defense and government networks',
-  },
-  {
-    id: 'disa_stig',
-    title: 'DISA STIG',
-    subtitle: 'DoD Network Device Management',
-    badges: ['Category I Severity', 'Category II Severity', 'SNMPv3 Privacy', 'Banners'],
-    scope: 'United States Department of Defense security technical implementation guides',
-  },
-  {
-    id: 'iso_27001',
-    title: 'ISO/IEC 27001:2022',
-    subtitle: 'Information Security Management',
-    badges: ['Control A.13.1', 'Control A.13.2', 'Network Segregation', 'Audit Logging'],
-    scope: 'International information security management specification',
-  },
-];
+    {/* Findings list */}
+    <div className="divide-y" style={{ borderColor: '#E4E0D8' }}>
+      {[
+        { id: 'CIS-1.1.4', title: 'SSHv2 Enforcement', status: 'PASS', sev: null, line: 'ip ssh version 2' },
+        { id: 'CIS-1.2.1', title: 'Telnet Disabled', status: 'PASS', sev: null, line: 'no service telnet' },
+        { id: 'NIST-SC-7', title: 'Boundary Protection', status: 'FAIL', sev: 'HIGH', line: 'line 40: missing ACL' },
+        { id: 'CIS-3.1', title: 'SNMPv3 Privacy', status: 'FAIL', sev: 'CRITICAL', line: 'snmp-server community ...' },
+      ].map((f) => (
+        <div key={f.id} className="px-5 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {f.status === 'PASS' ? (
+              <CheckCircle size={14} weight="fill" className="text-[#2D6A3F] shrink-0" />
+            ) : (
+              <XCircle size={14} weight="fill" className="text-[#B91C1C] shrink-0" />
+            )}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold text-[#7C7269]">{f.id}</span>
+                {f.sev && (
+                  <span
+                    className="text-[9px] font-mono font-bold px-1.5 py-px rounded uppercase"
+                    style={{
+                      backgroundColor: f.sev === 'CRITICAL' ? 'rgba(185,28,28,0.12)' : 'rgba(161,98,7,0.12)',
+                      color: f.sev === 'CRITICAL' ? '#B91C1C' : '#A16207',
+                    }}
+                  >
+                    {f.sev}
+                  </span>
+                )}
+              </div>
+              <div className="text-xs text-[#1E1C1A] font-medium truncate">{f.title}</div>
+            </div>
+          </div>
+          <div
+            className="text-[9px] font-mono px-2 py-1 rounded shrink-0 truncate max-w-[130px]"
+            style={{ backgroundColor: '#F5F4F0', color: '#7C7269', border: '1px solid #E4E0D8' }}
+          >
+            {f.line}
+          </div>
+        </div>
+      ))}
+    </div>
 
+    {/* SHA strip */}
+    <div
+      className="px-5 py-3 flex items-center gap-2"
+      style={{ backgroundColor: '#FAFAF8', borderTop: '1px solid #E4E0D8' }}
+    >
+      <LockKey size={11} weight="bold" className="text-[#A89F92]" />
+      <span className="text-[9px] font-mono text-[#A89F92] truncate">SHA-256: a4f2c8...d9e1b7</span>
+      <span className="ml-auto text-[9px] font-mono text-[#A89F92]">CIS · NIST · STIG</span>
+    </div>
+  </div>
+);
+
+// ─── Inline Product Mock: Config Ingestion ─────────────────────────────────────
+const IngestionMock: React.FC = () => (
+  <div
+    className="rounded-2xl border overflow-hidden"
+    style={{
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E4E0D8',
+      boxShadow: '0 12px 40px rgba(30,28,26,0.10)',
+    }}
+  >
+    <div
+      className="px-4 py-3 border-b flex items-center justify-between"
+      style={{ backgroundColor: '#FAFAF8', borderColor: '#E4E0D8' }}
+    >
+      <span className="text-[11px] font-bold text-[#1E1C1A]">Config Ingestion</span>
+      <span
+        className="text-[9px] font-mono font-bold px-2 py-0.5 rounded uppercase"
+        style={{ backgroundColor: 'rgba(200,131,10,0.10)', color: '#7C4F04', border: '1px solid rgba(200,131,10,0.25)' }}
+      >
+        REDACTING
+      </span>
+    </div>
+    <div
+      className="px-4 py-3 font-mono text-[10px] space-y-1"
+      style={{ backgroundColor: '#F5F4F0', color: '#4A4440' }}
+    >
+      {[
+        { line: 'hostname EDGE-SW01', color: '#4A4440' },
+        { line: 'service password-encryption', color: '#4A4440' },
+        { line: 'enable secret 9 $9$e7xW...', color: '#B91C1C', strike: true },
+        { line: '→ [REDACTED_SECRET_01]', color: '#C8830A' },
+        { line: 'ip ssh version 2', color: '#4A4440' },
+        { line: 'no service telnet', color: '#2D6A3F' },
+        { line: 'username admin privilege 15', color: '#4A4440' },
+        { line: 'secret 5 $1$abc$...', color: '#B91C1C', strike: true },
+        { line: '→ [REDACTED_SECRET_02]', color: '#C8830A' },
+      ].map((l, i) => (
+        <div
+          key={i}
+          className="leading-relaxed"
+          style={{ color: l.color, textDecoration: l.strike ? 'line-through' : 'none', opacity: l.strike ? 0.5 : 1 }}
+        >
+          {l.line}
+        </div>
+      ))}
+    </div>
+    <div
+      className="px-4 py-2.5 flex items-center gap-2 border-t"
+      style={{ backgroundColor: '#FAFAF8', borderColor: '#E4E0D8' }}
+    >
+      <div className="w-1.5 h-1.5 rounded-full bg-[#2D6A3F] animate-pulse" />
+      <span className="text-[10px] font-mono text-[#7C7269]">0 credentials in memory · SHA-256 verified</span>
+    </div>
+  </div>
+);
+
+// ─── Inline Product Mock: Dual-Lane diagram ─────────────────────────────────────
+const DualLaneMock: React.FC = () => (
+  <div
+    className="rounded-2xl border overflow-hidden"
+    style={{
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E4E0D8',
+      boxShadow: '0 12px 40px rgba(30,28,26,0.10)',
+    }}
+  >
+    <div
+      className="px-4 py-3 border-b"
+      style={{ backgroundColor: '#FAFAF8', borderColor: '#E4E0D8' }}
+    >
+      <span className="text-[11px] font-bold text-[#1E1C1A]">Dual-Lane Trust Engine</span>
+    </div>
+    <div className="px-4 py-4 space-y-3">
+      {/* Green Lane */}
+      <div
+        className="rounded-xl p-4 border"
+        style={{ backgroundColor: 'rgba(45,106,63,0.06)', borderColor: 'rgba(45,106,63,0.20)' }}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold font-mono"
+              style={{ backgroundColor: 'rgba(45,106,63,0.20)', color: '#2D6A3F' }}
+            >
+              G
+            </div>
+            <span className="text-xs font-bold text-[#1E4D2B]">Green Lane — Deterministic</span>
+          </div>
+          <span className="font-mono text-[9px] text-[#2D6A3F] font-bold">CONFIDENCE: 1.000</span>
+        </div>
+        {[
+          'Cisco IOS-XE · JunOS · Arista EOS',
+          'ntc-templates TextFSM parser',
+          'Line-number evidence mapping',
+        ].map((t) => (
+          <div key={t} className="flex items-center gap-1.5 text-[10px] text-[#2D6A3F] mb-1">
+            <CheckCircle size={10} weight="fill" />
+            {t}
+          </div>
+        ))}
+        <div
+          className="mt-2 px-2.5 py-1.5 rounded-md font-mono text-[9px]"
+          style={{ backgroundColor: 'rgba(45,106,63,0.08)', color: '#1E4D2B' }}
+        >
+          AST_RESOLVED: line 36 → ssh_version: "2" (1.000)
+        </div>
+      </div>
+
+      {/* Amber Lane */}
+      <div
+        className="rounded-xl p-4 border"
+        style={{ backgroundColor: 'rgba(161,98,7,0.06)', borderColor: 'rgba(161,98,7,0.20)' }}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold font-mono"
+              style={{ backgroundColor: 'rgba(161,98,7,0.20)', color: '#A16207' }}
+            >
+              A
+            </div>
+            <span className="text-xs font-bold text-[#7C4F04]">Amber Lane — Human-Gated LLM</span>
+          </div>
+          <span className="font-mono text-[9px] text-[#A16207] font-bold">OPT-IN ONLY</span>
+        </div>
+        {[
+          'PAN-OS · FortiOS · SONiC · MikroTik',
+          'AsyncAnthropic + instructor + Pydantic v2',
+          'Admin approval required, 0.80 threshold',
+        ].map((t) => (
+          <div key={t} className="flex items-center gap-1.5 text-[10px] text-[#A16207] mb-1">
+            <Warning size={10} weight="fill" />
+            {t}
+          </div>
+        ))}
+        <div
+          className="mt-2 px-2.5 py-1.5 rounded-md font-mono text-[9px]"
+          style={{ backgroundColor: 'rgba(161,98,7,0.08)', color: '#7C4F04' }}
+        >
+          LLM_ASSIST: watchdog → service_hardening (0.94) — PENDING REVIEW
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// ─── Main Landing Page ─────────────────────────────────────────────────────────
 export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchConsole }) => {
-  const [activeStageId, setActiveStageId] = useState<string>('ingest-redact');
-  const activeStage = PIPELINE_STAGES.find((s) => s.id === activeStageId) || PIPELINE_STAGES[0];
+  const reduce = useReducedMotion();
+  const [dragging, setDragging] = React.useState(false);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    onLaunchConsole(undefined, 'ingest');
+  }, [onLaunchConsole]);
 
   return (
     <div
-      className="min-h-[100dvh] flex flex-col justify-between selection:bg-sky-100 selection:text-sky-900 relative bg-slate-50/80 text-slate-900"
-      style={{
-        backgroundImage: 'radial-gradient(rgba(203, 213, 225, 0.4) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
-      }}
+      className="min-h-[100dvh] flex flex-col selection:bg-[rgba(200,131,10,0.18)] selection:text-[#1E1C1A]"
+      style={{ backgroundColor: '#F5F0E8' }}
     >
 
-      {/* ── TOP INSTITUTIONAL HEADER ── */}
-      <header className="sticky top-0 z-40 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 lg:px-12 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center border border-sky-200 bg-sky-50 text-sky-700 shadow-xs">
-            <ShieldCheck size={20} weight="bold" />
-          </div>
-          <div>
-            <div className="text-sm font-bold tracking-tight text-slate-900 flex items-baseline gap-2">
-              <span>NetSentry</span>
-              <span className="text-[10px] font-mono font-medium px-1.5 py-0.2 rounded bg-slate-100 border border-slate-200 text-slate-600">
-                v1.1.0
-              </span>
-            </div>
-            <div className="text-[11px] text-slate-500 font-mono mt-0.5">
-              NTRO, Government of India <span className="text-slate-300">/</span> SIH26155
-            </div>
-          </div>
+      {/* ─── TRUST STRIP ─── */}
+      <div
+        className="w-full py-2 px-4 text-center text-[11px] font-mono flex items-center justify-center gap-3"
+        style={{ backgroundColor: 'rgba(200,131,10,0.10)', borderBottom: '1px solid rgba(200,131,10,0.18)', color: '#7C4F04' }}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-[#C8830A] inline-block" />
+        <span className="font-semibold uppercase tracking-wider">Authorized Use Only</span>
+        <span className="text-[#C8830A] opacity-40">·</span>
+        <span>National Technical Research Organisation (NTRO) · Government of India · SIH 2026 · Project SIH26155</span>
+      </div>
+
+      {/* ─── NAV ─── */}
+      <motion.header
+        initial={reduce ? false : { opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="sticky top-0 z-40 h-[58px] flex items-center justify-between px-6 lg:px-12 backdrop-blur-md border-b"
+        style={{ backgroundColor: 'rgba(245,240,232,0.94)', borderColor: '#E4E0D8' }}
+      >
+        {/* Logo wordmark */}
+        <div className="flex items-center gap-2.5">
+          <ShieldCheck size={20} weight="fill" className="text-[#C8830A]" />
+          <span className="text-base font-extrabold tracking-tight text-[#1E1C1A]">ApexNet</span>
         </div>
 
-        {/* Right Status Badges & Quick Action */}
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Deterministic Engine Online</span>
-          </div>
+        {/* Center nav links */}
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#7C7269]">
+          {[
+            { label: 'Architecture', tab: 'architecture' },
+            { label: 'Rule Packs', tab: 'rules' },
+            { label: 'How It Works', tab: 'dashboard' },
+          ].map((n) => (
+            <button
+              key={n.tab}
+              onClick={() => onLaunchConsole(undefined, n.tab)}
+              className="hover:text-[#1E1C1A] transition-colors cursor-pointer"
+            >
+              {n.label}
+            </button>
+          ))}
+        </nav>
 
-          <button
-            onClick={() => onLaunchConsole()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 active:bg-sky-800 transition-colors shadow-xs cursor-pointer"
+        {/* Right CTA */}
+        <div className="flex items-center gap-3">
+          <div
+            className="hidden sm:flex items-center gap-1.5 text-[11px] font-mono text-[#2D6A3F]"
+            style={{}}
           >
-            <span>Access Workspace</span>
-            <ArrowRight size={14} weight="bold" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A3F] animate-pulse" />
+            Engine Online
+          </div>
+          <button
+            onClick={() => onLaunchConsole(undefined, 'ingest')}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold text-white bg-[#1E1C1A] hover:bg-[#2E2B28] active:scale-[0.97] transition-all cursor-pointer"
+          >
+            Launch Console
+            <ArrowRight size={13} weight="bold" />
           </button>
         </div>
-      </header>
+      </motion.header>
 
-      {/* ── MAIN BODY CONTENT ── */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-12 py-10 lg:py-16 space-y-16">
-        
-        {/* ── SECTION 1: HERO & TRUST BOUNDARY ── */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Col: Main Value Proposition */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Classification Badge Strip */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-mono font-semibold bg-sky-50 border border-sky-200 text-sky-700">
-                <IdentificationBadge size={14} weight="bold" />
-                <span>OFFICIAL USE ONLY</span>
+      {/* ─── HERO ─── */}
+      <section className="max-w-7xl mx-auto w-full px-6 lg:px-12 pt-16 pb-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+          {/* Left: big display type */}
+          <motion.div
+            className="lg:col-span-6 pt-4"
+            variants={stagger}
+            initial={reduce ? false : 'hidden'}
+            animate="show"
+          >
+            <motion.div variants={rise} className="mb-6">
+              <span
+                className="inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold uppercase tracking-widest"
+                style={{ color: '#C8830A' }}
+              >
+                <SealCheck size={12} weight="bold" />
+                Defense-Grade Network Compliance
               </span>
+            </motion.div>
 
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-mono bg-white border border-slate-200 text-slate-700 shadow-xs">
-                <ShieldCheckered size={14} weight="bold" className="text-slate-500" />
-                <span>SIH26155 • DEFENSE COMPLIANCE AUDITOR</span>
-              </span>
-            </div>
+            <motion.h1
+              variants={rise}
+              className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-[#1E1C1A] leading-[0.95] tracking-tight mb-3"
+            >
+              Upload once.
+            </motion.h1>
+            <motion.h1
+              variants={rise}
+              className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[0.95] tracking-tight mb-8"
+              style={{ color: '#C8830A' }}
+            >
+              Audit everything.
+            </motion.h1>
 
-            {/* Main Title & Narrative */}
-            <div className="space-y-3">
-              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950 leading-tight">
-                AI-Driven Multi-Vendor Network Security Compliance Auditor
-              </h1>
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
-                Deterministic compliance verification and canonical configuration normalization
-                for heterogeneous defense networks. Ingests Cisco, Juniper, Palo Alto,
-                SONiC, Fortinet, and Arista configs — auditing against national standards with zero hallucination.
-              </p>
-            </div>
+            <motion.p
+              variants={rise}
+              className="text-base text-[#7C7269] leading-relaxed max-w-[48ch] mb-8"
+            >
+              Drop any vendor config. ApexNet detects the dialect, redacts secrets, runs deterministic compliance evaluation against CIS, NIST, DISA STIG, and ISO 27001, and emits a cryptographically signed PDF — under 15ms.
+            </motion.p>
 
-            {/* Direct Action Hub */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <motion.div variants={rise} className="flex flex-wrap items-center gap-3 mb-10">
+              <button
+                onClick={() => onLaunchConsole(undefined, 'ingest')}
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full text-sm font-bold text-white bg-[#C8830A] hover:bg-[#A66A06] active:scale-[0.97] transition-all cursor-pointer shadow-lg shadow-[rgba(200,131,10,0.28)]"
+              >
+                <UploadSimple size={16} weight="bold" />
+                Upload Config File
+              </button>
               <button
                 onClick={() => onLaunchConsole(undefined, 'dashboard')}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 active:bg-sky-800 transition-all shadow-sm cursor-pointer hover:shadow"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold text-[#1E1C1A] border-2 border-[#D1CBC0] hover:border-[#1E1C1A] transition-all cursor-pointer"
+                style={{ backgroundColor: 'transparent' }}
               >
-                <span>Launch Audit Workspace</span>
-                <ArrowRight size={16} weight="bold" />
+                Open Dashboard
               </button>
+            </motion.div>
 
-              <button
-                onClick={() => onLaunchConsole(undefined, 'training')}
-                className="inline-flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 border border-slate-300 transition-colors shadow-xs cursor-pointer"
+            {/* Stats row */}
+            <motion.div
+              variants={rise}
+              className="flex flex-wrap gap-8 pt-6 border-t"
+              style={{ borderColor: '#D1CBC0' }}
+            >
+              {([
+                { val: '6', label: 'Vendor Parsers', note: 'IOS-XE, JunOS, PAN-OS, SONiC, FortiOS, EOS' },
+                { val: '4', label: 'Compliance Packs', note: 'CIS · NIST · STIG · ISO 27001' },
+                { val: '<15ms', label: 'Per Audit', note: 'Deterministic engine, zero ML latency' },
+              ] as const).map((s) => (
+                <div key={s.label}>
+                  <div className="text-3xl font-extrabold text-[#1E1C1A] tabular">{s.val}</div>
+                  <div className="text-xs font-semibold text-[#4A4440] mt-0.5">{s.label}</div>
+                  <div className="text-[10px] text-[#A89F92] mt-0.5 font-mono">{s.note}</div>
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+
+          {/* Right: floating product UI */}
+          <motion.div
+            className="lg:col-span-6 relative"
+            initial={reduce ? false : { opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="relative">
+              {/* Main audit report mock */}
+              <AuditReportMock />
+
+              {/* Floating small badge — top right */}
+              <motion.div
+                className="absolute -top-4 -right-4 hidden lg:flex items-center gap-2 px-3 py-2 rounded-full text-[11px] font-mono font-bold border shadow-lg"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderColor: '#E4E0D8',
+                  color: '#2D6A3F',
+                  boxShadow: '0 8px 24px rgba(30,28,26,0.12)',
+                }}
+                animate={reduce ? {} : { y: [0, -6, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <Robot size={16} weight="bold" className="text-amber-600" />
-                <span>Admin Training Queue</span>
-              </button>
+                <CheckCircle size={13} weight="fill" className="text-[#2D6A3F]" />
+                Deterministic · Zero LLM
+              </motion.div>
 
-              <button
-                onClick={() => onLaunchConsole(undefined, 'live-pull')}
-                className="inline-flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 border border-slate-300 transition-colors shadow-xs cursor-pointer"
+              {/* Floating vendor chip — bottom left */}
+              <motion.div
+                className="absolute -bottom-4 -left-4 hidden lg:flex flex-wrap gap-1.5 p-3 rounded-xl border shadow-lg max-w-[200px]"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderColor: '#E4E0D8',
+                  boxShadow: '0 8px 24px rgba(30,28,26,0.12)',
+                }}
+                animate={reduce ? {} : { y: [0, 4, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
               >
-                <Terminal size={16} weight="bold" className="text-slate-600" />
-                <span>Live SSH Ingest</span>
-              </button>
-            </div>
-
-            {/* Quick Metrics Bar */}
-            <div className="pt-4 border-t border-slate-200 grid grid-cols-3 gap-4 text-xs font-mono text-slate-600">
-              <div>
-                <span className="text-[10px] text-slate-600 uppercase block font-semibold">Vendor Dialects</span>
-                <span className="text-sm font-bold text-slate-900">6 Native Parsers</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-slate-600 uppercase block font-semibold">Audit Latency</span>
-                <span className="text-sm font-bold text-emerald-600">&lt; 15 ms / Device</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-slate-600 uppercase block font-semibold">Secret Protection</span>
-                <span className="text-sm font-bold text-sky-600">Zero-Egress SHA-256</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Col: Trust Principle & Architecture Pillar */}
-          <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-2">
-                <LockKey size={18} weight="bold" className="text-sky-600" />
-                <span className="font-mono text-xs uppercase font-semibold text-slate-900">
-                  Trust Boundary Philosophy
-                </span>
-              </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
-                DETERMINISTIC VERDICTS
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-xl font-bold text-slate-900 leading-snug">
-                AI normalizes syntax.<br />Deterministic rules decide compliance.
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                In defense and critical government infrastructure, LLM hallucinations cannot be tolerated in compliance verdicts.
-                NetSentry restricts AI to an on-demand translation assistant: translating unfamiliar CLI dialect blocks into canonical schema.
-                All Pass/Fail verdicts and remediation scripts are computed deterministically against authoritative rule engines.
-              </p>
-            </div>
-
-            {/* Dual Lane Breakdown */}
-            <div className="space-y-2.5 pt-2">
-              <div className="flex items-start gap-3 p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-200">
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-emerald-100 text-emerald-700 shrink-0 text-xs font-bold font-mono">
-                  G
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-emerald-900">Deterministic Green Lane</div>
-                  <div className="text-[11px] text-emerald-700">AST & regex parsing for recognized syntax. Zero LLM involvement, instant verification.</div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 p-2.5 rounded-lg bg-amber-50/60 border border-amber-200">
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-amber-100 text-amber-700 shrink-0 text-xs font-bold font-mono">
-                  A
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-amber-900">Administrator-in-the-Loop Amber Lane</div>
-                  <div className="text-[11px] text-amber-700">Unseen vendor commands queued for manual or LLM-assisted review, saved permanently to few-shot store.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── SECTION 2: 5-STAGE PROCESSING PIPELINE (INTERACTIVE INSPECTOR) ── */}
-        <section className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-slate-100 pb-5">
-            <div>
-              <span className="text-[11px] font-mono uppercase font-semibold text-sky-600">
-                System Specification
-              </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                Five-Stage Network Auditing Pipeline
-              </h2>
-            </div>
-            <span className="text-xs font-mono text-slate-500">
-              Click any stage to inspect technical execution flow
-            </span>
-          </div>
-
-          {/* Stage Selector Pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-            {PIPELINE_STAGES.map((stage) => {
-              const Icon = stage.icon;
-              const isSelected = stage.id === activeStageId;
-              return (
-                <button
-                  key={stage.id}
-                  onClick={() => setActiveStageId(stage.id)}
-                  className={`flex flex-col p-3 rounded-lg border text-left transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-sky-50/70 border-sky-300 ring-1 ring-sky-300 shadow-xs'
-                      : 'bg-slate-50/60 border-slate-200 hover:bg-slate-100/80'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-mono text-[10px] font-bold text-slate-400">
-                      STAGE {stage.num}
-                    </span>
-                    <Icon
-                      size={16}
-                      weight="bold"
-                      className={isSelected ? 'text-sky-600' : 'text-slate-400'}
-                    />
-                  </div>
-                  <div className="text-xs font-semibold text-slate-850 truncate">
-                    {stage.title}
-                  </div>
-                  <div className="text-[10px] font-mono mt-0.5">
-                    {stage.lane === 'GREEN' && (
-                      <span className="text-emerald-600 font-medium">Deterministic</span>
-                    )}
-                    {stage.lane === 'AMBER' && (
-                      <span className="text-amber-600 font-medium">Opt-In AI / Human</span>
-                    )}
-                    {stage.lane === 'NEUTRAL' && (
-                      <span className="text-slate-500 font-medium">Pre-Processing</span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Active Stage Technical Detail Card */}
-          <div className="bg-slate-50 rounded-lg border border-slate-200 p-5 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded bg-sky-100 text-sky-700 flex items-center justify-center font-mono text-xs font-bold">
-                  {activeStage.num}
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900">{activeStage.headline}</h4>
-                  <span className="text-[11px] text-slate-500 font-mono">
-                    Module ID: net_sentry.pipeline.{activeStage.id}
+                <div className="w-full text-[9px] font-mono font-bold text-[#A89F92] uppercase tracking-wider mb-1">Supported Vendors</div>
+                {['Cisco IOS-XE', 'JunOS', 'PAN-OS', 'SONiC', 'FortiOS', 'Arista EOS'].map((v) => (
+                  <span
+                    key={v}
+                    className="text-[9px] font-mono px-1.5 py-0.5 rounded border"
+                    style={{ backgroundColor: '#F5F4F0', borderColor: '#E4E0D8', color: '#7C7269' }}
+                  >
+                    {v}
                   </span>
-                </div>
-              </div>
-
-              <span
-                className={`text-[10px] font-mono px-2.5 py-1 rounded font-bold uppercase ${
-                  activeStage.lane === 'GREEN'
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : activeStage.lane === 'AMBER'
-                    ? 'bg-amber-100 text-amber-800'
-                    : 'bg-slate-200 text-slate-700'
-                }`}
-              >
-                {activeStage.lane} LANE
-              </span>
-            </div>
-
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {activeStage.description}
-            </p>
-
-            {/* Key Specs */}
-            <div className="space-y-1.5">
-              <div className="text-[11px] font-mono uppercase font-semibold text-slate-500">
-                Architectural Controls & Verification:
-              </div>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
-                {activeStage.technicalSpecs.map((spec, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <CheckCircle size={14} weight="bold" className="text-sky-600 shrink-0 mt-0.5" />
-                    <span>{spec}</span>
-                  </li>
                 ))}
-              </ul>
+              </motion.div>
             </div>
+          </motion.div>
+        </div>
+      </section>
 
-            {/* Trace Output Preview */}
-            <div className="pt-2 border-t border-slate-200">
-              <div className="text-[10px] font-mono text-slate-600 uppercase mb-1">
-                Telemetry Log Output:
-              </div>
-              <div
-                className="bg-slate-900 text-slate-100 rounded-md p-2.5 font-mono text-[11px] flex items-center justify-between overflow-x-auto"
-                data-no-tracker="true"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-400">❯</span>
-                  <span>{activeStage.sampleEvidence}</span>
-                </div>
-                <span className="text-[10px] text-slate-400 shrink-0 ml-4 font-mono">VERIFIED</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── SECTION 3: PRELOADED DEVICE CONFIGURATIONS ── */}
-        <section className="space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-            <div>
-              <span className="text-[11px] font-mono uppercase font-semibold text-sky-600">
-                Interactive Test Bench
-              </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                Preloaded Defense Device Configurations
-              </h2>
-            </div>
-            <span className="text-xs font-mono text-slate-500">
-              6 authentic vendor configurations with redacted credentials
+      {/* ─── HOW IT WORKS — Raksha-style timeline with right-side UI panels ─── */}
+      <section
+        className="mt-24 border-t border-b"
+        style={{ backgroundColor: '#EDE8DF', borderColor: '#D1CBC0' }}
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-20">
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5 }}
+            className="mb-4"
+          >
+            <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#C8830A]">
+              HOW APEXNET WORKS
             </span>
-          </div>
+          </motion.div>
 
-          {/* 6 Device Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {PRELOADED_DEVICES.map((device) => (
-              <div
-                key={device.id}
-                className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all hover:border-sky-300 flex flex-col justify-between space-y-4"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            {/* Left: editorial display copy + steps */}
+            <div className="lg:col-span-5">
+              <motion.h2
+                initial={reduce ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.05 }}
+                className="text-4xl sm:text-5xl font-extrabold text-[#1E1C1A] leading-[1.0] tracking-tight mb-3"
               >
-                <div className="space-y-2.5">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-[10px] font-mono uppercase font-semibold text-sky-600 block">
-                        {device.vendor}
-                      </span>
-                      <h3 className="text-base font-bold text-slate-900">{device.series}</h3>
-                    </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600">
-                      {device.model}
-                    </span>
-                  </div>
+                You upload.
+              </motion.h2>
+              <motion.h2
+                initial={reduce ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="text-4xl sm:text-5xl font-extrabold leading-[1.0] tracking-tight mb-3"
+                style={{ color: '#C8830A' }}
+              >
+                We audit it.
+              </motion.h2>
+              <motion.h2
+                initial={reduce ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="text-4xl sm:text-5xl font-extrabold text-[#1E1C1A] leading-[1.0] tracking-tight mb-8"
+              >
+                You get the report.
+              </motion.h2>
 
-                  <div className="text-xs text-slate-600">{device.role}</div>
+              <motion.p
+                initial={reduce ? false : { opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="text-sm text-[#7C7269] leading-relaxed mb-10 max-w-[44ch]"
+              >
+                Vendor fingerprinting, credential redaction, deterministic parsing with LLM fallback for unknown dialects, and cryptographic report signing — all automated. No account, no data retention.
+              </motion.p>
 
-                  <div className="pt-2 border-t border-slate-100 space-y-1.5 text-[11px] font-mono text-slate-500">
-                    <div className="flex items-center justify-between">
-                      <span>OS Version:</span>
-                      <span className="font-semibold text-slate-700">{device.os}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Target Benchmark:</span>
-                      <span className="font-semibold text-slate-700 truncate max-w-[170px]" title={device.framework}>
-                        {device.framework}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Secrets Redacted:</span>
-                      <span className="font-semibold text-sky-600">{device.redacted} Credentials</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Audit CTA button for this specific device */}
-                <button
-                  onClick={() => onLaunchConsole(device.id, 'results')}
-                  className="w-full inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-md text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 active:bg-sky-200 border border-sky-200 transition-colors cursor-pointer"
-                >
-                  <span>Audit This Configuration</span>
-                  <ArrowRight size={13} weight="bold" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── SECTION 4: COMPLIANCE BENCHMARK PACKS ── */}
-        <section className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-slate-100 pb-4">
-            <div>
-              <span className="text-[11px] font-mono uppercase font-semibold text-sky-600">
-                Authoritative Standards
-              </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                National & Defense Compliance Frameworks
-              </h2>
+              {/* Vertical step list */}
+              <motion.div
+                className="relative space-y-0"
+                variants={stagger}
+                initial={reduce ? false : 'hidden'}
+                whileInView="show"
+                viewport={{ once: true, amount: 0.2 }}
+              >
+                {[
+                  {
+                    num: '01',
+                    icon: UploadSimple,
+                    title: 'Drop your config file',
+                    desc: 'Any format — .cfg, .conf, .txt, .log. Secrets are redacted client-side before the engine ever sees the text.',
+                    tab: 'ingest',
+                    col: '#C8830A',
+                  },
+                  {
+                    num: '02',
+                    icon: Cpu,
+                    title: 'Dialect detected, parsed, evaluated',
+                    desc: 'TextFSM deterministic parser runs first. Falls back to human-gated LLM only for unrecognized syntax. Findings evaluated against your chosen framework.',
+                    tab: 'architecture',
+                    col: '#2D6A3F',
+                  },
+                  {
+                    num: '03',
+                    icon: FilePdf,
+                    title: 'Signed PDF delivered',
+                    desc: 'Every finding has line-level source evidence and a vendor-specific remediation CLI command. SHA-256 checksum for chain-of-custody.',
+                    tab: 'results',
+                    col: '#1E1C1A',
+                  },
+                ].map((step, i) => {
+                  const Icon = step.icon;
+                  return (
+                    <motion.div key={step.num} variants={rise} className="flex gap-5">
+                      <div className="flex flex-col items-center">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border-2"
+                          style={{
+                            backgroundColor: `${step.col}12`,
+                            borderColor: `${step.col}30`,
+                          }}
+                        >
+                          <Icon size={18} weight="bold" style={{ color: step.col }} />
+                        </div>
+                        {i < 2 && (
+                          <div
+                            className="w-px flex-1 my-2 min-h-[40px]"
+                            style={{ backgroundColor: '#D1CBC0' }}
+                          />
+                        )}
+                      </div>
+                      <div className="pb-8">
+                        <div
+                          className="text-[10px] font-mono font-bold mb-1 uppercase tracking-wider"
+                          style={{ color: step.col }}
+                        >
+                          STEP {step.num}
+                        </div>
+                        <div className="text-sm font-bold text-[#1E1C1A] mb-1">{step.title}</div>
+                        <p className="text-xs text-[#7C7269] leading-relaxed mb-2">{step.desc}</p>
+                        <button
+                          onClick={() => onLaunchConsole(undefined, step.tab)}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold cursor-pointer hover:gap-2 transition-all"
+                          style={{ color: step.col }}
+                        >
+                          See this step <ArrowRight size={11} weight="bold" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
             </div>
+
+            {/* Right: stacked product UI panels */}
+            <div className="lg:col-span-7 space-y-6">
+              <motion.div
+                initial={reduce ? false : { opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.55, delay: 0.1 }}
+              >
+                <div className="text-[10px] font-mono font-bold text-[#A89F92] uppercase tracking-wider mb-3">
+                  STAGE 01 — CONFIG INGESTION
+                </div>
+                <IngestionMock />
+              </motion.div>
+
+              <motion.div
+                initial={reduce ? false : { opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.55, delay: 0.2 }}
+              >
+                <div className="text-[10px] font-mono font-bold text-[#A89F92] uppercase tracking-wider mb-3">
+                  STAGES 02–04 — DUAL-LANE PARSING ENGINE
+                </div>
+                <DualLaneMock />
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── COMPLIANCE FRAMEWORKS — editorial 2-col ─── */}
+      <section className="max-w-7xl mx-auto w-full px-6 lg:px-12 py-20">
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.45 }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start"
+        >
+          {/* Left: headline */}
+          <div className="lg:col-span-4">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#C8830A] block mb-4">
+              COMPLIANCE PACKS
+            </span>
+            <h2 className="text-4xl font-extrabold text-[#1E1C1A] tracking-tight leading-[1.05] mb-4">
+              Four authoritative standards. One engine.
+            </h2>
+            <p className="text-sm text-[#7C7269] leading-relaxed mb-6">
+              Rules are YAML. Evaluation is pure Python. No LLM touches the compliance decision — ever.
+            </p>
             <button
               onClick={() => onLaunchConsole(undefined, 'rules')}
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-sky-600 hover:text-sky-700 font-semibold cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#C8830A] hover:text-[#A66A06] cursor-pointer transition-colors"
             >
-              <span>Explore Rule Packs</span>
-              <ArrowRight size={12} weight="bold" />
+              Explore rule packs <ArrowLineRight size={14} weight="bold" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {COMPLIANCE_FRAMEWORKS.map((fw) => (
-              <div
-                key={fw.id}
-                className="bg-slate-50/70 rounded-lg border border-slate-200 p-4 space-y-3 flex flex-col justify-between"
-              >
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900">{fw.title}</span>
-                    <ShieldCheck size={16} weight="bold" className="text-sky-600" />
-                  </div>
-                  <div className="text-[11px] font-mono text-slate-500">{fw.subtitle}</div>
-                  <p className="text-xs text-slate-600 pt-1 leading-relaxed">{fw.scope}</p>
-                </div>
-
-                <div className="flex flex-wrap gap-1 pt-2 border-t border-slate-200">
-                  {fw.badges.map((b, idx) => (
-                    <span
-                      key={idx}
-                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-600"
+          {/* Right: framework cards */}
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              {
+                id: 'cis', label: 'CIS Controls v8', sub: 'Network Infrastructure Benchmark',
+                rules: ['CIS-1.1.4 SSHv2 Enforcement', 'CIS-1.2.1 Telnet Disabled', 'CIS-3.1 SNMPv3 Privacy', 'CIS-5.1 AAA Hardening'],
+                col: '#C8830A', icon: SealCheck,
+              },
+              {
+                id: 'nist', label: 'NIST SP 800-53 Rev.5', sub: 'Federal Information Systems',
+                rules: ['SC-7 Boundary Protection', 'AC-3 Access Enforcement', 'IA-2 Identification & Auth', 'AU-2 Audit Events'],
+                col: '#2D6A3F', icon: ShieldCheck,
+              },
+              {
+                id: 'stig', label: 'DISA STIG', sub: 'DoD Network Device Management',
+                rules: ['CAT I Critical Findings', 'CAT II High Severity', 'SNMPv3 Auth Privacy', 'Warning Banners'],
+                col: '#B91C1C', icon: ShieldWarning,
+              },
+              {
+                id: 'iso', label: 'ISO/IEC 27001:2022', sub: 'Information Security Management',
+                rules: ['A.13.1 Net Controls', 'A.13.2 Info Transfer', 'Net Segregation Policy', 'Audit Logging'],
+                col: '#7C7269', icon: Globe,
+              },
+            ].map((fw) => {
+              const Icon = fw.icon;
+              return (
+                <motion.div
+                  key={fw.id}
+                  initial={reduce ? false : { opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{ duration: 0.4 }}
+                  className="rounded-2xl border p-5 hover:shadow-md transition-all cursor-pointer"
+                  style={{ backgroundColor: '#FFFFFF', borderColor: '#E4E0D8' }}
+                  onClick={() => onLaunchConsole(undefined, 'rules')}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: `${fw.col}12`, border: `1.5px solid ${fw.col}30` }}
                     >
-                      {b}
+                      <Icon size={17} weight="bold" style={{ color: fw.col }} />
+                    </div>
+                    <span
+                      className="text-[9px] font-mono font-bold px-2 py-0.5 rounded uppercase tracking-wide"
+                      style={{ backgroundColor: `${fw.col}10`, color: fw.col, border: `1px solid ${fw.col}25` }}
+                    >
+                      ACTIVE
                     </span>
-                  ))}
-                </div>
-              </div>
-            ))}
+                  </div>
+                  <div className="text-sm font-bold text-[#1E1C1A] mb-0.5">{fw.label}</div>
+                  <div className="text-[10px] font-mono text-[#A89F92] mb-3">{fw.sub}</div>
+                  <div className="space-y-1">
+                    {fw.rules.map((r) => (
+                      <div key={r} className="flex items-center gap-1.5 text-[10px] text-[#7C7269] font-mono">
+                        <div className="w-1 h-1 rounded-full shrink-0" style={{ backgroundColor: fw.col }} />
+                        {r}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
-        </section>
+        </motion.div>
+      </section>
 
-        {/* ── SECTION 5: INSTITUTIONAL TELEMETRY & ATTRIBUTION STRIP ── */}
-        <section className="rounded-xl border border-slate-200 bg-white p-6 sm:p-7 shadow-xs">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
-            <div className="pt-2 sm:pt-0">
-              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono">6</div>
-              <div className="text-[11px] font-mono uppercase text-slate-500 mt-1">Vendor Parsers</div>
+      {/* ─── DROP / UPLOAD CALLOUT ─── */}
+      <section
+        className="border-t border-b"
+        style={{ backgroundColor: '#EDE8DF', borderColor: '#D1CBC0' }}
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.45 }}
+            className={`relative rounded-2xl border-2 border-dashed p-10 sm:p-14 text-center cursor-pointer transition-all ${
+              dragging ? 'border-[#C8830A] bg-[rgba(200,131,10,0.05)]' : 'border-[#C4BDB4] hover:border-[rgba(200,131,10,0.60)]'
+            }`}
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => onLaunchConsole(undefined, 'ingest')}
+          >
+            <div
+              className="mx-auto mb-5 w-16 h-16 rounded-2xl flex items-center justify-center border-2"
+              style={{ backgroundColor: 'rgba(200,131,10,0.10)', borderColor: 'rgba(200,131,10,0.30)' }}
+            >
+              <ArrowUp size={28} weight="bold" className="text-[#C8830A]" />
             </div>
-
-            <div className="pt-4 sm:pt-0">
-              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono">4</div>
-              <div className="text-[11px] font-mono uppercase text-slate-500 mt-1">Compliance Packs</div>
+            <p className="text-xl font-bold text-[#1E1C1A] mb-2">
+              Drop config file to start audit
+            </p>
+            <p className="text-sm text-[#7C7269] mb-6">
+              or <span className="text-[#C8830A] font-semibold underline underline-offset-2 cursor-pointer">open the audit workspace</span>
+            </p>
+            <p className="text-xs font-mono text-[#A89F92]">
+              .cfg · .conf · .txt · .log — Cisco IOS-XE, JunOS, PAN-OS, SONiC, FortiOS, Arista EOS
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[11px] font-mono text-[#A89F92]">
+              {[
+                { dot: '#2D6A3F', label: 'Credentials redacted client-side before parsing' },
+                { dot: '#C8830A', label: 'Session-only — cleared on tab close' },
+                { dot: '#A16207', label: 'No data sent to any server' },
+              ].map(({ dot, label }) => (
+                <span key={label} className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: dot }} />
+                  {label}
+                </span>
+              ))}
             </div>
-
-            <div className="pt-4 sm:pt-0">
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-mono">&lt; 15ms</div>
-              <div className="text-[11px] font-mono uppercase text-slate-500 mt-1">Audit Latency</div>
-            </div>
-
-            <div className="pt-4 sm:pt-0">
-              <div className="text-2xl sm:text-3xl font-extrabold text-sky-600 font-mono">100%</div>
-              <div className="text-[11px] font-mono uppercase text-slate-500 mt-1">Evidence Mapped</div>
-            </div>
-          </div>
-        </section>
-
-      </main>
-
-      {/* ── INSTITUTIONAL VERIFICATION FOOTER ── */}
-      <footer className="border-t border-slate-200 bg-white py-6 px-6 lg:px-12 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span>National Technical Research Organisation (NTRO) • Government of India</span>
+          </motion.div>
         </div>
-        <div className="font-mono text-[11px] text-slate-500">
-          Smart India Hackathon 2026 • SIH26155 • NetSentry v1.1.0
+      </section>
+
+      {/* ─── FINAL CTA ─── */}
+      <section className="max-w-7xl mx-auto w-full px-6 lg:px-12 py-20">
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+        >
+          <div className="lg:col-span-7">
+            <h2 className="text-4xl sm:text-5xl font-extrabold text-[#1E1C1A] tracking-tight leading-[1.05] mb-4">
+              Your network. Our audit.<br />
+              <span style={{ color: '#C8830A' }}>Immediate results.</span>
+            </h2>
+            <p className="text-sm text-[#7C7269] leading-relaxed max-w-[52ch]">
+              Upload any vendor config file and receive a full compliance report in under 15ms. No account required, no data retention, SHA-256-signed output for chain-of-custody.
+            </p>
+          </div>
+          <div className="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col gap-3">
+            <button
+              onClick={() => onLaunchConsole(undefined, 'ingest')}
+              className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl text-sm font-bold text-white bg-[#C8830A] hover:bg-[#A66A06] active:scale-[0.97] transition-all cursor-pointer shadow-lg shadow-[rgba(200,131,10,0.22)]"
+            >
+              <UploadSimple size={16} weight="bold" />
+              Upload & Audit Config
+            </button>
+            <button
+              onClick={() => onLaunchConsole(undefined, 'dashboard')}
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-sm font-semibold text-[#1E1C1A] border-2 border-[#D1CBC0] hover:border-[#1E1C1A] transition-all cursor-pointer"
+              style={{ backgroundColor: 'transparent' }}
+            >
+              <ArrowSquareRight size={15} weight="bold" className="text-[#C8830A]" />
+              Open Console Dashboard
+            </button>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ─── FOOTER ─── */}
+      <footer
+        className="border-t px-6 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4"
+        style={{ backgroundColor: '#EDE8DF', borderColor: '#D1CBC0' }}
+      >
+        <div className="flex items-center gap-2.5">
+          <ShieldCheck size={15} weight="fill" className="text-[#C8830A]" />
+          <span className="text-xs font-semibold text-[#4A4440]">National Technical Research Organisation (NTRO) · Government of India</span>
+        </div>
+        <div className="flex items-center gap-4 text-[11px] font-mono text-[#A89F92]">
+          <span>Smart India Hackathon 2026</span>
+          <span className="text-[#D1CBC0]">·</span>
+          <span>SIH26155</span>
+          <span className="text-[#D1CBC0]">·</span>
+          <span>ApexNet</span>
         </div>
       </footer>
+
     </div>
   );
 };

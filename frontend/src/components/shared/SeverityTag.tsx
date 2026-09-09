@@ -7,9 +7,10 @@ import { SeverityLevel } from '../../types/canonical';
 interface SeverityTagProps {
   severity: SeverityLevel | 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
   size?: 'sm' | 'md';
+  className?: string;
 }
 
-export const SeverityTag: React.FC<SeverityTagProps> = ({ severity, size = 'sm' }) => {
+export const SeverityTag: React.FC<SeverityTagProps> = ({ severity, size = 'sm', className = '' }) => {
   const norm = severity.toLowerCase() as SeverityLevel;
 
   const config: Record<SeverityLevel, { label: string; color: string; bg: string; border: string }> = {
@@ -41,10 +42,11 @@ export const SeverityTag: React.FC<SeverityTagProps> = ({ severity, size = 'sm' 
 
   const item = config[norm] || config.low;
   const padding = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
+  const widthClass = className.includes('w-') ? '' : (size === 'sm' ? 'w-20' : 'w-24');
 
   return (
     <span
-      className={`inline-flex items-center justify-center font-mono font-semibold tracking-wider rounded border ${padding}`}
+      className={`inline-flex items-center justify-center shrink-0 font-mono font-semibold tracking-wider rounded border ${widthClass} ${padding} ${className}`}
       style={{
         backgroundColor: item.bg,
         color: item.color,

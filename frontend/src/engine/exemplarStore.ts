@@ -10,9 +10,9 @@ import {
   TrainingQueueItem,
 } from "../types/canonical";
 
-const LOCAL_STORAGE_KEY_EXEMPLARS = "netsentry_exemplars_v1";
-const LOCAL_STORAGE_KEY_FIELDS = "netsentry_baseline_fields_v1";
-const LOCAL_STORAGE_KEY_QUEUE = "netsentry_training_queue_v1";
+const LOCAL_STORAGE_KEY_EXEMPLARS = "apexnet_exemplars_v1";
+const LOCAL_STORAGE_KEY_FIELDS = "apexnet_baseline_fields_v1";
+const LOCAL_STORAGE_KEY_QUEUE = "apexnet_training_queue_v1";
 
 export const INITIAL_EXEMPLARS: FewShotExemplar[] = [
   {

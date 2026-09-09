@@ -188,7 +188,7 @@ export const DualLaneEngine: React.FC<DualLaneEngineProps> = ({ onOpenTraining }
               <tr className="border-b border-slate-200 font-mono text-[11px] text-slate-600 bg-slate-50">
                 <th className="p-4 w-1/4 font-semibold">Existing Tool / Platform</th>
                 <th className="p-4 w-3/8 font-semibold">What It Already Does</th>
-                <th className="p-4 w-3/8 text-sky-700 font-semibold">What It Does NOT Do (NetSentry Opening)</th>
+                <th className="p-4 w-3/8 text-sky-700 font-semibold">What It Does NOT Do (ApexNet Opening)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-slate-700">

@@ -2,7 +2,7 @@
 import { runAllCorrectnessTests } from "./engine/__tests__/correctnessTests";
 
 const results = runAllCorrectnessTests();
-console.log("=== NETSENTRY CANONICAL ARCHITECTURE CORRECTNESS TESTS ===");
+console.log("=== APEXNET CANONICAL ARCHITECTURE CORRECTNESS TESTS ===");
 let allPassed = true;
 for (const r of results) {
   const mark = r.passed ? "[PASS]" : "[FAIL]";

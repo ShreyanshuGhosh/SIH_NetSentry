@@ -67,7 +67,7 @@ export const SettingsView: React.FC = () => {
                 className={`p-3 rounded text-left border transition-colors cursor-pointer text-xs ${
                   isSelected
                     ? 'border-sky-600 bg-sky-50 text-sky-950 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
+                    : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-[var(--bg-surface)]'
                 }`}
               >
                 <div className="font-semibold text-slate-900 flex justify-between">
@@ -101,7 +101,7 @@ export const SettingsView: React.FC = () => {
             className={`px-4 py-2 rounded text-xs border transition-colors cursor-pointer ${
               density === 'standard'
                 ? 'border-sky-600 bg-sky-50 text-sky-950 font-bold shadow-xs'
-                : 'border-slate-300 text-slate-700 bg-white hover:border-slate-400'
+                : 'border-slate-300 text-slate-700 bg-[var(--bg-surface)] hover:border-slate-400'
             }`}
           >
             Standard High-Density (Default)
@@ -111,7 +111,7 @@ export const SettingsView: React.FC = () => {
             className={`px-4 py-2 rounded text-xs border transition-colors cursor-pointer ${
               density === 'compact'
                 ? 'border-sky-600 bg-sky-50 text-sky-950 font-bold shadow-xs'
-                : 'border-slate-300 text-slate-700 bg-white hover:border-slate-400'
+                : 'border-slate-300 text-slate-700 bg-[var(--bg-surface)] hover:border-slate-400'
             }`}
           >
             Compact Cockpit Mode
@@ -124,7 +124,7 @@ export const SettingsView: React.FC = () => {
         className="p-5 rounded-lg border text-xs font-mono space-y-2"
         style={{ backgroundColor: 'var(--bg-surface-raised)', borderColor: 'var(--border-subtle)' }}
       >
-        <div className="text-slate-800 font-semibold">NETSENTRY DUAL-LANE CORE COMPLIANCE ENGINE</div>
+        <div className="text-slate-800 font-semibold">APEXNET DUAL-LANE CORE COMPLIANCE ENGINE</div>
         <div className="text-slate-600 text-[11px]">
           Build: v1.1.0-sih26155-ntro • Engine: Deterministic Lexer + Few-Shot Store
         </div>

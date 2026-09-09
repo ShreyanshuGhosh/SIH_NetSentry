@@ -15,7 +15,6 @@ import {
   CaretRight,
   Archive,
   LockSimple,
-  Sparkle,
   CircleNotch,
 } from '@phosphor-icons/react';
 import { exemplarStore } from '../engine/exemplarStore';
@@ -349,20 +348,20 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
         </div>
 
         {/* Store Counter Header */}
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
           <div
-            className="p-3 rounded-lg border text-right"
+            className="p-3.5 px-4 rounded-xl border text-right shadow-2xs"
             style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
           >
-            <div className="text-[10px] font-mono uppercase text-slate-500">Exemplar Catalog</div>
-            <div className="text-xl font-bold font-mono text-slate-900 tabular">{exemplars.length}</div>
+            <div className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">Exemplar Catalog</div>
+            <div className="text-xl font-bold font-mono text-slate-900 tabular mt-0.5">{exemplars.length}</div>
           </div>
           <div
-            className="p-3 rounded-lg border text-right"
+            className="p-3.5 px-4 rounded-xl border text-right shadow-2xs"
             style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
           >
-            <div className="text-[10px] font-mono uppercase text-slate-500">Pending Review</div>
-            <div className="text-xl font-bold font-mono text-amber-600 tabular">{pendingItems.length}</div>
+            <div className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">Pending Review</div>
+            <div className="text-xl font-bold font-mono text-amber-600 tabular mt-0.5">{pendingItems.length}</div>
           </div>
         </div>
       </div>
@@ -434,27 +433,27 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                     <button
                       key={item.id}
                       onClick={() => handleSelectQueueItem(item)}
-                      className={`w-full text-left p-3.5 transition-colors cursor-pointer flex items-start justify-between gap-3 ${
-                        isSelected ? 'bg-slate-100 text-slate-900 font-medium' : 'hover:bg-slate-50 text-slate-700'
+                      className={`w-full text-left p-3.5 transition-all cursor-pointer flex items-start justify-between gap-3 border-l-4 ${
+                        isSelected ? 'border-cyan-600 bg-cyan-50/60 text-slate-900 font-medium' : 'border-transparent hover:bg-slate-50 text-slate-700'
                       }`}
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-mono text-[10px] px-1.5 py-0.2 rounded border text-slate-700 border-slate-300 bg-slate-100">
+                          <span className="font-mono text-[10px] px-2 py-0.5 rounded-md border text-slate-700 border-slate-300 bg-slate-100 font-semibold">
                             {vendorInfo?.dialect || item.vendor}
                           </span>
                           <span className="text-[10px] font-mono text-slate-500">{item.lineNumbers}</span>
                         </div>
-                        <div className="font-mono text-xs text-slate-800 truncate mt-1">
+                        <div className="font-mono text-xs text-slate-900 truncate mt-1">
                           {item.rawCommandBlock}
                         </div>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <div className="font-mono text-[10px] font-bold text-amber-600">
+                        <div className="font-mono text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                           {Math.round(item.confidence * 100)}%
                         </div>
-                        <div className="text-[9px] text-slate-500">Amber</div>
+                        <div className="text-[9px] text-slate-400 font-mono mt-0.5">Amber</div>
                       </div>
                     </button>
                   );
@@ -510,13 +509,13 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
               </div>
 
               {/* Opt-In AI Assist Bar (§4.B) */}
-              <div className="p-3.5 rounded-lg border border-indigo-200 bg-indigo-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 rounded-xl border border-cyan-200 bg-cyan-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-950">
-                    <Sparkle size={15} className="text-indigo-600" weight="fill" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-950">
+                    <Brain size={16} className="text-cyan-600" weight="fill" />
                     <span>Opt-In LLM Normalization</span>
                   </div>
-                  <div className="text-[11px] text-indigo-800/80 mt-0.5">
+                  <div className="text-[11px] text-cyan-800/90 mt-0.5 font-sans">
                     Trigger on-demand inference to inspect raw syntax and auto-suggest the baseline mapping.
                   </div>
                 </div>
@@ -525,10 +524,10 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                   type="button"
                   disabled={isAiLoading}
                   onClick={handleAskAi}
-                  className={`shrink-0 flex items-center gap-2 px-3.5 py-1.5 rounded text-xs font-semibold text-white transition-all cursor-pointer shadow-xs ${
+                  className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all cursor-pointer shadow-xs ${
                     isAiLoading
-                      ? 'bg-indigo-400 cursor-not-allowed'
-                      : 'bg-indigo-600 hover:bg-indigo-500 active:scale-95'
+                      ? 'bg-cyan-400 cursor-not-allowed'
+                      : 'bg-cyan-600 hover:bg-cyan-700 active:scale-95'
                   }`}
                 >
                   {isAiLoading ? (
@@ -538,7 +537,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                     </>
                   ) : (
                     <>
-                      <Sparkle size={14} weight="bold" />
+                      <Brain size={14} weight="bold" />
                       <span>Auto-Map with LLM</span>
                     </>
                   )}
@@ -564,10 +563,10 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                     <div className="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-xs space-y-1.5 animate-fade-in shadow-xs">
                       <div className="flex items-center justify-between text-emerald-900 font-semibold">
                         <span className="flex items-center gap-1.5">
-                          <Sparkle size={14} className="text-emerald-600" weight="fill" />
+                          <Brain size={14} className="text-emerald-600" weight="fill" />
                           <span>LLM Recommendation ({Math.round(aiSuggestion.confidence * 100)}% Confidence)</span>
                         </span>
-                        <span className="font-mono text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200 font-bold">
+                        <span className="font-mono text-[10px] text-emerald-700 bg-[var(--bg-surface)] px-1.5 py-0.5 rounded border border-emerald-200 font-bold">
                           LLM SUGGESTED
                         </span>
                       </div>
@@ -588,10 +587,10 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                   <div className="p-3.5 rounded-lg border border-amber-200 bg-amber-50/70 text-xs space-y-2 animate-fade-in shadow-xs">
                     <div className="flex items-center justify-between text-amber-900 font-semibold">
                       <span className="flex items-center gap-1.5">
-                        <Sparkle size={14} className="text-amber-600" weight="fill" />
+                        <Brain size={14} className="text-amber-600" weight="fill" />
                         <span>LLM Analysis ({Math.round(aiSuggestion.confidence * 100)}% Confidence)</span>
                       </span>
-                      <span className="font-mono text-[10px] text-amber-800 bg-white px-1.5 py-0.5 rounded border border-amber-300 font-bold">
+                      <span className="font-mono text-[10px] text-amber-800 bg-[var(--bg-surface)] px-1.5 py-0.5 rounded border border-amber-300 font-bold">
                         OUT OF BASELINE SCOPE
                       </span>
                     </div>
@@ -620,7 +619,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                   <button
                     type="button"
                     onClick={() => setIsCreatingField(!isCreatingField)}
-                    className="flex items-center gap-1 text-xs text-sky-600 hover:text-sky-700 font-medium cursor-pointer"
+                    className="flex items-center gap-1 text-xs text-cyan-600 hover:text-cyan-700 font-medium cursor-pointer"
                   >
                     <Plus size={12} />
                     <span>{isCreatingField ? 'Cancel' : 'Register New Field'}</span>
@@ -629,8 +628,8 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
 
                 {/* §6.1 On-the-fly field registration modal/card */}
                 {isCreatingField && (
-                  <div className="p-4 rounded border bg-slate-50 border-sky-300 space-y-3">
-                    <div className="text-xs font-semibold text-sky-900">
+                  <div className="p-4 rounded-xl border bg-slate-50 border-cyan-300 space-y-3">
+                    <div className="text-xs font-semibold text-cyan-900">
                       Create Extensible Baseline Field (§6.1)
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -641,7 +640,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                           placeholder="e.g. bgpAuthEnabled"
                           value={newFieldKey}
                           onChange={(e) => setNewFieldKey(e.target.value)}
-                          className="w-full px-2.5 py-1.5 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-500"
+                          className="w-full px-2.5 py-1.5 rounded-md text-xs font-mono text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-cyan-500"
                         />
                       </div>
                       <div>
@@ -651,7 +650,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                           placeholder="e.g. BGP Peer Authentication"
                           value={newFieldLabel}
                           onChange={(e) => setNewFieldLabel(e.target.value)}
-                          className="w-full px-2.5 py-1.5 rounded text-xs text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-500"
+                          className="w-full px-2.5 py-1.5 rounded-md text-xs text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-cyan-500"
                         />
                       </div>
                       <div>
@@ -659,7 +658,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                         <select
                           value={newFieldType}
                           onChange={(e) => setNewFieldType(e.target.value as any)}
-                          className="w-full px-2.5 py-1.5 rounded text-xs text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-500"
+                          className="w-full px-2.5 py-1.5 rounded-md text-xs text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-cyan-500"
                         >
                           <option value="boolean">Boolean</option>
                           <option value="number">Number</option>
@@ -670,7 +669,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                     <button
                       type="button"
                       onClick={handleCreateNewField}
-                      className="px-3 py-1.5 rounded text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-md text-xs font-semibold text-white bg-cyan-600 hover:bg-cyan-500 cursor-pointer shadow-xs"
                     >
                       Save New Field to Schema
                     </button>
@@ -686,20 +685,20 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                       placeholder="Search baseline controls..."
                       value={fieldSearch}
                       onChange={(e) => setFieldSearch(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 rounded text-xs text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-500"
+                      className="w-full pl-9 pr-3 py-2 rounded-lg text-xs text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-cyan-500"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[160px] overflow-y-auto p-1 border rounded border-slate-200 bg-slate-50">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[160px] overflow-y-auto p-1.5 border rounded-lg border-slate-200 bg-slate-50">
                     {filteredFields.map((f) => (
                       <button
                         key={f.key}
                         type="button"
                         onClick={() => setSelectedFieldKey(f.key)}
-                        className={`text-left p-2 rounded text-xs transition-colors cursor-pointer border ${
+                        className={`text-left p-2 rounded-md text-xs transition-all cursor-pointer border ${
                           selectedFieldKey === f.key
-                            ? 'border-sky-600 bg-sky-50 text-sky-950 shadow-sm'
-                            : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
+                            ? 'border-cyan-600 bg-cyan-50 text-cyan-950 shadow-xs'
+                            : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-[var(--bg-surface)]'
                         }`}
                       >
                         <div className="font-semibold text-slate-900 truncate">{f.label}</div>
@@ -719,7 +718,7 @@ export const TrainingUI: React.FC<TrainingUIProps> = ({ onTrainingUpdated }) => 
                     value={mappedValue}
                     onChange={(e) => setMappedValue(e.target.value)}
                     placeholder="e.g. true, false, 10, or value"
-                    className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-500"
+                    className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-sky-500"
                   />
                   <div className="text-[10px] text-slate-500 mt-1">
                     Enter <span className="font-mono text-slate-700 font-semibold">true</span>, <span className="font-mono text-slate-700 font-semibold">false</span>, a numeric limit, or text string.

@@ -41,7 +41,7 @@ const SCANNER_CONFIGS: Record<
     model: 'Catalyst 9300-48P Enterprise Core',
     os: 'IOS-XE 17.9.4a',
     benchmark: 'CIS Cisco IOS-XE Benchmark v2.0.0 / DISA STIG',
-    remediationScript: `! NetSentry Certified Hardening Script: Cisco IOS-XE
+    remediationScript: `! ApexNet Certified Hardening Script: Cisco IOS-XE
 ! Target: Catalyst 9300-48P (IOS-XE 17.9.4a)
 ! Benchmark: CIS Cisco IOS-XE v2.0.0 / DISA STIG
 configure terminal
@@ -127,7 +127,7 @@ write memory`,
     model: 'SRX345 Enterprise Firewall Gateway',
     os: 'JunOS 22.4R2-S2.5',
     benchmark: 'CIS Juniper JunOS Benchmark v1.1.0',
-    remediationScript: `# NetSentry Certified Hardening Script: Juniper JunOS
+    remediationScript: `# ApexNet Certified Hardening Script: Juniper JunOS
 # Target: SRX345 Gateway (JunOS 22.4R2-S2.5)
 # Benchmark: CIS Juniper JunOS v1.1.0
 configure
@@ -183,7 +183,7 @@ commit and-quit`,
     model: 'PA-3220 Next-Gen Perimeter Firewall',
     os: 'PAN-OS 11.0.2-h3',
     benchmark: 'CIS Palo Alto Firewall 11 Benchmark v1.0.0',
-    remediationScript: `# NetSentry Certified Hardening Script: Palo Alto PAN-OS
+    remediationScript: `# ApexNet Certified Hardening Script: Palo Alto PAN-OS
 # Target: PA-3220 Perimeter Firewall (PAN-OS 11.0.2-h3)
 # Benchmark: CIS Palo Alto Firewall 11 v1.0.0
 configure
@@ -236,7 +236,7 @@ commit`,
     model: 'Edgecore AS7712-32X Leaf Switch',
     os: 'SONiC.202311.0',
     benchmark: 'Open Compute Project (OCP) Hardening Profile',
-    remediationScript: `# NetSentry Certified Hardening Script: SONiC Linux
+    remediationScript: `# ApexNet Certified Hardening Script: SONiC Linux
 # Target: Edgecore AS7712-32X (SONiC 202311)
 # Benchmark: OCP / CIS SONiC Hardening Profile
 sonic-cli
@@ -276,7 +276,7 @@ write memory`,
     model: 'FortiGate 60F Edge Appliance',
     os: 'FortiOS v7.4.2',
     benchmark: 'CIS Fortinet FortiOS 7.x Benchmark',
-    remediationScript: `# NetSentry Certified Hardening Script: Fortinet FortiOS
+    remediationScript: `# ApexNet Certified Hardening Script: Fortinet FortiOS
 # Target: FortiGate 60F (FortiOS v7.4.2)
 # Benchmark: CIS Fortinet FortiOS 7.x
 config system global
@@ -326,7 +326,7 @@ end`,
     model: 'Arista 7050X Data Center Leaf Switch',
     os: 'EOS 4.30.2F',
     benchmark: 'CIS Arista EOS Benchmark v1.0.0',
-    remediationScript: `! NetSentry Certified Hardening Script: Arista EOS
+    remediationScript: `! ApexNet Certified Hardening Script: Arista EOS
 ! Target: 7050X Leaf (EOS 4.30.2F)
 ! Benchmark: CIS Arista EOS Benchmark v1.0.0
 configure terminal
@@ -484,7 +484,7 @@ export const TacticalRemediationScanner: React.FC<TacticalRemediationScannerProp
           <span>VULNERABLE BASELINE (Anti-Patterns)</span>
         </div>
 
-        <div className="text-slate-600 font-semibold bg-white px-3 py-1 rounded border border-slate-200 shadow-xs">
+        <div className="text-slate-600 font-semibold bg-[var(--bg-surface)] px-3 py-1 rounded border border-slate-200 shadow-xs">
           Scrub Position: <span className="text-slate-900 font-bold">{sliderPos}% Hardened</span>
         </div>
 

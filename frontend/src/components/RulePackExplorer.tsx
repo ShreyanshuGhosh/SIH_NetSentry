@@ -72,7 +72,7 @@ remediation_cli: |
               className={`px-4 py-2 rounded text-xs font-mono transition-colors cursor-pointer border ${
                 isSelected
                   ? 'border-sky-600 bg-sky-50 text-sky-950 font-bold shadow-xs'
-                  : 'border-slate-300 hover:border-slate-400 text-slate-700 bg-white'
+                  : 'border-slate-300 hover:border-slate-400 text-slate-700 bg-[var(--bg-surface)]'
               }`}
             >
               {fw?.name || fwId}
@@ -156,7 +156,7 @@ remediation_cli: |
                       className={`px-2 py-1 rounded text-[10px] font-mono transition-colors cursor-pointer border ${
                         selectedVendor === v
                           ? 'border-sky-600 bg-sky-50 text-sky-950 font-bold shadow-xs'
-                          : 'border-slate-300 text-slate-700 bg-white hover:border-slate-400'
+                          : 'border-slate-300 text-slate-700 bg-[var(--bg-surface)] hover:border-slate-400'
                       }`}
                     >
                       {v.split('_')[0].toUpperCase()}

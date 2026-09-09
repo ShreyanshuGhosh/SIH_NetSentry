@@ -1,6 +1,6 @@
 // src/components/shell/NavRail.tsx
-// Persistent left icon-rail on every authenticated screen (§5)
-// Dense, quiet, professional aesthetic (CrowdStrike / Palantir)
+// Persistent left icon-rail — Institutional Light Mode
+// Warm stone palette, saffron-gold accent. Clean ApexNet logo hyperlink to landing page.
 
 import React from 'react';
 import {
@@ -31,6 +31,7 @@ interface NavRailProps {
   activeTab: ActiveNavTab;
   onSelectTab: (tab: ActiveNavTab) => void;
   pendingTrainingCount?: number;
+  onViewLandingPage?: () => void;
 }
 
 interface NavItem {
@@ -44,57 +45,57 @@ export const NavRail: React.FC<NavRailProps> = ({
   activeTab,
   onSelectTab,
   pendingTrainingCount = 0,
+  onViewLandingPage,
 }) => {
   const navItems: NavItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: SquaresFour },
-    { id: 'ingest', label: 'Ingest & Audit', icon: UploadSimple },
-    { id: 'results', label: 'Audit Results', icon: ShieldCheck },
+    { id: 'dashboard',    label: 'Dashboard',               icon: SquaresFour },
+    { id: 'ingest',       label: 'Ingest & Audit',          icon: UploadSimple },
+    { id: 'results',      label: 'Audit Results',           icon: ShieldCheck },
     {
-      id: 'training',
-      label: 'AI Training GUI',
-      icon: Brain,
+      id: 'training', label: 'AI Training GUI', icon: Brain,
       badge: pendingTrainingCount > 0 ? pendingTrainingCount : undefined,
     },
-    { id: 'rules', label: 'Rule Packs', icon: FileCode },
-    { id: 'remediation', label: 'Remediation Scanner', icon: GitDiff },
-    { id: 'live-pull', label: 'Live Pull Simulator', icon: TerminalWindow },
+    { id: 'rules',        label: 'Rule Packs',              icon: FileCode },
+    { id: 'remediation',  label: 'Remediation Scanner',     icon: GitDiff },
+    { id: 'live-pull',    label: 'Live Pull Simulator',     icon: TerminalWindow },
     { id: 'architecture', label: 'Trust Boundary & Dual-Lane', icon: Cpu },
   ];
 
   return (
     <aside
       className="w-16 md:w-56 shrink-0 border-r flex flex-col justify-between select-none z-30 min-h-screen"
-      style={{
-        backgroundColor: 'var(--bg-surface)',
-        borderColor: 'var(--border-subtle)',
-      }}
+      style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-default)' }}
     >
       <div>
-        {/* Brand / Logo Header */}
-        <div
-          className="h-14 flex items-center px-4 gap-3 border-b"
+        {/* Brand — Hyperlinked ApexNet Logo & Title (Clicking returns to Public Landing Page) */}
+        <button
+          onClick={onViewLandingPage}
+          className="w-full h-14 flex items-center px-4 gap-3 border-b text-left hover:bg-[rgba(200,131,10,0.06)] transition-all cursor-pointer group"
           style={{ borderColor: 'var(--border-subtle)' }}
+          title="ApexNet — Return to Public Landing Page"
         >
           <div
-            className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 border border-sky-200 bg-sky-50 text-sky-600"
+            className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 border group-hover:scale-105 transition-transform"
+            style={{ backgroundColor: 'rgba(200,131,10,0.10)', borderColor: 'rgba(200,131,10,0.30)' }}
           >
-            <Shield size={17} weight="bold" />
+            <Shield size={17} weight="bold" className="text-[#C8830A]" />
           </div>
           <div className="hidden md:block overflow-hidden">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xs font-bold text-slate-900 tracking-tight">NetSentry</span>
-              <span className="font-mono text-[10px] text-slate-400 font-normal">v1.1.0</span>
+              <span className="text-sm font-extrabold text-[#1E1C1A] tracking-tight group-hover:text-[#C8830A] transition-colors">
+                ApexNet
+              </span>
             </div>
-            <div className="text-[10px] font-mono text-slate-500 tracking-tight flex items-center gap-1 mt-0.5">
+            <div className="text-[10px] font-mono text-[#A89F92] flex items-center gap-1 mt-0.5">
               <span>NTRO</span>
-              <span className="text-slate-300 select-none">/</span>
+              <span className="text-[#D1CBC0]">/</span>
               <span>SIH26155</span>
             </div>
           </div>
-        </div>
+        </button>
 
-        {/* Navigation items list */}
-        <nav className="p-2 space-y-1">
+        {/* Nav items */}
+        <nav className="p-2 space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -103,42 +104,40 @@ export const NavRail: React.FC<NavRailProps> = ({
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded text-xs transition-colors cursor-pointer group text-left relative ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-xs font-medium transition-all cursor-pointer relative ${
                   isActive
-                    ? 'text-slate-900 font-semibold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'font-bold border'
+                    : 'text-[#7C7269] hover:text-[#1E1C1A] hover:bg-[#EDE8DF]'
                 }`}
-                style={{
-                  backgroundColor: isActive ? 'var(--bg-surface-raised)' : 'transparent',
-                }}
-                title={item.label}
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: 'var(--bg-canvas)',
+                        borderColor: 'var(--border-default)',
+                        color: 'var(--text-primary)',
+                      }
+                    : {}
+                }
               >
-                {isActive && (
-                  <span
-                    className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r"
-                    style={{ backgroundColor: 'var(--accent-primary)' }}
-                  />
-                )}
                 <Icon
-                  size={18}
+                  size={16}
                   weight={isActive ? 'bold' : 'regular'}
-                  style={{
-                    color: isActive ? 'var(--accent-primary)' : 'inherit',
-                  }}
+                  className={isActive ? 'text-[#C8830A]' : 'text-[#A89F92]'}
                 />
                 <span className="hidden md:inline truncate">{item.label}</span>
-
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span
-                    className="ml-auto hidden md:flex items-center justify-center font-mono text-[10px] px-1.5 py-0.2 rounded-full font-bold"
-                    style={{
-                      backgroundColor: 'var(--status-warn-bg)',
-                      color: 'var(--status-warn)',
-                      border: '1px solid rgba(217, 119, 6, 0.3)',
-                    }}
-                  >
-                    {item.badge}
-                  </span>
+                {item.badge !== undefined && (
+                  <>
+                    <span
+                      className="hidden md:inline-flex ml-auto text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full"
+                      style={{
+                        backgroundColor: 'rgba(200,131,10,0.15)',
+                        color: '#7C4F04',
+                      }}
+                    >
+                      {item.badge}
+                    </span>
+                    <span className="md:hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#C8830A]" />
+                  </>
                 )}
               </button>
             );
@@ -146,28 +145,28 @@ export const NavRail: React.FC<NavRailProps> = ({
         </nav>
       </div>
 
-      {/* Bottom section: Settings & System metadata */}
+      {/* Footer / Settings */}
       <div className="p-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
         <button
           onClick={() => onSelectTab('settings')}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded text-xs transition-colors cursor-pointer ${
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-xs font-medium transition-all cursor-pointer ${
             activeTab === 'settings'
-              ? 'text-slate-900 font-semibold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'font-bold border'
+              : 'text-[#7C7269] hover:text-[#1E1C1A] hover:bg-[#EDE8DF]'
           }`}
-          style={{
-            backgroundColor: activeTab === 'settings' ? 'var(--bg-surface-raised)' : 'transparent',
-          }}
-          title="System Settings"
+          style={
+            activeTab === 'settings'
+              ? {
+                  backgroundColor: 'var(--bg-canvas)',
+                  borderColor: 'var(--border-default)',
+                  color: 'var(--text-primary)',
+                }
+              : {}
+          }
         >
-          <GearSix size={18} />
+          <GearSix size={16} weight={activeTab === 'settings' ? 'bold' : 'regular'} />
           <span className="hidden md:inline">Settings</span>
         </button>
-
-        <div className="hidden md:block px-3 py-2 mt-1 text-[10px] text-slate-500 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
-          <div>Engine: <span className="text-slate-700 font-medium">Dual-Lane Core</span></div>
-          <div>Mode: <span className="text-emerald-700 font-medium">Deterministic</span></div>
-        </div>
       </div>
     </aside>
   );

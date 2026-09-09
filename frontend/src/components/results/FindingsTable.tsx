@@ -94,8 +94,10 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                 className="p-4 flex items-center justify-between gap-4 cursor-pointer"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <StatusBadge status={finding.status} />
-                  <SeverityTag severity={finding.severity} />
+                  <div className="flex items-center gap-2 shrink-0 w-36">
+                    <StatusBadge status={finding.status} />
+                    <SeverityTag severity={finding.severity} />
+                  </div>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -145,7 +147,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                           Resolved via exemplar <strong className="font-mono text-sky-900">{finding.resolvedViaExemplar.exemplarId}</strong> (learned from device <strong className="font-mono text-sky-900">{finding.resolvedViaExemplar.sourceDeviceId}</strong>)
                         </span>
                       </div>
-                      <span className="font-mono text-[10px] text-sky-700 font-semibold uppercase tracking-wider bg-white px-2 py-0.5 rounded border border-sky-200 shrink-0">
+                      <span className="font-mono text-[10px] text-sky-700 font-semibold uppercase tracking-wider bg-[var(--bg-surface)] px-2 py-0.5 rounded border border-sky-200 shrink-0">
                         Cross-Device Reused
                       </span>
                     </div>
@@ -157,7 +159,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                       Triggering Line-Level Evidence
                     </div>
                     {finding.evidenceLines.length > 0 ? (
-                      <div className="rounded border border-slate-200 bg-white p-3 font-mono text-[11px] space-y-1">
+                      <div className="rounded border border-slate-200 bg-[var(--bg-surface)] p-3 font-mono text-[11px] space-y-1">
                         {finding.evidenceLines.map((ev, i) => (
                           <div key={i} className="flex gap-3 text-rose-700">
                             <span className="text-slate-400 select-none w-8 text-right">L{ev.line}</span>
@@ -166,7 +168,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                         ))}
                       </div>
                     ) : (
-                      <div className="rounded border border-slate-200 bg-white p-3 font-mono text-[11px] text-slate-500 italic">
+                      <div className="rounded border border-slate-200 bg-[var(--bg-surface)] p-3 font-mono text-[11px] text-slate-500 italic">
                         Control omitted in configuration; negative check trigger (absence of mandatory hardening directive).
                       </div>
                     )}
@@ -197,7 +199,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                     </div>
 
                     <pre
-                      className="p-3 rounded border border-slate-200 bg-white font-mono text-[11px] leading-relaxed overflow-x-auto text-emerald-800"
+                      className="p-3 rounded border border-slate-200 bg-[var(--bg-surface)] font-mono text-[11px] leading-relaxed overflow-x-auto text-emerald-800"
                     >
                       {finding.remediationCommand}
                     </pre>

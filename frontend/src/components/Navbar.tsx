@@ -100,13 +100,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onBackToLanding ? onBackToLanding : () => setActiveTab('pipeline')}
             className="flex items-center gap-2.5 shrink-0 cursor-pointer group"
-            title="NetSentry Home (Main Landing Page)"
+            title="ApexNet Home (Main Landing Page)"
           >
             <div className="w-7 h-7 rounded-none flex items-center justify-center border border-slate-800 bg-black group-hover:border-cyan-600 transition-colors">
               <ShieldCheck size={16} weight="bold" className="text-cyan-400" />
             </div>
             <span className="font-bold text-sm tracking-tight text-white group-hover:text-cyan-300 transition-colors">
-              NetSentry
+              ApexNet
             </span>
             <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-none border text-cyan-400 border-cyan-800/80 bg-cyan-950/60">
               HOME

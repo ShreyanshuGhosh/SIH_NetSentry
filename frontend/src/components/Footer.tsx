@@ -7,7 +7,7 @@ export const Footer: React.FC = () => (
       style={{ fontSize: 11, color: 'var(--text-tertiary)' }}
     >
       <div className="space-y-1">
-        <p>NetSentry - AI-Driven Multi-Vendor Network Compliance Auditor</p>
+        <p>ApexNet - AI-Driven Multi-Vendor Network Compliance Auditor</p>
         <p>Problem Statement SIH26155 / Organisation: NTRO / Smart India Hackathon 2026</p>
       </div>
       <div className="text-right space-y-1">

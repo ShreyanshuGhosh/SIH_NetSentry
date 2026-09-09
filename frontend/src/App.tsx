@@ -1,5 +1,5 @@
 // src/App.tsx
-// Authoritative Consolidated NetSentry Platform Application
+// Authoritative Consolidated ApexNet Platform Application
 // Zero-Slop Architecture with Persistent NavRail, TopBar, and Phase 0 Pipeline Integration
 
 import React, { useState, useCallback, useMemo } from 'react';
@@ -30,9 +30,20 @@ export function App() {
 
   // Active configuration & audit state
   const [selectedConfig, setSelectedConfig] = useState<SampleDeviceConfig>(SAMPLE_CONFIGS[0]);
-  const [selectedFramework, setSelectedFramework] = useState<FrameworkId>('cis_v8');
+  const [selectedFrameworks, setSelectedFrameworks] = useState<FrameworkId[]>(['cis_v8']);
   const [selectedLane, setSelectedLane] = useState<ParsingLane | 'auto'>('auto');
   const [isAuditing, setIsAuditing] = useState(false);
+
+  const handleToggleFramework = useCallback((fwId: FrameworkId) => {
+    setSelectedFrameworks((prev) => {
+      if (prev.includes(fwId)) {
+        if (prev.length === 1) return prev; // Keep at least 1 selected
+        return prev.filter((f) => f !== fwId);
+      } else {
+        return [...prev, fwId];
+      }
+    });
+  }, []);
 
   // Initial audit execution using Phase 0 canonical pipeline
   const [pipelineResult, setPipelineResult] = useState<PipelineExecutionResult>(() =>
@@ -69,6 +80,24 @@ export function App() {
     });
   });
 
+  // Automatically scroll to top whenever activeTab changes
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [activeTab]);
+
+  // Data Loss Protection — Prompt before page unload/reload when in console session
+  React.useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (viewMode === 'console') {
+        e.preventDefault();
+        e.returnValue = 'Data Loss Protection: Unsaved audit state will be lost if you reload.';
+        return e.returnValue;
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [viewMode]);
+
   // Execute compliance audit through Phase 0 pipeline
   const handleExecuteAudit = useCallback(() => {
     setIsAuditing(true);
@@ -76,13 +105,14 @@ export function App() {
       const res = runCompliancePipeline(selectedConfig.rawText, {
         deviceId: selectedConfig.id,
         vendorOverride: selectedConfig.vendor as any,
-        frameworks: [selectedFramework],
+        frameworks: selectedFrameworks,
         forceLane: selectedLane === 'auto' ? undefined : (selectedLane as any),
       });
 
       setPipelineResult(res);
       setIsAuditing(false);
       setActiveTab('results');
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
       // Update recent audits list
       setRecentAudits((prev) => {
@@ -102,7 +132,7 @@ export function App() {
         ];
       });
     }, 450);
-  }, [selectedConfig, selectedFramework, selectedLane]);
+  }, [selectedConfig, selectedFrameworks, selectedLane]);
 
   // Handle batch audit execution from BulkDropzone
   const handleBatchAudit = useCallback(
@@ -115,7 +145,7 @@ export function App() {
           return runCompliancePipeline(file.rawText, {
             deviceId: file.id,
             vendorOverride: file.detectedVendor,
-            frameworks: [selectedFramework],
+            frameworks: selectedFrameworks,
           });
         });
 
@@ -139,7 +169,7 @@ export function App() {
         setActiveTab('results');
       }, 650);
     },
-    [selectedFramework]
+    [selectedFrameworks]
   );
 
   // Live pull ingestion handoff
@@ -149,12 +179,12 @@ export function App() {
       const res = runCompliancePipeline(config.rawText, {
         deviceId: config.id,
         vendorOverride: config.vendor as any,
-        frameworks: [selectedFramework],
+        frameworks: selectedFrameworks,
       });
       setPipelineResult(res);
       setActiveTab('results');
     },
-    [selectedFramework]
+    [selectedFrameworks]
   );
 
   // Callback when Training GUI updates few-shot store (demonstrates Test 2: Mapping reuse!)
@@ -164,11 +194,11 @@ export function App() {
     const updated = runCompliancePipeline(selectedConfig.rawText, {
       deviceId: selectedConfig.id,
       vendorOverride: selectedConfig.vendor as any,
-      frameworks: [selectedFramework],
+      frameworks: selectedFrameworks,
       forceLane: 'llm_fallback',
     });
     setPipelineResult(updated);
-  }, [selectedConfig, selectedFramework]);
+  }, [selectedConfig, selectedFrameworks]);
 
   // Telemetry metrics for top bar
   const currentSummary = pipelineResult.auditResult.summary;
@@ -183,7 +213,7 @@ export function App() {
           const res = runCompliancePipeline(found.rawText, {
             deviceId: found.id,
             vendorOverride: found.vendor as any,
-            frameworks: [selectedFramework],
+            frameworks: selectedFrameworks,
           });
           setPipelineResult(res);
           setActiveTab((targetTab as ActiveNavTab) || 'results');
@@ -198,12 +228,12 @@ export function App() {
       setViewMode('console');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    [selectedFramework]
+    [selectedFrameworks]
   );
 
   return (
     <div
-      className="min-h-screen flex flex-col selection:bg-sky-100 selection:text-sky-900"
+      className="min-h-screen flex flex-col"
       style={{
         backgroundColor: 'var(--bg-canvas)',
         color: 'var(--text-primary)',
@@ -221,6 +251,7 @@ export function App() {
             activeTab={activeTab}
             onSelectTab={setActiveTab}
             pendingTrainingCount={pendingTrainingCount}
+            onViewLandingPage={() => setViewMode('landing')}
           />
 
           {/* Right Main Content Area */}
@@ -233,8 +264,11 @@ export function App() {
               passCount={currentSummary.passed}
               failCount={currentSummary.failed}
               isAuditing={isAuditing}
+              activeTab={activeTab}
               onExecuteAudit={handleExecuteAudit}
               onViewPublicOverview={() => setViewMode('landing')}
+              onBackToDashboard={() => setActiveTab('dashboard')}
+              onViewLandingPage={() => setViewMode('landing')}
             />
 
             {/* View Router */}
@@ -262,8 +296,9 @@ export function App() {
                 <IngestionConsole
                   selectedConfig={selectedConfig}
                   onSelectConfig={setSelectedConfig}
-                  selectedFramework={selectedFramework}
-                  onSelectFramework={setSelectedFramework}
+                  selectedFrameworks={selectedFrameworks}
+                  onToggleFramework={handleToggleFramework}
+                  onSelectAllFrameworks={(fws) => setSelectedFrameworks(fws)}
                   selectedLane={selectedLane}
                   onSelectLane={setSelectedLane}
                   onExecuteAudit={handleExecuteAudit}

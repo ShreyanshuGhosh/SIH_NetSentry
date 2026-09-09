@@ -36,10 +36,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', c
   }
 
   const padding = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
+  const widthClass = className.includes('w-') ? '' : (size === 'sm' ? 'w-14' : 'w-16');
 
   return (
     <span
-      className={`inline-flex items-center justify-center font-mono font-semibold tracking-wider rounded border ${padding} ${className}`}
+      className={`inline-flex items-center justify-center shrink-0 font-mono font-semibold tracking-wider rounded border ${widthClass} ${padding} ${className}`}
       style={{
         backgroundColor: bg,
         color: color,

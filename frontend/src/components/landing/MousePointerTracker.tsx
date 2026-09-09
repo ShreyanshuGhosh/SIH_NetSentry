@@ -143,7 +143,7 @@ export const MousePointerTracker: React.FC = () => {
           color: isHoveringInteractive ? '#15803d' : '#64748b',
         }}
       >
-        <span className="bg-white/95 px-1.5 py-0.5 rounded shadow-xs border border-slate-200 backdrop-blur-xs">
+        <span className="bg-[var(--bg-surface)]/95 px-1.5 py-0.5 rounded shadow-xs border border-slate-200 backdrop-blur-xs">
           [{coords.x}, {coords.y}]
         </span>
         {isHoveringInteractive && (

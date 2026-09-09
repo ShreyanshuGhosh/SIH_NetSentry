@@ -131,7 +131,7 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
               type="text"
               value={host}
               onChange={(e) => setHost(e.target.value)}
-              className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
+              className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
             />
           </div>
 
@@ -142,7 +142,7 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
                 type="text"
                 value={port}
                 onChange={(e) => setPort(e.target.value)}
-                className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
+                className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
               />
             </div>
             <div>
@@ -151,7 +151,7 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
                 type="text"
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
-                className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
+                className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
               />
             </div>
           </div>
@@ -161,7 +161,7 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
             <select
               value={driver}
               onChange={(e) => setDriver(e.target.value)}
-              className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-white border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
+              className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
             >
               {DRIVERS.map((d) => (
                 <option key={d.value} value={d.value}>

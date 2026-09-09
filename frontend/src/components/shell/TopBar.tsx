@@ -1,9 +1,14 @@
 // src/components/shell/TopBar.tsx
-// Persistent top navigation bar across authenticated console screens
+// Persistent top navigation bar — Institutional Light Mode
+// Warm stone palette, saffron-gold accent. Clean ApexNet brand hyperlink.
 
 import React from 'react';
-import { Play, ArrowSquareOut, CheckCircle, WarningCircle, XCircle } from '@phosphor-icons/react';
+import {
+  Play, ArrowSquareOut, CheckCircle, XCircle, MagnifyingGlass,
+  Bell, Question, ArrowLeft, Shield,
+} from '@phosphor-icons/react';
 import { SupportedVendor, VENDOR_DISPLAY_NAMES } from '../../types/canonical';
+import { ActiveNavTab } from './NavRail';
 
 interface TopBarProps {
   currentDeviceName: string;
@@ -12,8 +17,11 @@ interface TopBarProps {
   passCount: number;
   failCount: number;
   isAuditing?: boolean;
+  activeTab?: ActiveNavTab;
   onExecuteAudit: () => void;
   onViewPublicOverview: () => void;
+  onBackToDashboard?: () => void;
+  onViewLandingPage?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -23,8 +31,11 @@ export const TopBar: React.FC<TopBarProps> = ({
   passCount,
   failCount,
   isAuditing = false,
+  activeTab,
   onExecuteAudit,
   onViewPublicOverview,
+  onBackToDashboard,
+  onViewLandingPage,
 }) => {
   const vendorInfo = VENDOR_DISPLAY_NAMES[currentVendor] || { name: 'Multi-Vendor', dialect: 'Standard' };
 
@@ -35,35 +46,65 @@ export const TopBar: React.FC<TopBarProps> = ({
       ? 'var(--status-warn)'
       : 'var(--status-fail)';
 
+  const showBackButton = activeTab && activeTab !== 'dashboard';
+  const handleLandingClick = onViewLandingPage || onViewPublicOverview;
+
   return (
     <header
-      className="h-14 border-b px-4 md:px-6 flex items-center justify-between shrink-0 select-none z-20"
-      style={{
-        backgroundColor: 'var(--bg-surface)',
-        borderColor: 'var(--border-subtle)',
-      }}
+      className="h-14 border-b px-3 sm:px-5 flex items-center justify-between shrink-0 select-none z-20 backdrop-blur-sm sticky top-0 gap-2 sm:gap-4 overflow-hidden"
+      style={{ backgroundColor: 'rgba(237,234,228,0.95)', borderColor: 'var(--border-default)' }}
     >
-      {/* Left: Operational Context & Target Device Status */}
-      <div className="flex items-center gap-4 min-w-0">
-        <div className="hidden sm:flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
-          <span className="text-xs font-semibold text-slate-900 truncate">
-            NTRO Defense Infrastructure
-          </span>
-          <span className="text-slate-300 text-xs">•</span>
-        </div>
+      {/* Left: Premium Back Button + Device Context / Brand Hyperlink */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+        
+        {/* Stylish Premium Back Button (Only on sub-pages, NOT on Dashboard or Landing) */}
+        {showBackButton && (
+          <button
+            onClick={onBackToDashboard}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-[#1E1C1A] border transition-all cursor-pointer hover:bg-[#EDE8DF] hover:border-[#1E1C1A] active:scale-95 shadow-xs shrink-0"
+            style={{
+              backgroundColor: 'var(--bg-canvas)',
+              borderColor: 'var(--border-default)',
+            }}
+            title="Back to Fleet Dashboard"
+          >
+            <ArrowLeft size={14} weight="bold" className="text-[#C8830A]" />
+            <span>Back</span>
+          </button>
+        )}
 
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-slate-500 text-xs hidden md:inline">Target:</span>
-          <span className="text-xs font-semibold text-slate-900 truncate">
+        {/* Hyperlinked ApexNet Brand / Logo */}
+        <button
+          onClick={handleLandingClick}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer text-left shrink-0 group"
+          title="ApexNet — Return to Public Landing Page"
+        >
+          <div
+            className="w-7 h-7 rounded-md flex items-center justify-center border shrink-0 bg-[rgba(200,131,10,0.10)] border-[rgba(200,131,10,0.30)] group-hover:scale-105 transition-transform"
+          >
+            <Shield size={14} weight="bold" className="text-[#C8830A]" />
+          </div>
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A3F] animate-pulse" />
+            <span className="text-xs font-extrabold text-[#1E1C1A] truncate group-hover:text-[#C8830A] transition-colors">
+              ApexNet Perimeter
+            </span>
+            <span className="text-[#D1CBC0] text-xs">·</span>
+          </div>
+        </button>
+
+        {/* Target Node Details */}
+        <div className="flex items-center gap-1.5 min-w-0 truncate">
+          <span className="text-[#A89F92] text-xs hidden lg:inline shrink-0">Target Node:</span>
+          <span className="text-xs font-semibold text-[#2E2B28] truncate font-mono max-w-[120px] sm:max-w-[180px] md:max-w-[220px]" title={currentDeviceName}>
             {currentDeviceName}
           </span>
           <span
-            className="font-mono text-[10px] px-1.5 py-0.5 rounded border hidden sm:inline"
+            className="font-mono text-[10px] font-semibold px-1.5 py-0.5 rounded border hidden xl:inline shrink-0"
             style={{
-              backgroundColor: 'var(--bg-surface-raised)',
-              borderColor: 'var(--border-subtle)',
-              color: 'var(--accent-primary)',
+              backgroundColor: 'rgba(200,131,10,0.08)',
+              borderColor: 'rgba(200,131,10,0.25)',
+              color: '#7C4F04',
             }}
           >
             {vendorInfo.dialect}
@@ -71,30 +112,54 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
       </div>
 
-      {/* Right: Telemetry metrics + Actions */}
-      <div className="flex items-center gap-3 md:gap-5 shrink-0">
-        {/* Real Computed Score & Counts */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs font-mono">
-            <span className="flex items-center gap-1" style={{ color: 'var(--status-pass)' }}>
+      {/* Center: Command Search */}
+      <div className="hidden lg:flex items-center relative max-w-xs w-full mx-2 shrink">
+        <MagnifyingGlass size={13} className="absolute left-3 text-[#A89F92] pointer-events-none" />
+        <input
+          type="text"
+          placeholder="Search rules (e.g. /ac-1)..."
+          className="w-full h-8 pl-8 pr-12 rounded-md border text-xs font-sans transition-all focus:outline-none"
+          style={{
+            backgroundColor: 'var(--bg-canvas)',
+            borderColor: 'var(--border-default)',
+            color: 'var(--text-primary)',
+          }}
+          onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = '#C8830A'; }}
+          onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--border-default)'; }}
+        />
+        <kbd
+          className="absolute right-2.5 top-1.5 text-[9px] font-mono border px-1.5 py-0.5 rounded"
+          style={{
+            backgroundColor: 'var(--bg-surface)',
+            borderColor: 'var(--border-subtle)',
+            color: 'var(--text-tertiary)',
+          }}
+        >
+          ⌘K
+        </kbd>
+      </div>
+
+      {/* Right: Telemetry & Actions */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">
+        {/* Pass/Fail counts + Score */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
+            <span className="flex items-center gap-1 font-semibold" style={{ color: 'var(--status-pass)' }}>
               <CheckCircle size={14} weight="fill" />
               <span>{passCount}</span>
             </span>
-            <span className="text-slate-300">/</span>
-            <span className="flex items-center gap-1" style={{ color: 'var(--status-fail)' }}>
+            <span className="text-[#D1CBC0]">/</span>
+            <span className="flex items-center gap-1 font-semibold" style={{ color: 'var(--status-fail)' }}>
               <XCircle size={14} weight="fill" />
               <span>{failCount}</span>
             </span>
           </div>
 
           <div
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-xs font-mono"
-            style={{
-              backgroundColor: 'var(--bg-surface-raised)',
-              borderColor: 'var(--border-subtle)',
-            }}
+            className="flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-mono shrink-0"
+            style={{ backgroundColor: 'var(--bg-canvas)', borderColor: 'var(--border-default)' }}
           >
-            <span className="text-slate-500 text-[10px] uppercase font-sans font-medium">Score:</span>
+            <span className="text-[#A89F92] text-[10px] uppercase font-sans font-semibold hidden xs:inline">SCORE:</span>
             <span className="font-bold tabular" style={{ color: scoreColor }}>
               {complianceScore}%
             </span>
@@ -105,25 +170,41 @@ export const TopBar: React.FC<TopBarProps> = ({
         <button
           onClick={onExecuteAudit}
           disabled={isAuditing}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-white transition-all cursor-pointer shadow-sm hover:brightness-105 active:scale-95 disabled:opacity-50"
-          style={{
-            backgroundColor: 'var(--accent-primary)',
-          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-white transition-all cursor-pointer hover:brightness-95 active:scale-95 disabled:opacity-50 shrink-0 whitespace-nowrap"
+          style={{ backgroundColor: '#C8830A' }}
         >
-          <Play size={13} weight="bold" />
+          <Play size={12} weight="bold" />
           <span>{isAuditing ? 'Evaluating...' : 'Run Audit'}</span>
         </button>
 
-        {/* Public Gateway Switcher */}
+        {/* Utility Icons */}
+        <div className="hidden sm:flex items-center gap-0.5 text-[#A89F92] border-l pl-2 shrink-0" style={{ borderColor: 'var(--border-subtle)' }}>
+          <button
+            className="p-1 rounded-md transition-colors cursor-pointer hover:text-[#4A4440]"
+            title="Notifications"
+          >
+            <Bell size={15} />
+          </button>
+          <button
+            className="p-1 rounded-md transition-colors cursor-pointer hover:text-[#4A4440]"
+            title="Documentation"
+          >
+            <Question size={15} />
+          </button>
+        </div>
+
+        {/* Public Gateway Hyperlink */}
         <button
-          onClick={onViewPublicOverview}
-          className="hidden sm:flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-900 transition-colors cursor-pointer pl-2 border-l border-slate-200"
-          title="Return to Public Gateway"
+          onClick={handleLandingClick}
+          className="hidden sm:flex items-center gap-1.5 text-xs text-[#7C7269] hover:text-[#C8830A] font-bold transition-colors cursor-pointer"
+          title="ApexNet — Return to Landing Page"
         >
-          <span>Public Gateway</span>
-          <ArrowSquareOut size={13} />
+          <span>Landing Page</span>
+          <ArrowSquareOut size={12} weight="bold" />
         </button>
       </div>
     </header>
   );
 };
+
+export default TopBar;

@@ -29,8 +29,9 @@ export const AuditResultsView: React.FC<AuditResultsViewProps> = ({
   onOpenRemediation,
   onOpenTraining,
 }) => {
-  const fwId = result.frameworks[0] || 'cis_v8';
-  const fwMeta = FRAMEWORKS[fwId] || { name: 'CIS Benchmark v8', version: '8.0' };
+  const frameworkNameStr = result.frameworks && result.frameworks.length > 0
+    ? result.frameworks.map((fwId) => FRAMEWORKS[fwId]?.name || fwId).join(' + ')
+    : 'CIS Network Benchmarks';
   const vendorInfo = VENDOR_DISPLAY_NAMES[result.vendor] || { name: result.vendor, dialect: 'Generic' };
 
   return (
@@ -49,7 +50,7 @@ export const AuditResultsView: React.FC<AuditResultsViewProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={onReAudit}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-slate-300 text-slate-700 bg-white hover:text-slate-900 hover:border-slate-400 transition-colors cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-slate-300 text-slate-700 bg-[var(--bg-surface)] hover:text-slate-900 hover:border-slate-400 transition-colors cursor-pointer shadow-xs"
           >
             <ArrowClockwise size={13} />
             <span>Re-run Evaluation</span>
@@ -69,7 +70,7 @@ export const AuditResultsView: React.FC<AuditResultsViewProps> = ({
       {/* Section 1: Posture Summary Strip */}
       <PostureSummaryStrip
         summary={result.summary}
-        frameworkName={fwMeta.name}
+        frameworkName={frameworkNameStr}
         deviceName={deviceName}
         platform={platform}
         sourceHash={result.sourceHash}

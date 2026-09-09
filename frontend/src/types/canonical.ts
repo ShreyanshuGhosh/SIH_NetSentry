@@ -1,5 +1,5 @@
 // src/types/canonical.ts
-// Phase 0: Canonical Data Architecture for NetSentry
+// Phase 0: Canonical Data Architecture for ApexNet
 // Vendor-agnostic, extensible compliance schema
 
 export type SupportedVendor =

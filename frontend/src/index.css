@@ -1,73 +1,134 @@
 /* src/index.css */
-/* NetSentry Design Tokens - Authoritative Light Mode (Swiss / Radix / Linear Clean) */
+/* NetSentry Design Tokens — Institutional Light Mode */
+/* Palette: Warm Stone + Saffron Gold. No blue, no violet, no AI-purple. */
 
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
-@import '@fontsource/inter/700.css';
+@import '@fontsource/geist-sans/400.css';
+@import '@fontsource/geist-sans/500.css';
+@import '@fontsource/geist-sans/600.css';
+@import '@fontsource/geist-sans/700.css';
 
-@import '@fontsource/jetbrains-mono/400.css';
-@import '@fontsource/jetbrains-mono/500.css';
-@import '@fontsource/jetbrains-mono/600.css';
-@import '@fontsource/jetbrains-mono/700.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
 
 @import "tailwindcss";
 
+@theme {
+  /* Stone neutrals — warm, NOT cool gray */
+  --color-stone-50:  #FAFAF8;
+  --color-stone-100: #F5F4F0;  /* page canvas */
+  --color-stone-150: #EDEAE4;  /* surface card */
+  --color-stone-200: #E4E0D8;  /* border subtle */
+  --color-stone-300: #D1CBC0;  /* border strong */
+  --color-stone-400: #A89F92;  /* text disabled */
+  --color-stone-500: #7C7269;  /* text secondary */
+  --color-stone-600: #4A4440;  /* text tertiary */
+  --color-stone-700: #2E2B28;  /* text secondary-dark */
+  --color-stone-800: #1E1C1A;  /* text primary */
+  --color-stone-900: #0F0E0D;  /* true black */
+
+  /* Saffron Gold — single accent */
+  --color-gold-50:   #FDF8EE;
+  --color-gold-100:  #F9EDCF;
+  --color-gold-200:  #F0D589;
+  --color-gold-300:  #E4B840;
+  --color-gold-400:  #C8830A;  /* primary accent */
+  --color-gold-500:  #A66A06;  /* hover */
+  --color-gold-600:  #7C4F04;  /* pressed */
+
+  /* Status — deep semantic colors, not neon */
+  --color-pass-500:   #2D6A3F;  /* deep forest green */
+  --color-pass-100:   rgba(45, 106, 63, 0.10);
+  --color-pass-200:   rgba(45, 106, 63, 0.20);
+
+  --color-fail-500:   #B91C1C;  /* deep crimson */
+  --color-fail-100:   rgba(185, 28, 28, 0.10);
+  --color-fail-200:   rgba(185, 28, 28, 0.20);
+
+  --color-warn-500:   #A16207;  /* amber-gold */
+  --color-warn-100:   rgba(161, 98, 7, 0.10);
+  --color-warn-200:   rgba(161, 98, 7, 0.20);
+
+  /* Radius system — institutional: mostly sharp with soft cards */
+  --radius-sm:   3px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   10px;
+  --radius-2xl:  12px;
+  --radius-full: 9999px;
+
+  /* Shadows — warm-tinted, never pure-black */
+  --shadow-2xs: 0 1px 2px 0 rgba(30, 28, 26, 0.06);
+  --shadow-sm:  0 1px 3px 0 rgba(30, 28, 26, 0.10), 0 1px 2px -1px rgba(30, 28, 26, 0.08);
+  --shadow-md:  0 4px 6px -1px rgba(30, 28, 26, 0.12), 0 2px 4px -2px rgba(30, 28, 26, 0.08);
+  --shadow-lg:  0 10px 20px -3px rgba(30, 28, 26, 0.14), 0 4px 8px -4px rgba(30, 28, 26, 0.08);
+  --shadow-xl:  0 20px 40px -5px rgba(30, 28, 26, 0.18), 0 8px 16px -6px rgba(30, 28, 26, 0.10);
+
+  /* Typography */
+  --font-sans:    'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:    'IBM Plex Mono', 'JetBrains Mono', monospace;
+}
+
 @layer base {
   :root {
-    /* Surfaces (Light Mode) */
-    --bg-canvas: #F8FAFC;         /* slate-50 canvas */
-    --bg-surface: #FFFFFF;        /* pure white panels/cards */
-    --bg-surface-raised: #F1F5F9; /* slate-100 secondary panels */
-    --border-subtle: #E2E8F0;     /* slate-200 crisp borders */
-    --border-strong: #CBD5E1;     /* slate-300 prominent borders */
+    /* Surfaces */
+    --bg-canvas:          #F5F4F0;   /* warm stone — NOT white */
+    --bg-surface:         #EDEAE4;   /* slightly elevated card */
+    --bg-surface-raised:  #E4E0D8;   /* inset / code blocks */
+    --bg-inset:           #DDD9D2;   /* deeply inset fields */
+
+    /* Borders */
+    --border-subtle:      #E4E0D8;
+    --border-default:     #D1CBC0;
+    --border-strong:      #B8B0A4;
 
     /* Typography */
-    --text-primary: #0F172A;      /* slate-900 high contrast */
-    --text-secondary: #475569;    /* slate-600 readable subtext */
-    --text-disabled: #94A3B8;     /* slate-400 inactive/placeholder */
+    --text-primary:    #1E1C1A;
+    --text-secondary:  #7C7269;
+    --text-tertiary:   #A89F92;
+    --text-disabled:   #C5BEB5;
+    --text-mono:       #2E2B28;
+    --text-inverse:    #F5F4F0;
 
-    /* Restrained Cyber / Defense Blue Accent */
-    --accent-primary: #0284C7;       /* sky-600 */
-    --accent-primary-hover: #0369A1; /* sky-700 */
+    /* Accent — saffron gold */
+    --accent-primary:       #C8830A;
+    --accent-primary-hover: #A66A06;
+    --accent-primary-text:  #FFFFFF;
+    --accent-subtle:        rgba(200, 131, 10, 0.10);
+    --accent-border:        rgba(200, 131, 10, 0.30);
 
-    /* Compliance Verdict States */
-    --status-pass: #15803D;        /* emerald-700 */
-    --status-pass-bg: #ECFDF5;     /* emerald-50 */
-    --status-pass-border: #A7F3D0; /* emerald-200 */
+    /* Compliance triad */
+    --status-pass:        #2D6A3F;
+    --status-pass-bg:     rgba(45, 106, 63, 0.10);
+    --status-pass-border: rgba(45, 106, 63, 0.25);
 
-    --status-fail: #DC2626;        /* red-600 */
-    --status-fail-bg: #FEF2F2;     /* red-50 */
-    --status-fail-border: #FECACA; /* red-200 */
+    --status-fail:        #B91C1C;
+    --status-fail-bg:     rgba(185, 28, 28, 0.10);
+    --status-fail-border: rgba(185, 28, 28, 0.25);
 
-    --status-warn: #D97706;        /* amber-600 */
-    --status-warn-bg: #FFFBEB;     /* amber-50 */
-    --status-warn-border: #FDE68A; /* amber-200 */
+    --status-warn:        #A16207;
+    --status-warn-bg:     rgba(161, 98, 7, 0.10);
+    --status-warn-border: rgba(161, 98, 7, 0.25);
 
-    /* Severity Colors */
-    --severity-critical: #DC2626;  /* red-600 */
-    --severity-high: #EA580C;      /* orange-600 */
-    --severity-medium: #D97706;    /* amber-600 */
-    --severity-low: #64748B;       /* slate-500 */
+    /* Severity */
+    --severity-critical: #B91C1C;
+    --severity-high:     #C84B0A;
+    --severity-medium:   #A16207;
+    --severity-low:      #7C7269;
 
-    /* Bridge compatibility variables */
-    --bg-base: var(--bg-canvas);
-    --bg-elevated: var(--bg-surface-raised);
-    --border-default: var(--border-subtle);
-    --text-tertiary: var(--text-disabled);
-    --text-mono: var(--text-primary);
-    --pass: var(--status-pass);
-    --pass-bg: var(--status-pass-bg);
-    --fail: var(--status-fail);
-    --fail-bg: var(--status-fail-bg);
-    --warn: var(--status-warn);
-    --warn-bg: var(--status-warn-bg);
-    --crit: var(--severity-critical);
-    --accent: var(--accent-primary);
-
-    /* Typography Stacks */
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    /* Bridge aliases (keep existing components working) */
+    --bg-base:       var(--bg-canvas);
+    --bg-elevated:   var(--bg-surface-raised);
+    --text-mono:     var(--text-primary);
+    --pass:          var(--status-pass);
+    --pass-bg:       var(--status-pass-bg);
+    --fail:          var(--status-fail);
+    --fail-bg:       var(--status-fail-bg);
+    --warn:          var(--status-warn);
+    --warn-bg:       var(--status-warn-bg);
+    --crit:          var(--severity-critical);
+    --accent:        var(--accent-primary);
   }
 
   html {
@@ -86,6 +147,12 @@
     padding: 0;
   }
 
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
   .font-mono {
     font-family: var(--font-mono);
   }
@@ -94,24 +161,19 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Clean Light Scrollbars */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--bg-canvas);
-  }
+  /* Warm stone scrollbars */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-canvas); }
   ::-webkit-scrollbar-thumb {
-    background: var(--border-strong);
+    background: var(--border-default);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: var(--border-strong);
   }
 
   ::selection {
-    background-color: rgba(2, 132, 199, 0.15);
-    color: #0F172A;
+    background-color: rgba(200, 131, 10, 0.18);
+    color: var(--text-primary);
   }
 }
