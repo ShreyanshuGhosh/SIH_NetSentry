@@ -51,11 +51,11 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header
-      className="h-14 border-b px-2.5 sm:px-5 flex items-center justify-between shrink-0 select-none z-20 backdrop-blur-sm sticky top-0 gap-1.5 sm:gap-4 overflow-hidden"
+      className="h-14 border-b px-3 sm:px-5 flex items-center justify-between shrink-0 select-none z-20 backdrop-blur-sm sticky top-0 gap-2 sm:gap-4 overflow-hidden"
       style={{ backgroundColor: 'rgba(237,234,228,0.95)', borderColor: 'var(--border-default)' }}
     >
       {/* Left: Premium Back Button + Device Context / Brand Hyperlink */}
-      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 min-w-0">
+      <div className="flex-1 min-w-0 flex items-center gap-1.5 sm:gap-3 overflow-hidden">
         
         {/* Stylish Premium Back Button (Only on sub-pages, NOT on Dashboard or Landing) */}
         {showBackButton && (
@@ -94,9 +94,9 @@ export const TopBar: React.FC<TopBarProps> = ({
         </button>
 
         {/* Target Node Details */}
-        <div className="flex items-center gap-1 shrink-0 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0 shrink">
           <span className="text-[#A89F92] text-xs hidden lg:inline shrink-0">Target Node:</span>
-          <span className="text-xs font-semibold text-[#2E2B28] truncate font-mono max-w-[65px] xs:max-w-[100px] sm:max-w-[160px] md:max-w-[200px]" title={currentDeviceName}>
+          <span className="text-xs font-semibold text-[#2E2B28] truncate font-mono max-w-[90px] xs:max-w-[130px] sm:max-w-[180px] md:max-w-[220px]" title={currentDeviceName}>
             {currentDeviceName}
           </span>
           <span
@@ -113,12 +113,12 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Center: Command Search */}
-      <div className="hidden xl:flex items-center relative max-w-xs w-full mx-4 shrink-0">
+      <div className="hidden 2xl:flex items-center relative max-w-[200px] w-full mx-2 shrink">
         <MagnifyingGlass size={13} className="absolute left-3 text-[#A89F92] pointer-events-none" />
         <input
           type="text"
           placeholder="Search rules (e.g. /ac-1)..."
-          className="w-full h-8 pl-8 pr-12 rounded-md border text-xs font-sans transition-all focus:outline-none"
+          className="w-full h-8 pl-8 pr-10 rounded-md border text-xs font-sans transition-all focus:outline-none"
           style={{
             backgroundColor: 'var(--bg-canvas)',
             borderColor: 'var(--border-default)',
@@ -128,7 +128,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--border-default)'; }}
         />
         <kbd
-          className="absolute right-2.5 top-1.5 text-[9px] font-mono border px-1.5 py-0.5 rounded"
+          className="absolute right-2 top-1.5 text-[9px] font-mono border px-1 py-0.5 rounded"
           style={{
             backgroundColor: 'var(--bg-surface)',
             borderColor: 'var(--border-subtle)',
@@ -140,9 +140,9 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Right: Telemetry & Actions */}
-      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 whitespace-nowrap">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto whitespace-nowrap">
         {/* Pass/Fail counts + Score */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="hidden md:flex items-center gap-1.5 text-xs font-mono shrink-0">
             <span className="flex items-center gap-1 font-semibold" style={{ color: 'var(--status-pass)' }}>
               <CheckCircle size={14} weight="fill" />
@@ -156,11 +156,11 @@ export const TopBar: React.FC<TopBarProps> = ({
           </div>
 
           <div
-            className="flex items-center gap-1 px-1.5 py-1 sm:px-2 rounded-md border text-xs font-mono shrink-0"
+            className="flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-mono shrink-0"
             style={{ backgroundColor: 'var(--bg-canvas)', borderColor: 'var(--border-default)' }}
           >
-            <span className="text-[#A89F92] text-[10px] uppercase font-sans font-semibold hidden sm:inline">SCORE:</span>
-            <span className="font-bold tabular" style={{ color: scoreColor }}>
+            <span className="text-[#A89F92] text-[10px] uppercase font-sans font-semibold hidden xs:inline">SCORE:</span>
+            <span className="font-bold tabular font-chakra text-xs sm:text-sm" style={{ color: scoreColor }}>
               {complianceScore}%
             </span>
           </div>
@@ -170,16 +170,15 @@ export const TopBar: React.FC<TopBarProps> = ({
         <button
           onClick={onExecuteAudit}
           disabled={isAuditing}
-          className="flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold text-white transition-all cursor-pointer hover:brightness-95 active:scale-95 disabled:opacity-50 shrink-0 whitespace-nowrap"
-          style={{ backgroundColor: '#C8830A' }}
+          className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-white bg-[#C8830A] hover:bg-[#A66A06] active:scale-95 disabled:opacity-50 shrink-0 whitespace-nowrap shadow-xs cursor-pointer transition-all"
           title="Run Compliance Audit"
         >
           <Play size={13} weight="bold" />
-          <span className="hidden sm:inline">{isAuditing ? 'Evaluating...' : 'Run Audit'}</span>
+          <span>{isAuditing ? 'Evaluating...' : 'Run Audit'}</span>
         </button>
 
         {/* Utility Icons */}
-        <div className="hidden sm:flex items-center gap-0.5 text-[#A89F92] border-l pl-2 shrink-0" style={{ borderColor: 'var(--border-subtle)' }}>
+        <div className="hidden xl:flex items-center gap-0.5 text-[#A89F92] border-l pl-2 shrink-0" style={{ borderColor: 'var(--border-subtle)' }}>
           <button
             className="p-1 rounded-md transition-colors cursor-pointer hover:text-[#4A4440]"
             title="Notifications"
@@ -197,7 +196,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Public Gateway Hyperlink */}
         <button
           onClick={handleLandingClick}
-          className="hidden sm:flex items-center gap-1.5 text-xs text-[#7C7269] hover:text-[#C8830A] font-bold transition-colors cursor-pointer"
+          className="hidden 2xl:flex items-center gap-1.5 text-xs text-[#7C7269] hover:text-[#C8830A] font-bold transition-colors cursor-pointer shrink-0"
           title="ApexNet - Return to Landing Page"
         >
           <span>Landing Page</span>
