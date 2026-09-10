@@ -28,6 +28,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', c
     bg = 'var(--status-warn-bg)';
     color = 'var(--status-warn)';
     border = 'rgba(217, 119, 6, 0.3)';
+  } else if (norm === 'checking_infra_missing' || norm === 'infra_missing') {
+    text = 'INFRA REQ';
+    bg = '#EEF2FF';
+    color = '#4338CA';
+    border = 'rgba(79, 70, 229, 0.4)';
   } else if (norm === 'not_applicable' || norm === 'n/a') {
     text = 'N/A';
     bg = 'var(--bg-surface-raised)';
@@ -36,7 +41,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', c
   }
 
   const padding = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
-  const widthClass = className.includes('w-') ? '' : (size === 'sm' ? 'w-14' : 'w-16');
+  const widthClass = className.includes('w-') ? '' : (size === 'sm' ? (text === 'INFRA REQ' ? 'w-20' : 'w-14') : (text === 'INFRA REQ' ? 'w-22' : 'w-16'));
 
   return (
     <span

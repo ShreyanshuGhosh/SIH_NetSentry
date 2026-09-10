@@ -15,12 +15,15 @@ export type FrameworkId =
   | 'disa_stig' 
   | 'iso_27001';
 
+import { InfraCheckRequirements } from './canonical';
+
 export type ComplianceStatus = 
   | 'PASS' 
   | 'FAIL' 
   | 'UNKNOWN' 
   | 'NOT_APPLICABLE' 
-  | 'CONFLICT';
+  | 'CONFLICT'
+  | 'CHECKING_INFRA_MISSING';
 
 export type SeverityLevel = 
   | 'CRITICAL' 
@@ -58,6 +61,18 @@ export interface SecurityBaselineModel {
   login_banner_present: FieldExtraction;
   insecure_http_server_disabled: FieldExtraction;
   unencrypted_passwords_disabled: FieldExtraction;
+  icmp_redirects_disabled?: FieldExtraction;
+  proxy_arp_disabled?: FieldExtraction;
+  ip_source_routing_disabled?: FieldExtraction;
+  directed_broadcast_disabled?: FieldExtraction;
+  discovery_protocols_disabled?: FieldExtraction;
+  vty_access_class_configured?: FieldExtraction;
+  aaa_live_verified?: FieldExtraction;
+  siem_ingest_verified?: FieldExtraction;
+  oob_isolation_verified?: FieldExtraction;
+  pki_revocation_verified?: FieldExtraction;
+  copp_telemetry_verified?: FieldExtraction;
+  physical_tamper_verified?: FieldExtraction;
 }
 
 export interface AuditRule {
@@ -76,6 +91,7 @@ export interface AuditRule {
   failMessage: string;
   remediation: Partial<Record<VendorId, string>> & Record<string, any>;
   description: string;
+  infraRequirements?: InfraCheckRequirements;
 }
 
 export interface AuditFinding {
@@ -97,6 +113,7 @@ export interface AuditFinding {
   message: string;
   remediationCommand: string;
   remediationRationale: string;
+  infraRequirements?: InfraCheckRequirements;
 }
 
 export interface TrainingItem {

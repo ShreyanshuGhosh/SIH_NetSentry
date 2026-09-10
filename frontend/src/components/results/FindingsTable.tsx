@@ -1,6 +1,3 @@
-// src/components/results/FindingsTable.tsx
-// Line-level compliance findings table with vendor CLI remediation and exemplar traceability (§6.2, §6.4)
-
 import React, { useState } from 'react';
 import {
   CaretDown,
@@ -11,11 +8,15 @@ import {
   ShieldWarning,
   GitDiff,
   Brain,
+  Broadcast,
+  ArrowRight,
+  HardDrives
 } from '@phosphor-icons/react';
 import { Finding } from '../../types/canonical';
 import { StatusBadge } from '../shared/StatusBadge';
 import { SeverityTag } from '../shared/SeverityTag';
 import { MonoCodeBlock } from '../shared/MonoCodeBlock';
+import { InfraRequirementsModal } from '../shared/InfraRequirementsModal';
 
 interface FindingsTableProps {
   findings: Finding[];
@@ -26,11 +27,16 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
   findings,
   onOpenRemediation,
 }) => {
-  const [filter, setFilter] = useState<'ALL' | 'FAIL' | 'PASS'>('ALL');
+  const [filter, setFilter] = useState<'ALL' | 'FAIL' | 'PASS' | 'INFRA_MISSING'>('ALL');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copiedRuleId, setCopiedRuleId] = useState<string | null>(null);
+  const [selectedInfraFinding, setSelectedInfraFinding] = useState<Finding | null>(null);
 
-  const filtered = filter === 'ALL' ? findings : findings.filter((f) => f.status.toUpperCase() === filter);
+  const filtered = filter === 'ALL'
+    ? findings
+    : filter === 'INFRA_MISSING'
+      ? findings.filter((f) => f.status.toLowerCase() === 'checking_infra_missing')
+      : findings.filter((f) => f.status.toUpperCase() === filter);
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -60,21 +66,27 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
 
         {/* Filter Pills */}
         <div
-          className="flex items-center p-1 rounded border text-xs font-mono w-fit"
+          className="flex items-center p-1 rounded border text-xs font-mono w-fit overflow-x-auto"
           style={{
             backgroundColor: 'var(--bg-canvas)',
             borderColor: 'var(--border-subtle)',
           }}
         >
-          {(['ALL', 'FAIL', 'PASS'] as const).map((mode) => (
+          {(['ALL', 'FAIL', 'PASS', 'INFRA_MISSING'] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => setFilter(mode)}
-              className={`px-2.5 py-1 rounded text-[11px] cursor-pointer transition-colors ${
+              className={`px-2.5 py-1 rounded text-[11px] cursor-pointer transition-colors whitespace-nowrap ${
                 filter === mode ? 'bg-slate-900 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {mode} ({mode === 'ALL' ? findings.length : findings.filter((f) => f.status.toUpperCase() === mode).length})
+              {mode === 'INFRA_MISSING' ? 'INFRA MISSING' : mode} (
+              {mode === 'ALL'
+                ? findings.length
+                : mode === 'INFRA_MISSING'
+                ? findings.filter((f) => f.status.toLowerCase() === 'checking_infra_missing').length
+                : findings.filter((f) => f.status.toUpperCase() === mode).length}
+              )
             </button>
           ))}
         </div>
@@ -85,6 +97,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
         {filtered.map((finding) => {
           const isExpanded = expandedId === finding.ruleId;
           const isFail = finding.status === 'fail';
+          const isInfraMissing = finding.status.toLowerCase() === 'checking_infra_missing';
 
           return (
             <div key={finding.ruleId} className="transition-colors hover:bg-slate-50">
@@ -112,6 +125,18 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                           <span>Learned from Few-Shot Store</span>
                         </span>
                       )}
+                      {isInfraMissing && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedInfraFinding(finding);
+                          }}
+                          className="inline-flex items-center gap-1 font-mono text-[9px] px-2 py-0.5 rounded border text-indigo-700 bg-indigo-50 border-indigo-200 font-semibold hover:bg-indigo-100 transition-colors cursor-pointer"
+                        >
+                          <Broadcast size={11} className="text-indigo-600 animate-pulse" />
+                          <span>Checking Infra Missing (Click Details)</span>
+                        </button>
+                      )}
                     </div>
                     <div className="text-[11px] text-slate-600 mt-0.5 truncate">
                       {finding.frameworkRef}
@@ -138,6 +163,28 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                     borderColor: 'var(--border-subtle)',
                   }}
                 >
+                  {/* Dedicated Checking Infra Missing Callout Banner */}
+                  {isInfraMissing && finding.infraRequirements && (
+                    <div className="p-4 rounded-lg border border-indigo-200 bg-indigo-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-indigo-950 font-bold text-xs">
+                          <Broadcast size={16} className="text-indigo-600 animate-pulse" />
+                          <span>Checking Infrastructure Missing — External Environmental Telemetry Required</span>
+                        </div>
+                        <p className="text-xs text-indigo-900 leading-relaxed max-w-2xl">
+                          {finding.infraRequirements.whyConfigInsufficient}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setSelectedInfraFinding(finding)}
+                        className="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs transition-colors"
+                      >
+                        <span>Click More to Know Details</span>
+                        <ArrowRight size={13} weight="bold" />
+                      </button>
+                    </div>
+                  )}
+
                   {/* Exemplar Provenance (§6.2, Test 2) */}
                   {finding.resolvedViaExemplar && (
                     <div className="p-3 rounded border border-sky-200 bg-sky-50 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -166,6 +213,10 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                             <span className="whitespace-pre">{ev.raw}</span>
                           </div>
                         ))}
+                      </div>
+                    ) : isInfraMissing ? (
+                      <div className="rounded border border-indigo-200 bg-indigo-50/50 p-3 font-mono text-[11px] text-indigo-900">
+                        External telemetry integration required. Static CLI configuration lines alone cannot verify dynamic server or physical status.
                       </div>
                     ) : (
                       <div className="rounded border border-slate-200 bg-[var(--bg-surface)] p-3 font-mono text-[11px] text-slate-500 italic">
@@ -224,6 +275,18 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
           );
         })}
       </div>
+
+      {/* In-Depth Infrastructure Requirements Modal */}
+      {selectedInfraFinding && (
+        <InfraRequirementsModal
+          isOpen={true}
+          onClose={() => setSelectedInfraFinding(null)}
+          ruleId={selectedInfraFinding.ruleId}
+          ruleTitle={selectedInfraFinding.ruleTitle}
+          frameworkRef={selectedInfraFinding.frameworkRef}
+          infraRequirements={selectedInfraFinding.infraRequirements}
+        />
+      )}
     </div>
   );
 };

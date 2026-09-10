@@ -17,6 +17,7 @@ export interface EvaluatedAuditSummary {
   passed: number;
   failed: number;
   notApplicable: number;
+  infraMissing?: number;
   complianceScore: number; // 0-100
   criticalCount: number;
   highCount: number;
@@ -42,10 +43,18 @@ const RULE_EVIDENCE_MAP: Record<string, string> = {
   "CTRL-PASS-ENCRYPT": "passwordEncryptionEnabled",
   "CTRL-AAA-AUTH": "aaaAuthEnabled",
   "CTRL-SNMP-V3": "snmpVersion",
+  "CTRL-SNMP-COMMUNITY": "snmpDefaultCommunityDisabled",
   "CTRL-SYSLOG-SIEM": "syslogServers",
   "CTRL-IDLE-TIMEOUT": "sessionIdleTimeoutMinutes",
   "CTRL-NTP-SYNC": "ntpConfigured",
+  "CTRL-NTP-AUTH": "ntpAuthenticated",
   "CTRL-LOGIN-BANNER": "loginBannerConfigured",
+  "CTRL-ICMP-REDIRECTS": "icmpRedirectsDisabled",
+  "CTRL-PROXY-ARP": "proxyArpDisabled",
+  "CTRL-SOURCE-ROUTE": "ipSourceRoutingDisabled",
+  "CTRL-DIRECTED-BROADCAST": "directedBroadcastDisabled",
+  "CTRL-DISCOVERY-PROTOCOLS": "discoveryProtocolsDisabled",
+  "CTRL-MGMT-ACL": "vtyAccessClassConfigured",
 };
 
 export function evaluateNormalizedConfig(
@@ -75,6 +84,7 @@ export function evaluateNormalizedConfig(
       remediationCommand,
       frameworkRef: rule.frameworkRef,
       sourceNote: rule.sourceNote,
+      infraRequirements: rule.infraRequirements,
     });
   }
 
@@ -83,6 +93,7 @@ export function evaluateNormalizedConfig(
   let dedupPassed = 0;
   let dedupFailed = 0;
   let dedupNotApp = 0;
+  let dedupInfraMissing = 0;
   let dedupCritical = 0;
   let dedupHigh = 0;
   let dedupMedium = 0;
@@ -97,6 +108,7 @@ export function evaluateNormalizedConfig(
 
     if (f.status === "pass") dedupPassed++;
     else if (f.status === "fail") dedupFailed++;
+    else if (f.status === "checking_infra_missing") dedupInfraMissing++;
     else dedupNotApp++;
 
     if (f.status === "fail") {
@@ -116,6 +128,7 @@ export function evaluateNormalizedConfig(
     passed: dedupPassed,
     failed: dedupFailed,
     notApplicable: dedupNotApp,
+    infraMissing: dedupInfraMissing,
     complianceScore,
     criticalCount: dedupCritical,
     highCount: dedupHigh,

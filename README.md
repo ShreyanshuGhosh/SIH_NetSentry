@@ -178,21 +178,22 @@ Parser         + Confidence
 
 ## Multi-Framework & Multi-Vendor Engine
 
-ApexNet provides native multi-select framework evaluation across four major international and federal hardening standards:
+ApexNet provides native multi-select framework evaluation across four major international and federal hardening standards, offering a 100% comprehensive catalog of **96 authoritative compliance controls** (24 controls per framework):
 
-| Framework | Version | Controls | Severity Model | Reference Standard |
-|---|---|---|---|---|
-| **CIS Controls** | v8 (Network Infrastructure) | 10 Rules | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | CIS Controls v8 (Safeguards 4.1, 4.8, 5.2, 5.3, 12.6, 8.2, 4.3, 8.4) |
-| **NIST SP 800-53** | Rev. 5 (Federal Baselines) | 10 Rules | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | NIST SP 800-53 Rev. 5 (AC-17, SC-8, SC-13, IA-5, IA-2, AU-4, AC-12, AU-8, AC-8) |
-| **DISA STIG Network** | Release 34 (DoD) | 10 Rules | **`CAT I`** (Critical) / **`CAT II`** (High/Medium) / **`CAT III`** (Low) | DoD DISA Network L2S / Router STIG (V-216957 to V-217030 / SRG-NET) |
-| **ISO/IEC 27001** | 2022 Revision | 10 Rules | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | ISO/IEC 27001:2022 Annex A (A.8.20, A.8.21, A.8.9, A.8.24, A.8.5, A.8.15, A.5.15, A.8.17) |
+| Framework | Version | Total Controls | Automated Config | Infra Dependent | Severity Model | Reference Standard |
+|---|---|---|---|---|---|---|
+| **CIS Controls** | v8 (Network Infrastructure) | 24 Rules | 18 Rules | 6 Rules | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | CIS Controls v8 (Safeguards 1.1, 3.11, 4.1, 4.8, 4.11, 5.2, 8.2, 8.4, 12.1, 12.2, 12.5, 12.6) |
+| **NIST SP 800-53** | Rev. 5 (Federal Baselines) | 24 Rules | 18 Rules | 6 Rules | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | NIST SP 800-53 Rev. 5 (AC-2, AC-8, AC-17, AU-2, AU-6, AU-8, CM-7, IA-2, IA-5, PE-3, SC-5, SC-7, SC-10, SC-12, SC-13) |
+| **DISA STIG Network** | Release 34 (DoD) | 24 Rules | 18 Rules | 6 Rules | **`CAT I`** (Critical) / **`CAT II`** (High/Medium) / **`CAT III`** (Low) | DoD DISA Network L2S / Router STIG (V-216960 to V-220548 / SRG-NET) |
+| **ISO/IEC 27001** | 2022 Revision | 24 Rules | 18 Rules | 6 Rules | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | ISO/IEC 27001:2022 Annex A (A.5.15, A.5.16, A.7.1, A.8.15, A.8.17, A.8.20, A.8.22, A.8.24, A.8.26) |
 
 Operators can select any combination of benchmarks or click **Select All (4)** to produce a unified, deduplicated audit report.
 
 ### Canonical Control Baseline (1-to-1 Cross-Framework Deduplication)
 
-To eliminate artificial score inflation when running multi-framework audits, ApexNet evaluates all rules against a shared 10-control canonical hardening matrix:
+To eliminate artificial score inflation when running multi-framework audits, ApexNet maps all rules onto a shared **24-control canonical hardening matrix**:
 
+#### Automated Configuration Controls (18 Controls)
 1. `CTRL-SSH-V2` — Enforce Secure Shell Protocol Version 2 with Modern Ciphers
 2. `CTRL-TELNET-OFF` — Terminate Unencrypted Cleartext Telnet Management Daemon
 3. `CTRL-HTTP-OFF` — Disable Insecure Web Management HTTP Server
@@ -203,8 +204,26 @@ To eliminate artificial score inflation when running multi-framework audits, Ape
 8. `CTRL-IDLE-TIMEOUT` — Automatic Inactivity Disconnect / Console Lockout (≤ 15 min)
 9. `CTRL-NTP-SYNC` — Clock Synchronization to Authoritative Stratum NTP Sources
 10. `CTRL-LOGIN-BANNER` — Authorized Access Advisory & Legal Warning Banner
+11. `CTRL-ICMP-REDIRECTS` — Disable Insecure ICMP Redirects on All Interfaces
+12. `CTRL-PROXY-ARP` — Disable Insecure Proxy ARP on Transit Routed Interfaces
+13. `CTRL-SOURCE-ROUTE` — Disable IP Source Routing (Drop Loose & Strict Source Headers)
+14. `CTRL-DIRECTED-BROADCAST` — Disable IP Directed Broadcasts (Smurf DoS Mitigation)
+15. `CTRL-DISCOVERY-PROTOCOLS` — Disable Unauthenticated Discovery Protocols (CDP / LLDP)
+16. `CTRL-MGMT-ACL` — Restrict VTY / Terminal Management Lines with Ingress ACLs
+17. `CTRL-NTP-AUTH` — Enforce Cryptographic Symmetric Key Authentication for NTP
+18. `CTRL-SNMP-COMMUNITY` — Prohibit Default Insecure SNMP Communities (`public` / `private`)
 
-When evaluating CIS + NIST simultaneously (20 total rule evaluations), deduplication consolidates them to the 10 core controls, preventing double-penalizing or artificially inflating the compliance score.
+#### "Checking Infra Missing" Operational Controls (6 Controls)
+Certain essential network security safeguards cannot be proven by static device configuration text alone. ApexNet transparently tags these rules as **`CHECKING INFRA MISSING`** (`INFRA REQ`), providing an in-depth diagnostic modal with executable synthetic probes, telemetry signals, and audit procedures:
+
+19. `CTRL-AAA-LIVE` — Dynamic TACACS+/RADIUS Server Live Reachability & Latency SLA (<120ms)
+20. `CTRL-SIEM-INGEST` — Real-Time SIEM Ingestion Pipeline & Structured Schema Parsability
+21. `CTRL-OOB-ISOLATION` — Out-of-Band (OOB) Management Plane Physical & VRF Air-Gap Isolation
+22. `CTRL-PKI-REVOCATION` — PKI Certificate Revocation List (CRL) & OCSP Responder Live Reachability
+23. `CTRL-COPP-TELEMETRY` — Control Plane Policing (CoPP) Hardware Rate-Limiter Telemetry & Drop Monitoring
+24. `CTRL-PHYSICAL-TAMPER` — Datacenter Chassis Physical Tamper Microswitches & SFP Enclosure Sensors
+
+When evaluating CIS + NIST simultaneously (48 raw rule findings), deduplication consolidates them into the 24 core controls, preventing double-penalizing or artificially inflating the compliance score.
 
 ---
 

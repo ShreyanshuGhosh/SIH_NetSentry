@@ -3,13 +3,14 @@
 // Vendor selector shows 6 built-in demo dialects; unlimited via AI Training loop
 
 import React, { useState } from 'react';
-import { Copy, Check, CaretRight, FileCode, CheckCircle, ArrowRight } from '@phosphor-icons/react';
+import { Copy, Check, CaretRight, FileCode, CheckCircle, ArrowRight, Broadcast } from '@phosphor-icons/react';
 import { FrameworkId } from '../types/audit';
 import { FRAMEWORKS } from '../data/rulePacks';
 import { COMPLIANCE_RULES } from '../engine/rules';
 import { SeverityTag } from './shared/SeverityTag';
 import { MonoCodeBlock } from './shared/MonoCodeBlock';
 import { VENDOR_DISPLAY_NAMES, SupportedVendor } from '../types/canonical';
+import { InfraRequirementsModal } from './shared/InfraRequirementsModal';
 
 interface RulePackExplorerProps {
   onOpenTraining?: () => void;
@@ -18,6 +19,7 @@ interface RulePackExplorerProps {
 export const RulePackExplorer: React.FC<RulePackExplorerProps> = ({ onOpenTraining }) => {
   const [selectedFw, setSelectedFw] = useState<FrameworkId>('cis_v8');
   const [selectedVendor, setSelectedVendor] = useState<SupportedVendor>('cisco_ios');
+  const [infraModalOpen, setInfraModalOpen] = useState(false);
 
   const rules = COMPLIANCE_RULES.filter((r) => r.framework === selectedFw);
   const [activeRuleId, setActiveRuleId] = useState<string>(rules[0]?.id || 'CIS-NET-1.1.1');
@@ -52,7 +54,12 @@ framework: "${activeRule.framework}"
 reference: "${activeRule.frameworkRef}"
 severity: "${activeRule.severity}"
 control_group: "${activeRule.controlGroupId || 'NONE'}"
-description: >
+verification_mode: "${activeRule.infraRequirements ? 'EXTERNAL_INFRASTRUCTURE_REQUIRED' : 'AUTOMATED_STATIC_PARSER'}"
+${activeRule.infraRequirements ? `infra_requirements:
+  why_static_fails: "${activeRule.infraRequirements.whyConfigInsufficient}"
+  required_infra: [${activeRule.infraRequirements.requiredInfrastructure.map(i => `"${i}"`).join(', ')}]
+  telemetry_signal: "${activeRule.infraRequirements.telemetrySignal}"
+` : ''}description: >
   ${activeRule.description}
 remediation_target: "${selectedVendor}"
 remediation_cli: |
@@ -124,9 +131,14 @@ remediation_cli: |
                   }`}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="font-mono text-[11px] font-bold text-slate-900">{rule.id}</span>
                       <SeverityTag severity={rule.severity} size="sm" />
+                      {rule.infraRequirements && (
+                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold">
+                          INFRA REQ
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs text-slate-800 truncate">{rule.title}</div>
                     <div className="font-mono text-[10px] text-slate-500 mt-0.5 truncate">{rule.frameworkRef}</div>
@@ -147,15 +159,35 @@ remediation_cli: |
                 className="p-5 rounded-lg border space-y-2"
                 style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-sm font-bold text-slate-900">{activeRule.id}</span>
                     <SeverityTag severity={activeRule.severity} />
+                    {activeRule.infraRequirements && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold flex items-center gap-1">
+                        <Broadcast size={12} weight="bold" />
+                        CHECKING INFRA MISSING
+                      </span>
+                    )}
                   </div>
                   <span className="font-mono text-xs text-slate-500">{activeRule.frameworkRef}</span>
                 </div>
                 <h2 className="text-base font-bold text-slate-900">{activeRule.title}</h2>
                 <p className="text-xs text-slate-600 leading-relaxed">{activeRule.description}</p>
+                {activeRule.infraRequirements && (
+                  <div className="mt-3 pt-3 border-t border-indigo-100 flex items-center justify-between flex-wrap gap-2">
+                    <div className="text-[11px] text-indigo-900">
+                      <strong>External Checking Infrastructure:</strong> Requires live network prober, SIEM query, or hardware sensors.
+                    </div>
+                    <button
+                      onClick={() => setInfraModalOpen(true)}
+                      className="px-3 py-1 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Broadcast size={14} weight="bold" />
+                      Click More to Know Details →
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Vendor Selector for Remediation Preview */}
@@ -209,6 +241,17 @@ remediation_cli: |
           )}
         </div>
       </div>
+
+      {activeRule && activeRule.infraRequirements && (
+        <InfraRequirementsModal
+          isOpen={infraModalOpen}
+          onClose={() => setInfraModalOpen(false)}
+          ruleId={activeRule.id}
+          ruleTitle={activeRule.title}
+          frameworkRef={activeRule.frameworkRef}
+          infraRequirements={activeRule.infraRequirements}
+        />
+      )}
     </div>
   );
 };

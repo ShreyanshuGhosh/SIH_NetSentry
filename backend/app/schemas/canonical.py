@@ -43,11 +43,12 @@ class Finding(BaseModel):
     severity: str  # critical | high | medium | low
     cat_rating: Optional[str] = None  # CAT I | CAT II | CAT III
     source_note: Optional[str] = None
-    status: str    # pass | fail | not_applicable
+    status: str    # pass | fail | not_applicable | checking_infra_missing
     evidence_lines: List[LineEvidence] = []
     remediation_command: str
     framework_ref: str
     resolved_via_exemplar: Optional[Dict[str, Any]] = None
+    infra_requirements: Optional[Dict[str, Any]] = None
 
 class AuditSummary(BaseModel):
     compliance_score: int
@@ -55,6 +56,7 @@ class AuditSummary(BaseModel):
     deduplicated_controls: int
     passed: int
     failed: int
+    infra_missing: int = 0
     critical_count: int
     high_count: int
     medium_count: int

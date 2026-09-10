@@ -165,6 +165,78 @@ export const INITIAL_BASELINE_FIELDS: BaselineFieldDefinition[] = [
     createdBy: "system",
     createdAt: "2026-01-01T00:00:00Z",
   },
+  {
+    key: "icmpRedirectsDisabled",
+    label: "ICMP Redirects Disabled",
+    framework: ["cis_v8", "nist_800_53", "disa_stig", "iso_27001"],
+    valueType: "boolean",
+    description: "Prevent MITM route poisoning via forged ICMP redirect messages.",
+    createdBy: "system",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
+  {
+    key: "proxyArpDisabled",
+    label: "Proxy ARP Disabled",
+    framework: ["cis_v8", "nist_800_53", "disa_stig", "iso_27001"],
+    valueType: "boolean",
+    description: "Prevent spoofing and ARP table exhaustion by disabling Proxy ARP on transit interfaces.",
+    createdBy: "system",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
+  {
+    key: "ipSourceRoutingDisabled",
+    label: "IP Source Routing Disabled",
+    framework: ["cis_v8", "nist_800_53", "disa_stig", "iso_27001"],
+    valueType: "boolean",
+    description: "Drop IP packets with sender-specified loose/strict source route headers.",
+    createdBy: "system",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
+  {
+    key: "directedBroadcastDisabled",
+    label: "IP Directed Broadcast Disabled",
+    framework: ["cis_v8", "nist_800_53", "disa_stig", "iso_27001"],
+    valueType: "boolean",
+    description: "Prevent Smurf amplification attacks by dropping subnet-directed broadcast frames.",
+    createdBy: "system",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
+  {
+    key: "discoveryProtocolsDisabled",
+    label: "Discovery Protocols Disabled (CDP/LLDP)",
+    framework: ["cis_v8", "nist_800_53", "disa_stig", "iso_27001"],
+    valueType: "boolean",
+    description: "Disable CDP and LLDP broadcast beacons to prevent unauthorized network topology reconnaissance.",
+    createdBy: "system",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
+  {
+    key: "vtyAccessClassConfigured",
+    label: "Management VTY ACL Restriced",
+    framework: ["cis_v8", "nist_800_53", "disa_stig", "iso_27001"],
+    valueType: "boolean",
+    description: "Filter terminal/VTY administrative sessions using an ingress security access-list.",
+    createdBy: "system",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
+  {
+    key: "ntpAuthenticated",
+    label: "NTP Cryptographic Authentication",
+    framework: ["cis_v8", "nist_800_53", "disa_stig", "iso_27001"],
+    valueType: "boolean",
+    description: "Authenticate NTP time synchronization packets with SHA/MD5 pre-shared keys.",
+    createdBy: "system",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
+  {
+    key: "snmpDefaultCommunityDisabled",
+    label: "Default SNMP Communities Disabled",
+    framework: ["cis_v8", "nist_800_53", "disa_stig", "iso_27001"],
+    valueType: "boolean",
+    description: "Default community strings 'public' and 'private' must be completely removed.",
+    createdBy: "system",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
 ];
 
 // §6.1 Extensible Canonical Normalized Configuration Model
@@ -195,9 +267,18 @@ export interface FewShotExemplar {
   timesReused: number; // Incremented when resolving on DIFFERENT devices
 }
 
+// §6.3 Infrastructure Requirements for Non-Static Verification
+export interface InfraCheckRequirements {
+  whyConfigInsufficient: string;
+  requiredInfrastructure: string[];
+  syntheticProbeCommand?: string;
+  telemetrySignal: string;
+  verificationProcedure: string;
+}
+
 // §6.4 Rule Engine & Findings with controlGroupId for deduplication
 export type SeverityLevel = "critical" | "high" | "medium" | "low";
-export type ComplianceStatus = "pass" | "fail" | "not_applicable";
+export type ComplianceStatus = "pass" | "fail" | "not_applicable" | "checking_infra_missing";
 
 export interface ComplianceRule {
   id: string;
@@ -209,6 +290,7 @@ export interface ComplianceRule {
   description: string;
   frameworkRef: string;
   sourceNote?: string; // Paraphrased standard citation for auditability
+  infraRequirements?: InfraCheckRequirements; // Present when rule requires external checking infrastructure
   evaluate(parameters: NormalizedConfig["parameters"]): ComplianceStatus;
   remediation: Record<SupportedVendor, string>;
 }
@@ -226,6 +308,7 @@ export interface Finding {
   resolvedViaExemplar?: { exemplarId: string; sourceDeviceId: string };
   frameworkRef: string;
   sourceNote?: string;
+  infraRequirements?: InfraCheckRequirements;
 }
 
 // §6.5 Explicit Error / Failure State Machines
