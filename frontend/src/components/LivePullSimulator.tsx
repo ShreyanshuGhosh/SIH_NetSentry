@@ -1,5 +1,6 @@
 // src/components/LivePullSimulator.tsx
 // Live SSH Collector Simulator with explicit state machine and honest telemetry (§6.5, C1)
+// 6 built-in Netmiko drivers; unlimited via AI Training loop — see "Unknown / Other Vendor" option
 
 import React, { useState } from 'react';
 import {
@@ -18,8 +19,10 @@ import { LivePullState } from '../types/canonical';
 
 interface LivePullSimulatorProps {
   onIngestPulledConfig: (config: SampleDeviceConfig) => void;
+  onOpenTraining?: () => void;
 }
 
+// 6 built-in demo dialects; unlimited via AI Training loop — "Unknown / Other Vendor" routes there
 const DRIVERS = [
   { value: 'cisco_ios', label: 'cisco_ios (Cisco IOS-XE Catalyst/ISR)' },
   { value: 'juniper_junos', label: 'juniper_junos (Juniper JunOS SRX/MX)' },
@@ -27,9 +30,10 @@ const DRIVERS = [
   { value: 'sonic', label: 'sonic (SONiC Open Linux NOS)' },
   { value: 'fortinet_fortios', label: 'fortinet_fortios (Fortinet FortiGate)' },
   { value: 'arista_eos', label: 'arista_eos (Arista EOS Data Center)' },
+  { value: 'ai_training', label: '+ Unknown / Other Vendor → (route to AI Training loop)' },
 ];
 
-export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPulledConfig }) => {
+export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPulledConfig, onOpenTraining }) => {
   const [host, setHost] = useState('10.14.20.1');
   const [port, setPort] = useState('22');
   const [driver, setDriver] = useState('cisco_ios');
@@ -160,7 +164,14 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
             <label className="block text-xs text-slate-600 mb-1">Device Driver</label>
             <select
               value={driver}
-              onChange={(e) => setDriver(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === 'ai_training') {
+                  onOpenTraining?.();
+                  return;
+                }
+                setDriver(val);
+              }}
               className="w-full px-3 py-2 rounded text-xs font-mono text-slate-900 bg-[var(--bg-surface)] border border-slate-300 outline-none focus:border-sky-600 shadow-2xs"
             >
               {DRIVERS.map((d) => (
@@ -169,6 +180,9 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
                 </option>
               ))}
             </select>
+            <p className="text-[10px] font-mono text-[#7C4F04] bg-[rgba(200,131,10,0.08)] border border-[rgba(200,131,10,0.20)] rounded px-2 py-1 mt-1.5 leading-relaxed">
+              6 built-in drivers — unrecognized vendor syntax is handled by the AI Training loop
+            </p>
           </div>
 
           {/* Test Fail State Toggle (§6.5 C1 demonstration) */}

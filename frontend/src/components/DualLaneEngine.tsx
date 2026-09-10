@@ -19,23 +19,23 @@ interface DualLaneEngineProps {
 export const DualLaneEngine: React.FC<DualLaneEngineProps> = ({ onOpenTraining }) => {
   const competitors = [
     {
-      name: 'Batfish (AWS / UCLA / USC)',
-      does: 'Model-based network behavior, data-plane simulation, ACL & firewall verification.',
+      name: 'Model-based network verification tools',
+      does: 'Verify routing/ACL behavior against a modeled network state.',
       lacks: 'No LLM normalization of previously unseen vendor syntax; no admin-in-the-loop few-shot training.',
     },
     {
-      name: 'FireMon',
-      does: 'Multi-vendor firewall policy management across 600+ network platforms, audit reporting.',
+      name: 'Mature multi-vendor policy management platforms',
+      does: 'Enterprise-scale policy normalization across a fixed set of supported vendors.',
       lacks: 'Fixed static vendor drivers; no adaptive/learning layer for arbitrary or newly deployed NOS syntax.',
     },
     {
-      name: 'Tufin',
-      does: 'Continuous compliance automation for PCI DSS, SOX, NERC CIP, and HIPAA.',
+      name: 'Continuous compliance automation platforms',
+      does: 'Ongoing policy compliance checks against regulatory frameworks.',
       lacks: 'Not architected around vendor-neutral AI interpretation of unknown command lines.',
     },
     {
-      name: 'Itential',
-      does: 'Visual workflow orchestration, multi-cloud lifecycle management, approval gates.',
+      name: 'AI/visual workflow orchestration platforms',
+      does: 'General-purpose orchestration, approval gates, and governance workflows.',
       lacks: 'Orchestration-first platform, not specialized in deterministic compliance-reasoning.',
     },
     {
@@ -99,7 +99,7 @@ export const DualLaneEngine: React.FC<DualLaneEngineProps> = ({ onOpenTraining }
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--status-pass)' }} />
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider font-mono">
-              Green Lane: Deterministic Parser
+              Deterministic Parser
             </h2>
           </div>
 
@@ -135,7 +135,7 @@ export const DualLaneEngine: React.FC<DualLaneEngineProps> = ({ onOpenTraining }
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--status-warn)' }} />
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider font-mono">
-              Amber Lane: AI Normalization Layer
+              AI Normalization Layer
             </h2>
           </div>
 

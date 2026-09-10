@@ -65,7 +65,10 @@ export interface AuditRule {
   title: string;
   framework: FrameworkId;
   frameworkRef: string;
+  sourceNote?: string;
+  controlGroupId?: string;
   severity: SeverityLevel;
+  catRating?: 'CAT I' | 'CAT II' | 'CAT III';
   field: keyof SecurityBaselineModel;
   operator: 'equals' | 'greater_equal' | 'contains' | 'is_true' | 'is_false' | 'not_empty';
   targetValue: any;
@@ -80,7 +83,10 @@ export interface AuditFinding {
   title: string;
   framework: FrameworkId;
   frameworkRef: string;
+  sourceNote?: string;
+  controlGroupId?: string;
   severity: SeverityLevel;
+  catRating?: 'CAT I' | 'CAT II' | 'CAT III';
   status: ComplianceStatus;
   evidenceLine: number;
   evidenceSnippet: string;

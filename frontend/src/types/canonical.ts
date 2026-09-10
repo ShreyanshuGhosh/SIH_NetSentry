@@ -204,9 +204,11 @@ export interface ComplianceRule {
   title: string;
   framework: FrameworkId;
   severity: SeverityLevel;
+  catRating?: "CAT I" | "CAT II" | "CAT III"; // Authentic DISA STIG Category rating
   controlGroupId?: string; // Deduplicates identical underlying controls across frameworks
   description: string;
   frameworkRef: string;
+  sourceNote?: string; // Paraphrased standard citation for auditability
   evaluate(parameters: NormalizedConfig["parameters"]): ComplianceStatus;
   remediation: Record<SupportedVendor, string>;
 }
@@ -218,10 +220,12 @@ export interface Finding {
   controlGroupId?: string;
   status: ComplianceStatus;
   severity: SeverityLevel;
+  catRating?: "CAT I" | "CAT II" | "CAT III";
   evidenceLines: { line: number; raw: string }[];
   remediationCommand: string;
   resolvedViaExemplar?: { exemplarId: string; sourceDeviceId: string };
   frameworkRef: string;
+  sourceNote?: string;
 }
 
 // §6.5 Explicit Error / Failure State Machines

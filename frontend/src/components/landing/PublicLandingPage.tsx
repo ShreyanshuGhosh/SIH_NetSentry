@@ -307,23 +307,13 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
       style={{ backgroundColor: '#F5F0E8' }}
     >
 
-      {/* ─── TRUST STRIP ─── */}
-      <div
-        className="w-full py-2 px-3 sm:px-4 text-center text-[10px] sm:text-[11px] font-mono flex flex-wrap items-center justify-center gap-1.5 sm:gap-3"
-        style={{ backgroundColor: 'rgba(200,131,10,0.10)', borderBottom: '1px solid rgba(200,131,10,0.18)', color: '#7C4F04' }}
-      >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#C8830A] inline-block shrink-0" />
-        <span className="font-semibold uppercase tracking-wider">Authorized Use Only</span>
-        <span className="text-[#C8830A] opacity-40 hidden sm:inline">·</span>
-        <span className="text-center">National Technical Research Organisation (NTRO) · Government of India · SIH 2026 · Project SIH26155</span>
-      </div>
 
       {/* ─── NAV ─── */}
       <motion.header
         initial={reduce ? false : { opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="sticky top-0 z-40 h-[58px] flex items-center justify-between px-4 sm:px-6 lg:px-12 backdrop-blur-md border-b"
+        className="fixed w-full top-0 z-50 h-[58px] flex items-center justify-between px-4 sm:px-6 lg:px-12 backdrop-blur-md border-b"
         style={{ backgroundColor: 'rgba(245,240,232,0.94)', borderColor: '#E4E0D8' }}
       >
         {/* Logo wordmark */}
@@ -369,7 +359,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
       </motion.header>
 
       {/* ─── HERO ─── */}
-      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 pt-10 sm:pt-16 pb-0">
+      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 pt-[98px] sm:pt-[122px] pb-0">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
 
           {/* Left: big display type */}
@@ -430,11 +420,12 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
             {/* Stats row */}
             <motion.div
               variants={rise}
-              className="grid grid-cols-1 xs:grid-cols-3 gap-4 sm:gap-8 pt-6 border-t"
+              className="grid grid-cols-2 xs:grid-cols-4 gap-4 sm:gap-6 pt-6 border-t"
               style={{ borderColor: '#D1CBC0' }}
             >
               {([
-                { val: '6', label: 'Vendor Parsers', note: 'IOS-XE, JunOS, PAN-OS, SONiC, FortiOS, EOS' },
+                { val: '6', label: 'Deterministic Parsers', note: 'IOS-XE, JunOS, PAN-OS, SONiC, FortiOS, EOS — Green Lane, zero LLM' },
+                { val: '∞', label: 'Learned via AI Training', note: 'Unrecognized syntax is mapped once, then reused automatically on future devices' },
                 { val: '4', label: 'Compliance Packs', note: 'CIS · NIST · STIG · ISO 27001' },
                 { val: '<15ms', label: 'Per Audit', note: 'Deterministic engine, zero ML latency' },
               ] as const).map((s) => (

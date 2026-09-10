@@ -63,7 +63,7 @@ export const NavRail: React.FC<NavRailProps> = ({
 
   return (
     <aside
-      className="w-16 md:w-56 shrink-0 border-r flex flex-col justify-between select-none z-30 min-h-screen"
+      className="w-16 md:w-56 shrink-0 border-r flex flex-col justify-between select-none z-30 sticky top-0 h-screen overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[rgba(200,131,10,0.3)] hover:scrollbar-thumb-[rgba(200,131,10,0.6)] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#D1CBC0] [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-[#A89F92]"
       style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-default)' }}
     >
       <div>

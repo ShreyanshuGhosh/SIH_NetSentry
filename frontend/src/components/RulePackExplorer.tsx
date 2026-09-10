@@ -1,8 +1,9 @@
 // src/components/RulePackExplorer.tsx
 // Declarative YAML Rule Pack Explorer with single unified remediation display (no duplication, §4)
+// Vendor selector shows 6 built-in demo dialects; unlimited via AI Training loop
 
 import React, { useState } from 'react';
-import { Copy, Check, CaretRight, FileCode, CheckCircle } from '@phosphor-icons/react';
+import { Copy, Check, CaretRight, FileCode, CheckCircle, ArrowRight } from '@phosphor-icons/react';
 import { FrameworkId } from '../types/audit';
 import { FRAMEWORKS } from '../data/rulePacks';
 import { COMPLIANCE_RULES } from '../engine/rules';
@@ -10,7 +11,11 @@ import { SeverityTag } from './shared/SeverityTag';
 import { MonoCodeBlock } from './shared/MonoCodeBlock';
 import { VENDOR_DISPLAY_NAMES, SupportedVendor } from '../types/canonical';
 
-export const RulePackExplorer: React.FC = () => {
+interface RulePackExplorerProps {
+  onOpenTraining?: () => void;
+}
+
+export const RulePackExplorer: React.FC<RulePackExplorerProps> = ({ onOpenTraining }) => {
   const [selectedFw, setSelectedFw] = useState<FrameworkId>('cis_v8');
   const [selectedVendor, setSelectedVendor] = useState<SupportedVendor>('cisco_ios');
 
@@ -19,6 +24,7 @@ export const RulePackExplorer: React.FC = () => {
   const activeRule = rules.find((r) => r.id === activeRuleId) || rules[0] || COMPLIANCE_RULES[0];
 
   const frameworksList = Object.keys(FRAMEWORKS) as FrameworkId[];
+  // 6 built-in demo dialects; unlimited via AI Training loop — see "Unknown / Other Vendor" option below
   const vendorsList: SupportedVendor[] = [
     'cisco_ios',
     'juniper_junos',
@@ -27,6 +33,16 @@ export const RulePackExplorer: React.FC = () => {
     'fortinet_fortios',
     'arista_eos',
   ];
+
+  // Short display names for vendor pills
+  const vendorShortName: Record<SupportedVendor, string> = {
+    cisco_ios: 'Cisco',
+    juniper_junos: 'JunOS',
+    palo_alto_panos: 'PAN-OS',
+    sonic: 'SONiC',
+    fortinet_fortios: 'FortiOS',
+    arista_eos: 'Arista',
+  };
 
   // Pure declarative YAML representation (single remediation block, no duplication with embedded strings)
   const yamlContent = activeRule
@@ -143,25 +159,40 @@ remediation_cli: |
               </div>
 
               {/* Vendor Selector for Remediation Preview */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-600 uppercase font-mono font-medium">
-                  Select Vendor Dialect Remediation
-                </span>
+              {/* 6 built-in demo dialects; unlimited via AI Training loop — "Unknown / Other Vendor" routes there */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-600 uppercase font-mono font-medium">
+                    Select Vendor Dialect Remediation
+                  </span>
+                  <span className="text-[10px] font-mono text-[#7C4F04] bg-[rgba(200,131,10,0.08)] border border-[rgba(200,131,10,0.20)] rounded px-2 py-0.5">
+                    6 built-in — any other vendor handled by AI Training loop
+                  </span>
+                </div>
 
-                <div className="flex gap-1">
+                <div className="flex gap-1 flex-wrap">
                   {vendorsList.map((v) => (
                     <button
                       key={v}
                       onClick={() => setSelectedVendor(v)}
-                      className={`px-2 py-1 rounded text-[10px] font-mono transition-colors cursor-pointer border ${
+                      className={`px-2.5 py-1 rounded text-[10px] font-mono transition-colors cursor-pointer border ${
                         selectedVendor === v
                           ? 'border-sky-600 bg-sky-50 text-sky-950 font-bold shadow-xs'
                           : 'border-slate-300 text-slate-700 bg-[var(--bg-surface)] hover:border-slate-400'
                       }`}
                     >
-                      {v.split('_')[0].toUpperCase()}
+                      {vendorShortName[v]}
                     </button>
                   ))}
+                  {/* 7th option: visually distinct — routes to AI Training, not a hardcoded dialect */}
+                  <button
+                    onClick={() => onOpenTraining?.()}
+                    className="px-2.5 py-1 rounded text-[10px] font-mono cursor-pointer border border-dashed border-[#C8830A] text-[#C8830A] hover:bg-[rgba(200,131,10,0.08)] flex items-center gap-1 font-semibold transition-all"
+                    title="Any vendor not in the built-in list is handled by the AI Training loop"
+                  >
+                    <span>+</span>
+                    <span>Unknown / Other →</span>
+                  </button>
                 </div>
               </div>
 
@@ -181,3 +212,5 @@ remediation_cli: |
     </div>
   );
 };
+
+

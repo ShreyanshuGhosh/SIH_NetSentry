@@ -1,11 +1,10 @@
 // src/components/shell/TopBar.tsx
 // Persistent top navigation bar — Institutional Light Mode
-// Warm stone palette, saffron-gold accent. Clean ApexNet brand hyperlink.
 
 import React from 'react';
 import {
   Play, ArrowSquareOut, CheckCircle, XCircle, MagnifyingGlass,
-  Bell, Question, ArrowLeft, Shield,
+  Bell, Question, ArrowLeft,
 } from '@phosphor-icons/react';
 import { SupportedVendor, VENDOR_DISPLAY_NAMES } from '../../types/canonical';
 import { ActiveNavTab } from './NavRail';
@@ -73,25 +72,6 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
         )}
 
-        {/* Hyperlinked ApexNet Brand / Logo */}
-        <button
-          onClick={handleLandingClick}
-          className={`${showBackButton ? 'hidden sm:flex' : 'flex'} items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer text-left shrink-0 group`}
-          title="ApexNet - Return to Public Landing Page"
-        >
-          <div
-            className="w-7 h-7 rounded-md flex items-center justify-center border shrink-0 bg-[rgba(200,131,10,0.10)] border-[rgba(200,131,10,0.30)] group-hover:scale-105 transition-transform"
-          >
-            <Shield size={14} weight="bold" className="text-[#C8830A]" />
-          </div>
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A3F] animate-pulse" />
-            <span className="text-xs font-extrabold text-[#1E1C1A] truncate group-hover:text-[#C8830A] transition-colors">
-              ApexNet Perimeter
-            </span>
-            <span className="text-[#D1CBC0] text-xs">·</span>
-          </div>
-        </button>
 
         {/* Target Node Details */}
         <div className="flex items-center gap-1.5 min-w-0 shrink">

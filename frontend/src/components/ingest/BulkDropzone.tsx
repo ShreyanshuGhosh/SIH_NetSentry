@@ -168,7 +168,7 @@ export const BulkDropzone: React.FC<BulkDropzoneProps> = ({
               Drag & drop configuration files here, or <span className="text-sky-600 underline">browse</span>
             </div>
             <div className="text-xs text-slate-500 mt-1">
-              Supports Cisco (.cfg), Juniper (.conf), PAN-OS, SONiC (.json), Fortinet, and Arista.
+              Ships with deterministic parsers for Cisco, Juniper, PAN-OS, SONiC, Fortinet, and Arista — any other vendor's syntax is picked up automatically by the AI Training loop.
             </div>
           </div>
 

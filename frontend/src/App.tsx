@@ -323,12 +323,12 @@ export function App() {
                 <TrainingUI onTrainingUpdated={handleTrainingUpdated} />
               )}
 
-              {activeTab === 'rules' && <RulePackExplorer />}
+              {activeTab === 'rules' && <RulePackExplorer onOpenTraining={() => setActiveTab('training')} />}
 
-              {activeTab === 'remediation' && <TacticalRemediationScanner />}
+              {activeTab === 'remediation' && <TacticalRemediationScanner onOpenTraining={() => setActiveTab('training')} />}
 
               {activeTab === 'live-pull' && (
-                <LivePullSimulator onIngestPulledConfig={handleIngestFromLivePull} />
+                <LivePullSimulator onIngestPulledConfig={handleIngestFromLivePull} onOpenTraining={() => setActiveTab('training')} />
               )}
 
               {activeTab === 'architecture' && (

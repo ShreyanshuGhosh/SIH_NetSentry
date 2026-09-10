@@ -70,9 +70,11 @@ export function evaluateNormalizedConfig(
       controlGroupId: rule.controlGroupId,
       status,
       severity: rule.severity,
+      catRating: rule.catRating,
       evidenceLines,
       remediationCommand,
       frameworkRef: rule.frameworkRef,
+      sourceNote: rule.sourceNote,
     });
   }
 

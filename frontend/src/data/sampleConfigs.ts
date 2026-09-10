@@ -226,7 +226,7 @@ set mgt-config users secadmin password $1$REDACTED_PASSWORD_HASH`
     }
   },
   "BANNER": {
-    "login": "RESTRICTED ACCESS - NTRO AI COMPUTE FABRIC"
+    "login": "RESTRICTED ACCESS - AUTHORIZED PERSONNEL ONLY"
   },
   "AAA": {
     "authentication": {

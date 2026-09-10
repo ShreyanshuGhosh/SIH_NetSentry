@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import audit, training, dashboard, exemplars, reports, rules, live_pull
 
 app = FastAPI(
-    title="NetSentry AI Compliance Auditor Backend",
+    title="ApexNet AI Compliance Auditor Backend",
     version="1.1.0",
     description="SIH26155 (NTRO, Government of India) - AI-Driven Multi-Vendor Network Compliance Auditor"
 )
@@ -29,7 +29,7 @@ app.include_router(live_pull.router)
 async def health_check():
     return {
         "status": "healthy",
-        "engine": "NetSentry Dual-Lane Core v1.1.0",
+        "engine": "ApexNet Dual-Lane Core v1.1.0",
         "problem_statement": "SIH26155",
         "organization": "NTRO, Government of India"
     }

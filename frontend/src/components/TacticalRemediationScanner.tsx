@@ -1,6 +1,6 @@
 // src/components/TacticalRemediationScanner.tsx
-// Drag-to-compare before/after remediation diff scrubber wired for ALL 6 VENDORS (§5, Phase 5)
-// Features literal, executable CLI remediation command sequences (Zero UI Slop)
+// Drag-to-compare before/after remediation diff scrubber wired for 6 built-in demo dialects
+// Unlimited vendor coverage via AI Training loop — see "Unknown / Other Vendor" option
 
 import React, { useState, useRef, useCallback } from 'react';
 import {
@@ -374,9 +374,10 @@ write memory`,
 
 interface TacticalRemediationScannerProps {
   onLaunchConsole?: () => void;
+  onOpenTraining?: () => void;
 }
 
-export const TacticalRemediationScanner: React.FC<TacticalRemediationScannerProps> = ({ onLaunchConsole }) => {
+export const TacticalRemediationScanner: React.FC<TacticalRemediationScannerProps> = ({ onLaunchConsole, onOpenTraining }) => {
   const [dialect, setDialect] = useState<ScannerDialect>('cisco');
   const [sliderPos, setSliderPos] = useState<number>(50); // 0 to 100%
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -422,22 +423,36 @@ export const TacticalRemediationScanner: React.FC<TacticalRemediationScannerProp
           </p>
         </div>
 
-        {/* Vendor Selector Tabs (All 6 dialects) */}
-        <div className="flex gap-1 overflow-x-auto p-1 rounded border border-slate-200 bg-slate-100 font-mono text-[11px]">
-          {(['cisco', 'juniper', 'paloalto', 'sonic', 'fortinet', 'arista'] as const).map((d) => (
+        {/* Vendor Selector Tabs (6 built-in demo dialects; unlimited via AI Training — see "Unknown / Other Vendor" option) */}
+        <div className="flex flex-col items-end gap-1.5">
+          <p className="text-[10px] font-mono text-[#7C4F04] bg-[rgba(200,131,10,0.08)] border border-[rgba(200,131,10,0.20)] rounded px-2 py-0.5 max-w-[340px] text-right leading-relaxed">
+            6 built-in — any other vendor or dialect is handled by the AI Training loop, not a hardcoded limit.
+          </p>
+          <div className="flex gap-1 overflow-x-auto p-1 rounded border border-slate-200 bg-slate-100 font-mono text-[11px]">
+            {(['cisco', 'juniper', 'paloalto', 'sonic', 'fortinet', 'arista'] as const).map((d) => (
+              <button
+                key={d}
+                onClick={() => {
+                  setDialect(d);
+                  setSliderPos(50);
+                }}
+                className={`px-3 py-1.5 rounded cursor-pointer transition-colors ${
+                  dialect === d ? 'bg-slate-900 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {SCANNER_CONFIGS[d].name}
+              </button>
+            ))}
+            {/* 7th option: routes into AI Training — visually distinct, not a hardcoded dialect */}
             <button
-              key={d}
-              onClick={() => {
-                setDialect(d);
-                setSliderPos(50);
-              }}
-              className={`px-3 py-1.5 rounded cursor-pointer transition-colors ${
-                dialect === d ? 'bg-slate-900 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
-              }`}
+              onClick={() => onOpenTraining?.()}
+              className="px-3 py-1.5 rounded cursor-pointer transition-all flex items-center gap-1.5 text-[#C8830A] border border-dashed border-[#C8830A] hover:bg-[rgba(200,131,10,0.08)] font-semibold ml-1"
+              title="Any vendor not in the built-in list is handled by the AI Training loop"
             >
-              {SCANNER_CONFIGS[d].name}
+              <span className="text-base leading-none">+</span>
+              <span>Unknown / Other Vendor →</span>
             </button>
-          ))}
+          </div>
         </div>
       </div>
 

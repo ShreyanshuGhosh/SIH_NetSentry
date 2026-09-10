@@ -41,6 +41,8 @@ class Finding(BaseModel):
     framework: str
     control_group_id: Optional[str] = None
     severity: str  # critical | high | medium | low
+    cat_rating: Optional[str] = None  # CAT I | CAT II | CAT III
+    source_note: Optional[str] = None
     status: str    # pass | fail | not_applicable
     evidence_lines: List[LineEvidence] = []
     remediation_command: str

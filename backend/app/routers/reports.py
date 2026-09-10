@@ -12,7 +12,7 @@ async def download_audit_pdf(audit_id: str):
 
     pdf_bytes = generate_pdf_report(audit_data)
     clean_name = audit_data.get("device_name", "Device").replace(" ", "_")
-    filename = f"NetSentry_Audit_{clean_name}_{audit_id}.pdf"
+    filename = f"ApexNet_Audit_{clean_name}_{audit_id}.pdf"
 
     return Response(
         content=pdf_bytes,
