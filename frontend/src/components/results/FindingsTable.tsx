@@ -100,53 +100,61 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
           const isInfraMissing = finding.status.toLowerCase() === 'checking_infra_missing';
 
           return (
-            <div key={finding.ruleId} className="transition-colors hover:bg-slate-50">
+            <div key={finding.ruleId} className="transition-colors hover:bg-[rgba(30,28,26,0.03)]">
               {/* Row Summary */}
               <div
                 onClick={() => setExpandedId(isExpanded ? null : finding.ruleId)}
-                className="p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-4 cursor-pointer"
+                className="p-3 sm:p-3.5 flex items-center justify-between gap-3 sm:gap-4 cursor-pointer"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                  <div className="flex items-center gap-2 shrink-0 sm:w-36">
+                  {/* Fixed-width aligned status & severity column */}
+                  <div className="flex items-center gap-2 shrink-0 sm:w-[172px]">
                     <StatusBadge status={finding.status} />
                     <SeverityTag severity={finding.severity} />
                   </div>
 
+                  {/* Title and reference */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-semibold text-slate-900 truncate">
+                      <span
+                        className="font-mono text-xs font-semibold text-slate-900 leading-snug truncate"
+                        title={`${finding.ruleId}: ${finding.ruleTitle}`}
+                      >
                         {finding.ruleId}: {finding.ruleTitle}
                       </span>
                       {finding.resolvedViaExemplar && (
                         <span
-                          className="hidden md:inline-flex items-center gap-1 font-mono text-[9px] px-1.5 py-0.2 rounded border text-sky-700 bg-sky-50 border-sky-200 font-medium"
+                          className="hidden lg:inline-flex items-center gap-1 font-mono text-[9px] px-1.5 py-0.5 rounded border text-sky-700 bg-sky-50 border-sky-200 font-medium shrink-0"
                         >
                           <Brain size={11} />
-                          <span>Learned from Few-Shot Store</span>
+                          <span>Few-Shot Reused</span>
                         </span>
                       )}
-                      {isInfraMissing && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedInfraFinding(finding);
-                          }}
-                          className="inline-flex items-center gap-1 font-mono text-[9px] px-2 py-0.5 rounded border text-indigo-700 bg-indigo-50 border-indigo-200 font-semibold hover:bg-indigo-100 transition-colors cursor-pointer"
-                        >
-                          <Broadcast size={11} className="text-indigo-600 animate-pulse" />
-                          <span>Checking Infra Missing (Click Details)</span>
-                        </button>
-                      )}
                     </div>
-                    <div className="text-[11px] text-slate-600 mt-0.5 truncate">
+                    <div className="text-[11px] text-slate-500 mt-0.5 truncate font-mono">
                       {finding.frameworkRef}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 shrink-0">
+                {/* Right actions */}
+                <div className="flex items-center gap-2.5 shrink-0">
+                  {isInfraMissing && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedInfraFinding(finding);
+                      }}
+                      className="inline-flex items-center gap-1.5 font-mono text-[10px] px-2.5 py-1 rounded border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-300 font-medium whitespace-nowrap transition-colors cursor-pointer shadow-2xs"
+                      title="View external checking infrastructure diagnostic requirements"
+                    >
+                      <Broadcast size={13} weight="bold" className="text-indigo-600" />
+                      <span className="hidden xs:inline">Infra Details</span>
+                      <ArrowRight size={10} weight="bold" />
+                    </button>
+                  )}
                   {finding.evidenceLines.length > 0 && (
-                    <span className="font-mono text-[10px] text-slate-500 hidden sm:inline">
+                    <span className="font-mono text-[10px] text-slate-500 hidden sm:inline px-1.5 py-0.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)]">
                       Line {finding.evidenceLines[0].line}
                     </span>
                   )}

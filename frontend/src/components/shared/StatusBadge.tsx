@@ -40,8 +40,8 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm', c
     border = 'var(--border-subtle)';
   }
 
-  const padding = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
-  const widthClass = className.includes('w-') ? '' : (size === 'sm' ? (text === 'INFRA REQ' ? 'w-20' : 'w-14') : (text === 'INFRA REQ' ? 'w-22' : 'w-16'));
+  const padding = size === 'sm' ? 'px-1.5 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
+  const widthClass = className.includes('w-') ? '' : (size === 'sm' ? 'w-20' : 'w-24');
 
   return (
     <span

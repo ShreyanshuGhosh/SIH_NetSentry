@@ -127,7 +127,7 @@ remediation_cli: |
                   key={rule.id}
                   onClick={() => setActiveRuleId(rule.id)}
                   className={`w-full text-left p-3.5 transition-colors cursor-pointer flex items-center justify-between gap-2 ${
-                    isActive ? 'bg-slate-100 text-slate-900 font-medium' : 'hover:bg-slate-50 text-slate-700'
+                    isActive ? 'bg-[var(--bg-surface-raised)] text-slate-900 font-semibold' : 'hover:bg-black/[0.02] text-slate-700'
                   }`}
                 >
                   <div className="min-w-0 flex-1">
@@ -135,7 +135,7 @@ remediation_cli: |
                       <span className="font-mono text-[11px] font-bold text-slate-900">{rule.id}</span>
                       <SeverityTag severity={rule.severity} size="sm" />
                       {rule.infraRequirements && (
-                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold">
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold">
                           INFRA REQ
                         </span>
                       )}
