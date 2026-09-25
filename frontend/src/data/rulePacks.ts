@@ -581,14 +581,14 @@ export const AUDIT_RULES: AuditRule[] = [
       verificationProcedure: "1. Emit synthetic high-priority syslog test frame from network device.\n2. Query SIEM REST API within 60 seconds to verify document ingestion.\n3. Validate parsed fields: timestamp, host, process_id, severity, and raw payload.\n4. Trigger alert pipeline test to confirm SIEM rule match on critical event.",
     },
     remediation: {
-      cisco_ios: "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include APEXNET",
-      juniper_junos: "request logger tag APEXNET message \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+      cisco_ios: "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include NETSENTRY",
+      juniper_junos: "request logger tag NETSENTRY message \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
       palo_alto: "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
       palo_alto_panos: "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
-      sonic: "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
-      sonic_whitebox: "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+      sonic: "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
+      sonic_whitebox: "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
       fortinet_fortios: "diagnose log test",
-      arista_eos: "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"",
+      arista_eos: "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"",
       cloud_aws_sg: 'aws ec2 describe-security-groups --group-ids <sg-id>'
     }
   },
@@ -1250,14 +1250,14 @@ export const AUDIT_RULES: AuditRule[] = [
       verificationProcedure: "1. Emit synthetic high-priority syslog test frame from network device.\n2. Query SIEM REST API within 60 seconds to verify document ingestion.\n3. Validate parsed fields: timestamp, host, process_id, severity, and raw payload.\n4. Trigger alert pipeline test to confirm SIEM rule match on critical event.",
     },
     remediation: {
-      cisco_ios: "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include APEXNET",
-      juniper_junos: "request logger tag APEXNET message \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+      cisco_ios: "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include NETSENTRY",
+      juniper_junos: "request logger tag NETSENTRY message \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
       palo_alto: "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
       palo_alto_panos: "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
-      sonic: "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
-      sonic_whitebox: "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+      sonic: "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
+      sonic_whitebox: "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
       fortinet_fortios: "diagnose log test",
-      arista_eos: "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"",
+      arista_eos: "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"",
       cloud_aws_sg: 'aws ec2 describe-security-groups --group-ids <sg-id>'
     }
   },
@@ -1939,14 +1939,14 @@ export const AUDIT_RULES: AuditRule[] = [
       verificationProcedure: "1. Emit synthetic high-priority syslog test frame from network device.\n2. Query SIEM REST API within 60 seconds to verify document ingestion.\n3. Validate parsed fields: timestamp, host, process_id, severity, and raw payload.\n4. Trigger alert pipeline test to confirm SIEM rule match on critical event.",
     },
     remediation: {
-      cisco_ios: "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include APEXNET",
-      juniper_junos: "request logger tag APEXNET message \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+      cisco_ios: "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include NETSENTRY",
+      juniper_junos: "request logger tag NETSENTRY message \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
       palo_alto: "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
       palo_alto_panos: "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
-      sonic: "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
-      sonic_whitebox: "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+      sonic: "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
+      sonic_whitebox: "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
       fortinet_fortios: "diagnose log test",
-      arista_eos: "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"",
+      arista_eos: "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"",
       cloud_aws_sg: 'aws ec2 describe-security-groups --group-ids <sg-id>'
     }
   },
@@ -2612,14 +2612,14 @@ export const AUDIT_RULES: AuditRule[] = [
       verificationProcedure: "1. Emit synthetic high-priority syslog test frame from network device.\n2. Query SIEM REST API within 60 seconds to verify document ingestion.\n3. Validate parsed fields: timestamp, host, process_id, severity, and raw payload.\n4. Trigger alert pipeline test to confirm SIEM rule match on critical event.",
     },
     remediation: {
-      cisco_ios: "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include APEXNET",
-      juniper_junos: "request logger tag APEXNET message \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+      cisco_ios: "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include NETSENTRY",
+      juniper_junos: "request logger tag NETSENTRY message \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
       palo_alto: "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
       palo_alto_panos: "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
-      sonic: "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
-      sonic_whitebox: "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+      sonic: "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
+      sonic_whitebox: "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
       fortinet_fortios: "diagnose log test",
-      arista_eos: "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"",
+      arista_eos: "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"",
       cloud_aws_sg: 'aws ec2 describe-security-groups --group-ids <sg-id>'
     }
   },

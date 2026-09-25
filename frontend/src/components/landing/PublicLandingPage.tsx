@@ -1,5 +1,5 @@
 // src/components/landing/PublicLandingPage.tsx
-// ApexNet — Premium Institutional Landing Page
+// NetSentry — Premium Institutional Landing Page
 // DESIGN_VARIANCE: 6 / MOTION_INTENSITY: 3 / VISUAL_DENSITY: 5
 // Design language: Editorial · Real product UI illustrations · Raksha-class premium
 // Palette: Warm Stone (#F5F0E8 canvas) + Saffron Gold (#C8830A accent). Zero blue/violet.
@@ -9,9 +9,10 @@ import { motion, useReducedMotion, type Variants } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, UploadSimple, Cpu, FilePdf,
   CheckCircle, XCircle, LockKey, ArrowLineRight, SealCheck,
-  ShieldWarning, ArrowSquareRight, FileText, Warning,
+  ShieldWarning, Cursor, FileText, Warning,
   Globe, HardDrives, ArrowUp,
 } from '@phosphor-icons/react';
+import { AnimatedProductDemo } from './AnimatedProductDemo';
 
 interface PublicLandingPageProps {
   onLaunchConsole: (configId?: string, targetTab?: string) => void;
@@ -28,121 +29,49 @@ const stagger: Variants = {
 
 // ─── Inline Product Mock: Audit Report Card ────────────────────────────────────
 const AuditReportMock: React.FC = () => (
-  <div
-    className="rounded-2xl border overflow-hidden shadow-xl"
-    style={{
-      backgroundColor: '#FFFFFF',
-      borderColor: '#E4E0D8',
-      boxShadow: '0 24px 64px rgba(30,28,26,0.14), 0 4px 12px rgba(30,28,26,0.08)',
-    }}
-  >
-    {/* Header bar */}
     <div
-      className="px-5 py-4 flex items-center justify-between border-b"
-      style={{ backgroundColor: '#FAFAF8', borderColor: '#E4E0D8' }}
+      className="rounded-2xl border overflow-hidden shadow-xl"
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderColor: '#E4E0D8',
+        boxShadow: '0 24px 64px rgba(30,28,26,0.14), 0 4px 12px rgba(30,28,26,0.08)',
+      }}
     >
-      <div className="flex items-center gap-2">
-        <div
-          className="w-7 h-7 rounded-md flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(200,131,10,0.12)', border: '1px solid rgba(200,131,10,0.30)' }}
-        >
-          <ShieldCheck size={14} weight="bold" className="text-[#C8830A]" />
+      <div className="px-5 py-4 flex items-center justify-between border-b" style={{ backgroundColor: '#FAFAF8', borderColor: '#E4E0D8' }}>
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ backgroundColor: 'rgba(200,131,10,0.12)', border: '1px solid rgba(200,131,10,0.30)' }}>
+            <ShieldCheck size={14} weight="bold" className="text-[#C8830A]" />
+          </div>
+          <span className="text-xs font-bold text-[#1E1C1A]">Audit Report</span>
         </div>
-        <span className="text-xs font-bold text-[#1E1C1A]">Audit Report</span>
+        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border uppercase" style={{ backgroundColor: 'rgba(45,106,63,0.10)', borderColor: 'rgba(45,106,63,0.30)', color: '#1E4D2B' }}>SIGNED PDF</span>
       </div>
-      <div className="flex items-center gap-1.5">
-        <span
-          className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border uppercase"
-          style={{
-            backgroundColor: 'rgba(45,106,63,0.10)',
-            borderColor: 'rgba(45,106,63,0.30)',
-            color: '#1E4D2B',
-          }}
-        >
-          SIGNED PDF
-        </span>
-      </div>
-    </div>
 
-    {/* Device identity block */}
-    <div className="px-5 py-4 border-b" style={{ borderColor: '#E4E0D8' }}>
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="text-[10px] font-mono text-[#A89F92] uppercase tracking-wider mb-1">Device Node</div>
-          <div className="text-sm font-bold text-[#1E1C1A] font-mono">EDGE-SW01</div>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] font-mono text-[#7C7269]">IOS-XE 17.6.1</span>
-            <span className="text-[#D1CBC0]">·</span>
-            <span className="text-[10px] font-mono text-[#7C7269]">SN: FCW2142L0BZ</span>
+      <div className="px-5 py-4 border-b" style={{ borderColor: '#E4E0D8' }}>
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[10px] font-mono text-[#A89F92] uppercase tracking-wider mb-1">Device Node</div>
+            <div className="text-sm font-bold text-[#1E1C1A] font-mono">EDGE-SW01</div>
+            <div className="flex items-center gap-2 mt-1"><span className="text-[10px] font-mono text-[#7C7269]">IOS-XE 17.6.1</span><span className="text-[#D1CBC0]">·</span><span className="text-[10px] font-mono text-[#7C7269]">SN: FCW2142L0BZ</span></div>
           </div>
-        </div>
-        <div className="text-right">
-          <div className="text-[10px] font-mono text-[#A89F92] uppercase tracking-wider mb-1">Score</div>
-          <div className="text-2xl font-extrabold font-mono text-[#2D6A3F] tabular">87%</div>
-          <div className="flex items-center gap-1 mt-0.5 justify-end">
-            <CheckCircle size={10} weight="fill" className="text-[#2D6A3F]" />
-            <span className="text-[10px] font-mono text-[#2D6A3F]">10 Pass</span>
-            <XCircle size={10} weight="fill" className="text-[#B91C1C]" />
-            <span className="text-[10px] font-mono text-[#B91C1C]">2 Fail</span>
-          </div>
+          <div className="text-right"><div className="text-[10px] font-mono text-[#A89F92] uppercase tracking-wider mb-1">Score</div><div className="text-2xl font-extrabold font-mono text-[#2D6A3F] tabular">87%</div><div className="flex items-center gap-1 mt-0.5 justify-end"><CheckCircle size={10} weight="fill" className="text-[#2D6A3F]" /><span className="text-[10px] font-mono text-[#2D6A3F]">10 Pass</span><XCircle size={10} weight="fill" className="text-[#B91C1C]" /><span className="text-[10px] font-mono text-[#B91C1C]">2 Fail</span></div></div>
         </div>
       </div>
-    </div>
 
-    {/* Findings list */}
-    <div className="divide-y" style={{ borderColor: '#E4E0D8' }}>
-      {[
-        { id: 'CIS-1.1.4', title: 'SSHv2 Enforcement', status: 'PASS', sev: null, line: 'ip ssh version 2' },
-        { id: 'CIS-1.2.1', title: 'Telnet Disabled', status: 'PASS', sev: null, line: 'no service telnet' },
-        { id: 'NIST-SC-7', title: 'Boundary Protection', status: 'FAIL', sev: 'HIGH', line: 'line 40: missing ACL' },
-        { id: 'CIS-3.1', title: 'SNMPv3 Privacy', status: 'FAIL', sev: 'CRITICAL', line: 'snmp-server community ...' },
-      ].map((f) => (
-        <div key={f.id} className="px-5 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            {f.status === 'PASS' ? (
-              <CheckCircle size={14} weight="fill" className="text-[#2D6A3F] shrink-0" />
-            ) : (
-              <XCircle size={14} weight="fill" className="text-[#B91C1C] shrink-0" />
-            )}
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold text-[#7C7269]">{f.id}</span>
-                {f.sev && (
-                  <span
-                    className="text-[9px] font-mono font-bold px-1.5 py-px rounded uppercase"
-                    style={{
-                      backgroundColor: f.sev === 'CRITICAL' ? 'rgba(185,28,28,0.12)' : 'rgba(161,98,7,0.12)',
-                      color: f.sev === 'CRITICAL' ? '#B91C1C' : '#A16207',
-                    }}
-                  >
-                    {f.sev}
-                  </span>
-                )}
-              </div>
-              <div className="text-xs text-[#1E1C1A] font-medium truncate">{f.title}</div>
-            </div>
-          </div>
-          <div
-            className="text-[9px] font-mono px-2 py-1 rounded shrink-0 truncate max-w-[130px]"
-            style={{ backgroundColor: '#F5F4F0', color: '#7C7269', border: '1px solid #E4E0D8' }}
-          >
-            {f.line}
-          </div>
-        </div>
-      ))}
-    </div>
+      <div className="divide-y" style={{ borderColor: '#E4E0D8' }}>
+        {[
+          { id: 'CIS-1.1.4', title: 'SSHv2 Enforcement', status: 'PASS', sev: null, line: 'ip ssh version 2' },
+          { id: 'CIS-1.2.1', title: 'Telnet Disabled', status: 'PASS', sev: null, line: 'no service telnet' },
+          { id: 'NIST-SC-7', title: 'Boundary Protection', status: 'FAIL', sev: 'HIGH', line: 'line 40: missing ACL' },
+          { id: 'CIS-3.1', title: 'SNMPv3 Privacy', status: 'FAIL', sev: 'CRITICAL', line: 'snmp-server community ...' },
+        ].map((f) => (
+          <div key={f.id} className="px-5 py-3 flex items-center justify-between gap-3"><div className="flex items-center gap-2.5 min-w-0">{f.status === 'PASS' ? <CheckCircle size={14} weight="fill" className="text-[#2D6A3F] shrink-0" /> : <XCircle size={14} weight="fill" className="text-[#B91C1C] shrink-0" />}<div className="min-w-0"><div className="flex items-center gap-2"><span className="text-[10px] font-mono font-bold text-[#7C7269]">{f.id}</span>{f.sev && <span className="text-[9px] font-mono font-bold px-1.5 py-px rounded uppercase" style={{ backgroundColor: f.sev === 'CRITICAL' ? 'rgba(185,28,28,0.12)' : 'rgba(161,98,7,0.12)', color: f.sev === 'CRITICAL' ? '#B91C1C' : '#A16207' }}>{f.sev}</span>}</div><div className="text-xs text-[#1E1C1A] font-medium truncate">{f.title}</div></div></div><div className="text-[9px] font-mono px-2 py-1 rounded shrink-0 truncate max-w-[130px]" style={{ backgroundColor: '#F5F4F0', color: '#7C7269', border: '1px solid #E4E0D8' }}>{f.line}</div></div>
+        ))}
+      </div>
 
-    {/* SHA strip */}
-    <div
-      className="px-5 py-3 flex items-center gap-2"
-      style={{ backgroundColor: '#FAFAF8', borderTop: '1px solid #E4E0D8' }}
-    >
-      <LockKey size={11} weight="bold" className="text-[#A89F92]" />
-      <span className="text-[9px] font-mono text-[#A89F92] truncate">SHA-256: a4f2c8...d9e1b7</span>
-      <span className="ml-auto text-[9px] font-mono text-[#A89F92]">CIS · NIST · STIG</span>
+      <div className="px-5 py-3 flex items-center gap-2" style={{ backgroundColor: '#FAFAF8', borderTop: '1px solid #E4E0D8' }}><LockKey size={11} weight="bold" className="text-[#A89F92]" /><span className="text-[9px] font-mono text-[#A89F92] truncate">SHA-256: a4f2c8...d9e1b7</span><span className="ml-auto text-[9px] font-mono text-[#A89F92]">CIS · NIST · STIG</span></div>
     </div>
-  </div>
-);
+  );
 
 // ─── Inline Product Mock: Config Ingestion ─────────────────────────────────────
 const IngestionMock: React.FC = () => (
@@ -319,7 +248,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
         {/* Logo wordmark */}
         <div className="flex items-center gap-2.5">
           <ShieldCheck size={20} weight="fill" className="text-[#C8830A]" />
-          <span className="text-base font-extrabold tracking-tight text-[#1E1C1A]">ApexNet</span>
+          <span className="text-base font-extrabold tracking-tight text-[#1E1C1A]">NetSentry</span>
         </div>
 
         {/* Center nav links */}
@@ -397,7 +326,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
               variants={rise}
               className="text-sm sm:text-base text-[#7C7269] leading-relaxed max-w-[48ch] mb-6 sm:mb-8"
             >
-              Drop any vendor config. ApexNet detects the dialect, redacts secrets, runs deterministic compliance evaluation against CIS, NIST, DISA STIG, and ISO 27001, and emits a cryptographically signed PDF - under 15ms.
+              Drop any vendor config. NetSentry detects the dialect, redacts secrets, runs deterministic compliance evaluation against CIS, NIST, DISA STIG, and ISO 27001, and emits a cryptographically signed PDF - under 15ms.
             </motion.p>
 
             <motion.div variants={rise} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:mb-10">
@@ -438,7 +367,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
             </motion.div>
           </motion.div>
 
-          {/* Right: floating product UI */}
+          {/* Right: floating product UI / Video */}
           <motion.div
             className="lg:col-span-6 relative"
             initial={reduce ? false : { opacity: 0, y: 24 }}
@@ -446,47 +375,18 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
             transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="relative">
-              {/* Main audit report mock */}
-              <AuditReportMock />
-
-              {/* Floating small badge — top right */}
-              <motion.div
-                className="absolute -top-4 -right-4 hidden lg:flex items-center gap-2 px-3 py-2 rounded-full text-[11px] font-mono font-bold border shadow-lg"
+              {/* Main animated demo container */}
+              <div 
+                className="relative rounded-2xl overflow-hidden border shadow-xl"
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderColor: '#E4E0D8',
-                  color: '#2D6A3F',
-                  boxShadow: '0 8px 24px rgba(30,28,26,0.12)',
+                  boxShadow: '0 24px 64px rgba(30,28,26,0.14), 0 4px 12px rgba(30,28,26,0.08)',
+                  aspectRatio: '16/9'
                 }}
-                animate={reduce ? {} : { y: [0, -6, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <CheckCircle size={13} weight="fill" className="text-[#2D6A3F]" />
-                Deterministic · Zero LLM
-              </motion.div>
-
-              {/* Floating vendor chip — bottom left */}
-              <motion.div
-                className="absolute -bottom-4 -left-4 hidden lg:flex flex-wrap gap-1.5 p-3 rounded-xl border shadow-lg max-w-[200px]"
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderColor: '#E4E0D8',
-                  boxShadow: '0 8px 24px rgba(30,28,26,0.12)',
-                }}
-                animate={reduce ? {} : { y: [0, 4, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-              >
-                <div className="w-full text-[9px] font-mono font-bold text-[#A89F92] uppercase tracking-wider mb-1">Supported Vendors</div>
-                {['Cisco IOS-XE', 'JunOS', 'PAN-OS', 'SONiC', 'FortiOS', 'Arista EOS'].map((v) => (
-                  <span
-                    key={v}
-                    className="text-[9px] font-mono px-1.5 py-0.5 rounded border"
-                    style={{ backgroundColor: '#F5F4F0', borderColor: '#E4E0D8', color: '#7C7269' }}
-                  >
-                    {v}
-                  </span>
-                ))}
-              </motion.div>
+                <AnimatedProductDemo />
+              </div>
             </div>
           </motion.div>
         </div>
@@ -506,7 +406,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
             className="mb-4"
           >
             <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#C8830A]">
-              HOW APEXNET WORKS
+              HOW NETSENTRY WORKS
             </span>
           </motion.div>
 
@@ -835,7 +735,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
               className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-sm font-semibold text-[#1E1C1A] border-2 border-[#D1CBC0] hover:border-[#1E1C1A] transition-all cursor-pointer"
               style={{ backgroundColor: 'transparent' }}
             >
-              <ArrowSquareRight size={15} weight="bold" className="text-[#C8830A]" />
+              <ArrowRight size={15} weight="bold" className="text-[#C8830A]" />
               Open Console Dashboard
             </button>
           </div>
@@ -856,7 +756,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
           <span className="text-[#D1CBC0]">·</span>
           <span>SIH26155</span>
           <span className="text-[#D1CBC0]">·</span>
-          <span>ApexNet</span>
+          <span>NetSentry</span>
         </div>
       </footer>
 

@@ -1,4 +1,4 @@
-﻿import asyncio
+import asyncio
 import hashlib
 from app.store import store
 from app.services.redaction import redact_secrets
@@ -11,7 +11,7 @@ from app.schemas.canonical import AskAIRequest, ApproveExemplarRequest
 from app.services.ssh_collector import stream_ssh_collection
 
 async def main():
-    print("=== APEXNET MANUAL-FIRST + OPT-IN AI ASSIST VERIFICATION ===")
+    print("=== NETSENTRY MANUAL-FIRST + OPT-IN AI ASSIST VERIFICATION ===")
 
     # 1. Secret Redaction Test
     sample_cisco = """hostname CORE-SW01

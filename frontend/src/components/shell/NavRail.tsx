@@ -1,6 +1,6 @@
 // src/components/shell/NavRail.tsx
 // Persistent left icon-rail — Institutional Light Mode
-// Warm stone palette, saffron-gold accent. Clean ApexNet logo hyperlink to landing page.
+// Warm stone palette, saffron-gold accent. Clean NetSentry logo hyperlink to landing page.
 
 import React from 'react';
 import {
@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Brain,
   FileCode,
-  GitDiff,
   TerminalWindow,
   Cpu,
   GearSix,
@@ -22,7 +21,6 @@ export type ActiveNavTab =
   | 'results'
   | 'training'
   | 'rules'
-  | 'remediation'
   | 'live-pull'
   | 'architecture'
   | 'settings';
@@ -56,7 +54,6 @@ export const NavRail: React.FC<NavRailProps> = ({
       badge: pendingTrainingCount > 0 ? pendingTrainingCount : undefined,
     },
     { id: 'rules',        label: 'Rule Packs',              icon: FileCode },
-    { id: 'remediation',  label: 'Remediation Scanner',     icon: GitDiff },
     { id: 'live-pull',    label: 'Live Pull Simulator',     icon: TerminalWindow },
     { id: 'architecture', label: 'Trust Boundary & Dual-Lane', icon: Cpu },
   ];
@@ -67,12 +64,12 @@ export const NavRail: React.FC<NavRailProps> = ({
       style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-default)' }}
     >
       <div>
-        {/* Brand — Hyperlinked ApexNet Logo & Title (Clicking returns to Public Landing Page) */}
+        {/* Brand — Hyperlinked NetSentry Logo & Title (Clicking returns to Public Landing Page) */}
         <button
           onClick={onViewLandingPage}
           className="w-full h-14 flex items-center px-4 gap-3 border-b text-left hover:bg-[rgba(200,131,10,0.06)] transition-all cursor-pointer group"
           style={{ borderColor: 'var(--border-subtle)' }}
-          title="ApexNet - Return to Public Landing Page"
+          title="NetSentry - Return to Public Landing Page"
         >
           <div
             className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 border group-hover:scale-105 transition-transform"
@@ -83,7 +80,7 @@ export const NavRail: React.FC<NavRailProps> = ({
           <div className="hidden md:block overflow-hidden">
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-extrabold text-[#1E1C1A] tracking-tight group-hover:text-[#C8830A] transition-colors">
-                ApexNet
+                NetSentry
               </span>
             </div>
             <div className="text-[10px] font-mono text-[#A89F92] flex items-center gap-1 mt-0.5">

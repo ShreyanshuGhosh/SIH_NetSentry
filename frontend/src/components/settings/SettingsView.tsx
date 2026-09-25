@@ -124,7 +124,7 @@ export const SettingsView: React.FC = () => {
         className="p-5 rounded-lg border text-xs font-mono space-y-2"
         style={{ backgroundColor: 'var(--bg-surface-raised)', borderColor: 'var(--border-subtle)' }}
       >
-        <div className="text-slate-800 font-semibold">APEXNET DUAL-LANE CORE COMPLIANCE ENGINE</div>
+        <div className="text-slate-800 font-semibold">NETSENTRY DUAL-LANE CORE COMPLIANCE ENGINE</div>
         <div className="text-slate-600 text-[11px]">
           Build: v1.1.0-sih26155-ntro • Engine: Deterministic Lexer + Few-Shot Store
         </div>

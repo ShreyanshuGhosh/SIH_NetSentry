@@ -389,12 +389,12 @@ RULES_CATALOG = [
         },
         "evaluate": lambda p: "checking_infra_missing",
         "remediation": {
-            "cisco_ios": "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include APEXNET",
-            "juniper_junos": "request logger tag APEXNET message \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+            "cisco_ios": "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include NETSENTRY",
+            "juniper_junos": "request logger tag NETSENTRY message \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
             "palo_alto_panos": "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
-            "sonic": "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+            "sonic": "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
             "fortinet_fortios": "diagnose log test",
-            "arista_eos": "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"",
+            "arista_eos": "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"",
         }
     },
     {
@@ -882,12 +882,12 @@ RULES_CATALOG = [
         },
         "evaluate": lambda p: "checking_infra_missing",
         "remediation": {
-            "cisco_ios": "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include APEXNET",
-            "juniper_junos": "request logger tag APEXNET message \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+            "cisco_ios": "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include NETSENTRY",
+            "juniper_junos": "request logger tag NETSENTRY message \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
             "palo_alto_panos": "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
-            "sonic": "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+            "sonic": "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
             "fortinet_fortios": "diagnose log test",
-            "arista_eos": "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"",
+            "arista_eos": "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"",
         }
     },
     {
@@ -1395,12 +1395,12 @@ RULES_CATALOG = [
         },
         "evaluate": lambda p: "checking_infra_missing",
         "remediation": {
-            "cisco_ios": "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include APEXNET",
-            "juniper_junos": "request logger tag APEXNET message \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+            "cisco_ios": "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include NETSENTRY",
+            "juniper_junos": "request logger tag NETSENTRY message \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
             "palo_alto_panos": "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
-            "sonic": "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+            "sonic": "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
             "fortinet_fortios": "diagnose log test",
-            "arista_eos": "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"",
+            "arista_eos": "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"",
         }
     },
     {
@@ -1892,12 +1892,12 @@ RULES_CATALOG = [
         },
         "evaluate": lambda p: "checking_infra_missing",
         "remediation": {
-            "cisco_ios": "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include APEXNET",
-            "juniper_junos": "request logger tag APEXNET message \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+            "cisco_ios": "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"\nshow logging | include NETSENTRY",
+            "juniper_junos": "request logger tag NETSENTRY message \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
             "palo_alto_panos": "test routing fib-lookup ip 10.14.5.50\ntest management-server test-log",
-            "sonic": "logger -p local0.warn \"APEXNET-TEST-PROBE: SIEM Ingestion Test\"",
+            "sonic": "logger -p local0.warn \"NETSENTRY-TEST-PROBE: SIEM Ingestion Test\"",
             "fortinet_fortios": "diagnose log test",
-            "arista_eos": "send log 1 \"APEXNET-TEST-PROBE: SIEM Connectivity Verification\"",
+            "arista_eos": "send log 1 \"NETSENTRY-TEST-PROBE: SIEM Connectivity Verification\"",
         }
     },
     {

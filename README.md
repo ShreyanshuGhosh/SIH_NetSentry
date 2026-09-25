@@ -1,4 +1,4 @@
-# ApexNet
+# NetSentry
 
 **AI-Driven Multi-Vendor Network Security Compliance Auditor**
 
@@ -36,7 +36,7 @@
 
 Modern enterprise networks are heterogeneous by nature — Cisco, Juniper, Palo Alto, SONiC white-box, Fortinet, Arista, and others, each with incompatible CLI syntax. Auditing them against security frameworks (CIS Benchmarks, NIST SP 800-53, DISA STIGs, ISO 27001) today means either manual, checklist-based work or expensive vendor-locked tools that cannot cover the full estate.
 
-**ApexNet** is an authoritative, vendor-agnostic compliance auditing platform that:
+**NetSentry** is an authoritative, vendor-agnostic compliance auditing platform that:
 
 1. Ingests heterogeneous configuration files or connects live via read-only driver sessions across **major vendor dialects and cloud SASE ecosystems**:
    - **Cisco IOS-XE** (Catalyst 9000, ISR, ASR)
@@ -112,7 +112,7 @@ Parser         + Confidence
 
 ## Key Differentiators
 
-| Property | ApexNet | Typical AI approach |
+| Property | NetSentry | Typical AI approach |
 |---|---|---|
 | Framework Selection | Multi-select combined deduplicated evaluation | Single benchmark lock |
 | Parsing lanes | Two: deterministic + LLM fallback | Single AI pipeline |
@@ -178,7 +178,7 @@ Parser         + Confidence
 
 ## Multi-Framework & Multi-Vendor Engine
 
-ApexNet provides native multi-select framework evaluation across four major international and federal hardening standards, offering a 100% comprehensive catalog of **96 authoritative compliance controls** (24 controls per framework):
+NetSentry provides native multi-select framework evaluation across four major international and federal hardening standards, offering a 100% comprehensive catalog of **96 authoritative compliance controls** (24 controls per framework):
 
 | Framework | Version | Total Controls | Automated Config | Infra Dependent | Severity Model | Reference Standard |
 |---|---|---|---|---|---|---|
@@ -191,7 +191,7 @@ Operators can select any combination of benchmarks or click **Select All (4)** t
 
 ### Canonical Control Baseline (1-to-1 Cross-Framework Deduplication)
 
-To eliminate artificial score inflation when running multi-framework audits, ApexNet maps all rules onto a shared **24-control canonical hardening matrix**:
+To eliminate artificial score inflation when running multi-framework audits, NetSentry maps all rules onto a shared **24-control canonical hardening matrix**:
 
 #### Automated Configuration Controls (18 Controls)
 1. `CTRL-SSH-V2` — Enforce Secure Shell Protocol Version 2 with Modern Ciphers
@@ -214,7 +214,7 @@ To eliminate artificial score inflation when running multi-framework audits, Ape
 18. `CTRL-SNMP-COMMUNITY` — Prohibit Default Insecure SNMP Communities (`public` / `private`)
 
 #### "Checking Infra Missing" Operational Controls (6 Controls)
-Certain essential network security safeguards cannot be proven by static device configuration text alone. ApexNet transparently tags these rules as **`CHECKING INFRA MISSING`** (`INFRA REQ`), providing an in-depth diagnostic modal with executable synthetic probes, telemetry signals, and audit procedures:
+Certain essential network security safeguards cannot be proven by static device configuration text alone. NetSentry transparently tags these rules as **`CHECKING INFRA MISSING`** (`INFRA REQ`), providing an in-depth diagnostic modal with executable synthetic probes, telemetry signals, and audit procedures:
 
 19. `CTRL-AAA-LIVE` — Dynamic TACACS+/RADIUS Server Live Reachability & Latency SLA (<120ms)
 20. `CTRL-SIEM-INGEST` — Real-Time SIEM Ingestion Pipeline & Structured Schema Parsability
@@ -262,7 +262,7 @@ Generated audit PDF reports follow the R30 government-grade standard:
 ## Project Structure
 
 ```
-apexnet/
+netsentry/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py                  # FastAPI entrypoint
@@ -306,7 +306,7 @@ apexnet/
 │   │   │   ├── IngestionConsole.tsx # Multi-framework upload & viewer
 │   │   │   ├── AuditResultsView.tsx # Audit findings & summary
 │   │   │   ├── RulePackExplorer.tsx # Interactive benchmark explorer
-│   │   │   ├── TacticalRemediationScanner.tsx # Before/after diff scrubber
+│   │   │   ├── AnimatedProductDemo.tsx # Full-bleed animated product demo
 │   │   │   ├── TrainingUI.tsx       # Few-shot mapping queue
 │   │   │   ├── dashboard/           # Fleet posture dashboard
 │   │   │   ├── results/
@@ -342,8 +342,8 @@ apexnet/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-org>/apexnet.git
-cd apexnet/backend
+git clone https://github.com/<your-org>/netsentry.git
+cd netsentry/backend
 
 # 2. Create and activate a virtual environment
 python -m venv .venv
@@ -361,7 +361,7 @@ alembic upgrade head
 ### Frontend Setup & Automated Verification
 
 ```bash
-cd apexnet/frontend
+cd netsentry/frontend
 
 # 1. Install dependencies
 npm install
@@ -387,10 +387,10 @@ The frontend runs locally on `http://localhost:3000`.
 
 ```bash
 # Start a local PostgreSQL instance (or use Docker)
-docker run --name apexnet-db \
-  -e POSTGRES_DB=apexnet \
-  -e POSTGRES_USER=apexnet \
-  -e POSTGRES_PASSWORD=apexnet_dev \
+docker run --name netsentry-db \
+  -e POSTGRES_DB=netsentry \
+  -e POSTGRES_USER=netsentry \
+  -e POSTGRES_PASSWORD=netsentry_dev \
   -p 5432:5432 \
   -d postgres:15
 ```
@@ -409,7 +409,7 @@ cp .env.example .env
 
 ```env
 # Database
-DATABASE_URL=postgresql://apexnet:apexnet_dev@localhost:5432/apexnet
+DATABASE_URL=postgresql://netsentry:netsentry_dev@localhost:5432/netsentry
 
 # LLM configuration
 LLM_API_BASE=https://api.openai.com/v1
@@ -492,7 +492,7 @@ Click **Download Full Audit PDF Report** to export the institutional 5-column PD
 | Source code | This repository |
 | README with setup instructions | `README.md` (this file) |
 | System Architecture Specification | `DESIGN.md` |
-| Technical Presentation | `docs/ApexNet_SIH2026.pdf` |
+| Technical Presentation | `docs/NetSentry_SIH2026.pdf` |
 
 ---
 

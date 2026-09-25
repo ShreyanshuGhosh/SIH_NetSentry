@@ -2,7 +2,7 @@
 // Comprehensive Audit Results screen composing PostureSummaryStrip, FindingsTable, and PdfReportPreview
 
 import React from 'react';
-import { Play, GitDiff, FilePdf, ArrowClockwise } from '@phosphor-icons/react';
+import { Play, FilePdf, ArrowClockwise } from '@phosphor-icons/react';
 import { EngineEvaluationResult } from '../engine/ruleEngine';
 import { PostureSummaryStrip } from './results/PostureSummaryStrip';
 import { FindingsTable } from './results/FindingsTable';
@@ -16,7 +16,6 @@ interface AuditResultsViewProps {
   platform?: string;
   osVersion?: string;
   onReAudit: () => void;
-  onOpenRemediation: (ruleId?: string) => void;
   onOpenTraining: () => void;
 }
 
@@ -26,7 +25,6 @@ export const AuditResultsView: React.FC<AuditResultsViewProps> = ({
   platform = 'Catalyst 9300',
   osVersion = 'IOS-XE 17.9.4a',
   onReAudit,
-  onOpenRemediation,
   onOpenTraining,
 }) => {
   const frameworkNameStr = result.frameworks && result.frameworks.length > 0
@@ -56,14 +54,6 @@ export const AuditResultsView: React.FC<AuditResultsViewProps> = ({
             <span>Re-run Evaluation</span>
           </button>
 
-          <button
-            onClick={() => onOpenRemediation()}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded text-xs font-semibold text-white transition-all cursor-pointer shadow-sm hover:brightness-110 active:scale-95"
-            style={{ backgroundColor: 'var(--accent-primary)' }}
-          >
-            <GitDiff size={14} weight="bold" />
-            <span>Open Remediation Scanner</span>
-          </button>
         </div>
       </div>
 
@@ -79,7 +69,6 @@ export const AuditResultsView: React.FC<AuditResultsViewProps> = ({
       {/* Section 2: Findings Table */}
       <FindingsTable
         findings={result.findings}
-        onOpenRemediation={onOpenRemediation}
       />
 
       {/* Section 3: PDF Report Preview & Download */}

@@ -1,5 +1,5 @@
 // src/App.tsx
-// Authoritative Consolidated ApexNet Platform Application
+// Authoritative Consolidated NetSentry Platform Application
 // Zero-Slop Architecture with Persistent NavRail, TopBar, and Phase 0 Pipeline Integration
 
 import React, { useState, useCallback, useMemo } from 'react';
@@ -11,7 +11,6 @@ import { IngestionConsole } from './components/IngestionConsole';
 import { AuditResultsView } from './components/AuditResultsView';
 import { TrainingUI } from './components/TrainingUI';
 import { RulePackExplorer } from './components/RulePackExplorer';
-import { TacticalRemediationScanner, ScannerDialect } from './components/TacticalRemediationScanner';
 import { LivePullSimulator } from './components/LivePullSimulator';
 import { DualLaneEngine } from './components/DualLaneEngine';
 import { SettingsView } from './components/settings/SettingsView';
@@ -314,7 +313,6 @@ export function App() {
                   platform={selectedConfig.model}
                   osVersion={selectedConfig.osVersion}
                   onReAudit={handleExecuteAudit}
-                  onOpenRemediation={() => setActiveTab('remediation')}
                   onOpenTraining={() => setActiveTab('training')}
                 />
               )}
@@ -324,8 +322,6 @@ export function App() {
               )}
 
               {activeTab === 'rules' && <RulePackExplorer onOpenTraining={() => setActiveTab('training')} />}
-
-              {activeTab === 'remediation' && <TacticalRemediationScanner onOpenTraining={() => setActiveTab('training')} />}
 
               {activeTab === 'live-pull' && (
                 <LivePullSimulator onIngestPulledConfig={handleIngestFromLivePull} onOpenTraining={() => setActiveTab('training')} />

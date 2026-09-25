@@ -177,7 +177,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         <button
           onClick={handleLandingClick}
           className="hidden 2xl:flex items-center gap-1.5 text-xs text-[#7C7269] hover:text-[#C8830A] font-bold transition-colors cursor-pointer shrink-0"
-          title="ApexNet - Return to Landing Page"
+          title="NetSentry - Return to Landing Page"
         >
           <span>Landing Page</span>
           <ArrowSquareOut size={12} weight="bold" />

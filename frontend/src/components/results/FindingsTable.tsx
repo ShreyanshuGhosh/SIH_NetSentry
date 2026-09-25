@@ -6,7 +6,6 @@ import {
   Check,
   Terminal,
   ShieldWarning,
-  GitDiff,
   Brain,
   Broadcast,
   ArrowRight,
@@ -20,12 +19,10 @@ import { InfraRequirementsModal } from '../shared/InfraRequirementsModal';
 
 interface FindingsTableProps {
   findings: Finding[];
-  onOpenRemediation: (ruleId?: string) => void;
 }
 
 export const FindingsTable: React.FC<FindingsTableProps> = ({
   findings,
-  onOpenRemediation,
 }) => {
   const [filter, setFilter] = useState<'ALL' | 'FAIL' | 'PASS' | 'INFRA_MISSING'>('ALL');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -264,19 +261,6 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({
                     </pre>
                   </div>
 
-                  {/* Remediation CTA */}
-                  {isFail && (
-                    <div className="flex justify-end pt-1">
-                      <button
-                        onClick={() => onOpenRemediation(finding.ruleId)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold text-white transition-all cursor-pointer shadow-sm hover:brightness-110"
-                        style={{ backgroundColor: 'var(--accent-primary)' }}
-                      >
-                        <GitDiff size={14} weight="bold" />
-                        <span>Send to Remediation Diff-Scrubber</span>
-                      </button>
-                    </div>
-                  )}
                 </div>
               )}
             </div>

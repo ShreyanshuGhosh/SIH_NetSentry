@@ -1,5 +1,5 @@
 // src/components/results/PdfReportPreview.tsx
-// Authentic preview of the ApexNet PDF Audit Report matching the website theme palette (Warm Stone + Saffron Gold + Deep Charcoal)
+// Authentic preview of the NetSentry PDF Audit Report matching the website theme palette (Warm Stone + Saffron Gold + Deep Charcoal)
 
 import React, { useState } from 'react';
 import { FilePdf, DownloadSimple, ShieldCheck } from '@phosphor-icons/react';
@@ -90,7 +90,7 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-[#1E1C1A]">
             <FilePdf size={18} className="text-[#C8830A]" />
-            <span>ApexNet Official Multi-Vendor Compliance PDF Report</span>
+            <span>NetSentry Official Multi-Vendor Compliance PDF Report</span>
           </div>
           <p className="text-[11px] text-[#7C7269] mt-0.5">
             Institutional R30-format PDF report preview featuring AI baseline normalization, 5-column metric summary, exact CLI remediation, and CISO attestation.
@@ -130,8 +130,8 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
           
           {/* 1. Deep Charcoal Top Banner with Saffron Gold Accent Line */}
         <div className="bg-[#1E1C1A] text-white px-5 py-3 flex items-center justify-between gap-4 border-b-2 border-[#C8830A]">
-          <div className="font-extrabold text-sm tracking-tight truncate min-w-0 flex-1" title={`APEXNET | ${deviceName} Security Audit Report`}>
-            APEXNET | {deviceName} Security Audit Report
+          <div className="font-extrabold text-sm tracking-tight truncate min-w-0 flex-1" title={`NETSENTRY | ${deviceName} Security Audit Report`}>
+            NETSENTRY | {deviceName} Security Audit Report
           </div>
           <div className="text-[10px] font-mono text-[#F5C578] shrink-0 whitespace-nowrap">
             Session ID: {sessionId.substring(0, 32)}
@@ -158,7 +158,7 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
                 <td className="bg-[#EDE8DF] font-bold px-3 py-1.5 text-[#1E1C1A] border-r border-[#D1CBC0]">Hardware Model:</td>
                 <td className="px-3 py-1.5 text-[#2E2B28] border-r border-[#D1CBC0]">Switch - {platform}</td>
                 <td className="bg-[#EDE8DF] font-bold px-3 py-1.5 text-[#1E1C1A] border-r border-[#D1CBC0]">Operator ID:</td>
-                <td className="px-3 py-1.5 text-[#2E2B28]">operator-admin (admin@apexnet.gov.in)</td>
+                <td className="px-3 py-1.5 text-[#2E2B28]">operator-admin (admin@netsentry.gov.in)</td>
               </tr>
               <tr>
                 <td className="bg-[#EDE8DF] font-bold px-3 py-1.5 text-[#1E1C1A] border-r border-[#D1CBC0]">Vendor / Firmware:</td>
@@ -285,10 +285,10 @@ export const PdfReportPreview: React.FC<PdfReportPreviewProps> = ({
 
         {/* 8. Document Footer Bar */}
         <div className="bg-[#F5F0E8] border-t border-[#D1CBC0] px-5 py-3 text-center text-[10px] text-[#A89F92] space-y-0.5 font-sans">
-          <div>Generated using ApexNet AI-Augmented Compliance Engine | Reviewed by operator-admin</div>
+          <div>Generated using NetSentry AI-Augmented Compliance Engine | Reviewed by operator-admin</div>
           <div>Mandatory human operator validation required prior to production CLI deployment.</div>
           <div className="flex justify-between items-center pt-1 font-mono text-[9px] text-[#A89F92]">
-            <span>www.apexnet.gov.in</span>
+            <span>www.netsentry.gov.in</span>
             <span>Page 1 of 1</span>
           </div>
         </div>

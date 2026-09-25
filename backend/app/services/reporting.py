@@ -21,7 +21,7 @@ def generate_pdf_report(audit_result: Dict[str, Any]) -> bytes:
 
     styles = getSampleStyleSheet()
 
-    # Color Palette matching ApexNet Website (Warm Stone + Deep Charcoal + Saffron Gold)
+    # Color Palette matching NetSentry Website (Warm Stone + Deep Charcoal + Saffron Gold)
     deep_charcoal = colors.HexColor('#1E1C1A')
     saffron_gold = colors.HexColor('#C8830A')
     warm_stone = colors.HexColor('#EDE8DF')
@@ -156,7 +156,7 @@ def generate_pdf_report(audit_result: Dict[str, Any]) -> bytes:
     # 1. Top Deep Charcoal Banner Table with Saffron Gold Line
     banner_data = [
         [
-            Paragraph(f"<b>APEXNET | {device_name} Security Audit Report</b>", title_style),
+            Paragraph(f"<b>NETSENTRY | {device_name} Security Audit Report</b>", title_style),
             Paragraph(f"Session ID: {source_hash[:32]}", sub_right_style)
         ]
     ]
@@ -191,7 +191,7 @@ def generate_pdf_report(audit_result: Dict[str, Any]) -> bytes:
             Paragraph("Hardware Model:", meta_key_style),
             Paragraph(f"Switch — {model_str}", meta_val_style),
             Paragraph("Operator ID:", meta_key_style),
-            Paragraph("operator-admin (admin@apexnet.gov.in)", meta_val_style)
+            Paragraph("operator-admin (admin@netsentry.gov.in)", meta_val_style)
         ],
         [
             Paragraph("Vendor / Firmware:", meta_key_style),
@@ -359,9 +359,9 @@ def generate_pdf_report(audit_result: Dict[str, Any]) -> bytes:
         canvas.saveState()
         canvas.setFont("Helvetica", 6.8)
         canvas.setFillColor(colors.HexColor("#A89F92"))
-        canvas.drawCentredString(297.5, 25, "Generated using ApexNet AI-Augmented Compliance Engine | Reviewed by operator-admin")
+        canvas.drawCentredString(297.5, 25, "Generated using NetSentry AI-Augmented Compliance Engine | Reviewed by operator-admin")
         canvas.drawCentredString(297.5, 16, "Mandatory human operator validation required prior to production CLI deployment.")
-        canvas.drawString(36, 8, "www.apexnet.gov.in")
+        canvas.drawString(36, 8, "www.netsentry.gov.in")
         canvas.drawRightString(559, 8, f"Page {doc.page}")
         canvas.restoreState()
 

@@ -9,8 +9,6 @@ import {
   CheckCircle,
   UploadSimple,
   Brain,
-  GitDiff,
-  ArrowRight,
   CaretRight,
   HardDrives,
   MagnifyingGlass,
@@ -391,14 +389,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => onNavigate('remediation')}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-semibold text-white transition-all cursor-pointer shadow-xs hover:brightness-110 active:scale-95"
-                      style={{ backgroundColor: 'var(--accent-primary)' }}
-                    >
-                      <span>Apply in Tactical Diff-Scrubber</span>
-                      <ArrowRight size={14} weight="bold" />
-                    </button>
                   </div>
                 );
               })()
@@ -420,13 +410,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               >
                 <Brain size={14} />
                 <span>Training Queue ({pendingTrainingCount})</span>
-              </button>
-              <button
-                onClick={() => onNavigate('remediation')}
-                className="flex items-center gap-1.5 hover:text-sky-600 transition-colors font-medium cursor-pointer"
-              >
-                <GitDiff size={14} />
-                <span>Diff Scrubber</span>
               </button>
             </div>
           </div>

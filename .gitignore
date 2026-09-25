@@ -30,4 +30,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.db
-backend/apexnet.db
+backend/netsentry.db

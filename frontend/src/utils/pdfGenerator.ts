@@ -31,7 +31,7 @@ export function generateAuditPdf(result: AuditRunResult): void {
     badgeColor: 'emerald',
   };
 
-  // Color Palette matching ApexNet Website (Warm Stone + Deep Charcoal + Saffron Gold)
+  // Color Palette matching NetSentry Website (Warm Stone + Deep Charcoal + Saffron Gold)
   const deepCharcoal: [number, number, number] = [30, 28, 26];     // #1E1C1A
   const saffronGold: [number, number, number] = [200, 131, 10];    // #C8830A
   const lightGoldText: [number, number, number] = [245, 197, 120];  // #F5C578
@@ -43,7 +43,7 @@ export function generateAuditPdf(result: AuditRunResult): void {
   const borderGray: [number, number, number] = [209, 203, 192];
 
   // Hash / Session ID
-  const sessionId = (result as any).sourceHash || `SESSION-${device.id || 'APEXNET'}-${Date.now().toString(16)}`;
+  const sessionId = (result as any).sourceHash || `SESSION-${device.id || 'NETSENTRY'}-${Date.now().toString(16)}`;
 
   // 1. Top Header Banner — Deep Charcoal with Saffron Gold Accent Line
   doc.setFillColor(...deepCharcoal);
@@ -54,7 +54,7 @@ export function generateAuditPdf(result: AuditRunResult): void {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  const titleText = `APEXNET | ${device.name || 'Network Node'} Security Audit Report`;
+  const titleText = `NETSENTRY | ${device.name || 'Network Node'} Security Audit Report`;
   doc.text(titleText, 12, 10, { maxWidth: 135 });
 
   doc.setFontSize(7.5);
@@ -82,7 +82,7 @@ export function generateAuditPdf(result: AuditRunResult): void {
       { content: 'Hardware Model:', styles: { fontStyle: 'bold', fillColor: warmStoneHeader } },
       { content: `${device.deviceType || 'Network Node'} - ${device.model || 'Enterprise Dialect'}` },
       { content: 'Operator ID:', styles: { fontStyle: 'bold', fillColor: warmStoneHeader } },
-      { content: 'operator-admin (admin@apexnet.gov.in)' },
+      { content: 'operator-admin (admin@netsentry.gov.in)' },
     ],
     [
       { content: 'Vendor / Firmware:', styles: { fontStyle: 'bold', fillColor: warmStoneHeader } },
@@ -274,14 +274,14 @@ export function generateAuditPdf(result: AuditRunResult): void {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(168, 159, 146);
 
-    doc.text('Generated using ApexNet AI-Augmented Compliance Engine | Reviewed by operator-admin', 105, 287, { align: 'center' });
+    doc.text('Generated using NetSentry AI-Augmented Compliance Engine | Reviewed by operator-admin', 105, 287, { align: 'center' });
     doc.text('Mandatory human operator validation required prior to production CLI deployment.', 105, 290, { align: 'center' });
-    doc.text('www.apexnet.gov.in', 12, 293);
+    doc.text('www.netsentry.gov.in', 12, 293);
     doc.text(`Page ${i} of ${pageCount}`, 198, 293, { align: 'right' });
   }
 
   // Save document
   const cleanName = (device.name || 'Node').replace(/[^a-zA-Z0-9]/g, '_');
-  const filename = `ApexNet_Compliance_Report_${cleanName}_${result.framework || 'cis'}.pdf`;
+  const filename = `NetSentry_Compliance_Report_${cleanName}_${result.framework || 'cis'}.pdf`;
   doc.save(filename);
 }
