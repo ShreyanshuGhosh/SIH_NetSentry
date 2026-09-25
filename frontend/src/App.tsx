@@ -79,6 +79,28 @@ export function App() {
     });
   });
 
+  // Browser history integration — makes Back button work correctly
+  React.useEffect(() => {
+    if (viewMode === 'console') {
+      window.history.pushState({ viewMode: 'console', tab: activeTab }, '', `#${activeTab}`);
+    } else {
+      window.history.pushState({ viewMode: 'landing' }, '', ' ');
+    }
+  }, [viewMode, activeTab]);
+
+  React.useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state?.viewMode === 'landing' || !e.state) {
+        setViewMode('landing');
+      } else if (e.state?.viewMode === 'console') {
+        setViewMode('console');
+        if (e.state.tab) setActiveTab(e.state.tab as ActiveNavTab);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Automatically scroll to top whenever activeTab changes
   React.useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });

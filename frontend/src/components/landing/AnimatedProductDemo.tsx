@@ -6,12 +6,31 @@ import {
   ShieldWarning, ChartDonut, HardDrives
 } from '@phosphor-icons/react';
 
+const RealisticCursor = ({ className = "" }) => (
+  <svg 
+    width="22" 
+    height="32" 
+    viewBox="0 0 22 32" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={`drop-shadow-[0_2px_10px_rgba(0,0,0,0.25)] ${className}`}
+  >
+    <path 
+      d="M2 2L9 26L12.5 16L22.5 12L2 2Z" 
+      fill="black" 
+      stroke="white" 
+      strokeWidth="2" 
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const AnimatedProductDemo: React.FC = () => {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
-    if (step === 0) timeout = setTimeout(() => setStep(1), 2000); 
+    if (step === 0) timeout = setTimeout(() => setStep(1), 2200); 
     else if (step === 1) timeout = setTimeout(() => setStep(2), 800);  
     else if (step === 2) timeout = setTimeout(() => setStep(3), 3500); 
     else if (step === 3) timeout = setTimeout(() => setStep(0), 5000); 
@@ -94,6 +113,13 @@ export const AnimatedProductDemo: React.FC = () => {
                     >
                       <div className="relative flex flex-col items-center">
                         <motion.div
+                          className="absolute w-12 h-12 rounded-full border-2 border-[#C8830A] opacity-0"
+                          style={{ top: '35px', left: '-15px' }}
+                          initial={{ scale: 0.2, opacity: 0 }}
+                          animate={{ scale: 1.8, opacity: [0, 0.6, 0] }}
+                          transition={{ duration: 0.5, delay: 1.4, ease: "easeOut" }}
+                        />
+                        <motion.div
                            initial={{ scale: 0.8, opacity: 0 }}
                            animate={{ scale: 1, opacity: 1 }}
                            transition={{ delay: 0.8 }}
@@ -102,7 +128,7 @@ export const AnimatedProductDemo: React.FC = () => {
                           <FileCode size={16} weight="fill" className="text-[#C8830A]" />
                           core-switch-dc1.cfg
                         </motion.div>
-                        <Cursor size={28} weight="fill" className="text-[#1E1C1A] drop-shadow-md -ml-6" />
+                        <RealisticCursor className="-ml-6" />
                       </div>
                     </motion.div>
                   )}
@@ -120,7 +146,7 @@ export const AnimatedProductDemo: React.FC = () => {
                 className="absolute inset-0 flex"
               >
                 {/* Left: Raw Config Feed */}
-                <div className="w-1/2 h-full border-r border-[#E4E0D8] bg-[#FAFAF8] p-4 flex flex-col">
+                <div className="w-1/2 h-full border-r border-[#E4E0D8] bg-[#FAFAF8] p-4 flex flex-col overflow-hidden">
                   <div className="text-[10px] font-mono font-bold text-[#A89F92] mb-3 uppercase">Memory Stream</div>
                   <div className="flex-1 overflow-hidden relative">
                     <motion.div 
@@ -149,7 +175,7 @@ export const AnimatedProductDemo: React.FC = () => {
                 </div>
 
                 {/* Right: Engine Terminal */}
-                <div className="w-1/2 h-full bg-[#111110] p-4 flex flex-col">
+                <div className="w-1/2 h-full bg-[#0F0F0F] p-4 flex flex-col overflow-hidden">
                   <div className="flex items-center gap-2 text-[10px] font-mono text-[#888] mb-4">
                     <TerminalWindow size={14} /> Deterministic Evaluator
                   </div>
@@ -264,10 +290,24 @@ export const AnimatedProductDemo: React.FC = () => {
                   <motion.div
                     className="absolute z-20 pointer-events-none"
                     initial={{ x: 50, y: 250, opacity: 0 }}
-                    animate={{ x: 200, y: 150, opacity: 1, scale: [1, 0.9, 1] }}
-                    transition={{ delay: 1.5, duration: 1.5, ease: "circOut" }}
+                    animate={{ x: 200, y: 150, opacity: 1 }}
+                    transition={{ delay: 1.5, duration: 1.2, ease: "circOut" }}
                   >
-                    <Cursor size={28} weight="fill" className="text-[#1E1C1A] drop-shadow-md" />
+                    <div className="relative">
+                      <motion.div
+                        className="absolute w-10 h-10 rounded-full border-2 border-[#2D6A3F] opacity-0"
+                        style={{ top: '-10px', left: '-10px' }}
+                        initial={{ scale: 0.2, opacity: 0 }}
+                        animate={{ scale: 1.5, opacity: [0, 0.6, 0] }}
+                        transition={{ duration: 0.5, delay: 2.7, ease: "easeOut" }}
+                      />
+                      <motion.div
+                        animate={{ scale: [1, 0.85, 1] }}
+                        transition={{ duration: 0.3, delay: 2.7 }}
+                      >
+                        <RealisticCursor />
+                      </motion.div>
+                    </div>
                   </motion.div>
                 </div>
               </motion.div>

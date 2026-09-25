@@ -242,7 +242,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
         initial={reduce ? false : { opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed w-full top-0 z-50 h-[58px] flex items-center justify-between px-4 sm:px-6 lg:px-12 backdrop-blur-md border-b"
+        className="fixed w-full top-0 z-50 h-[58px] flex items-center justify-between px-4 sm:px-8 xl:px-20 backdrop-blur-md border-b"
         style={{ backgroundColor: 'rgba(245,240,232,0.94)', borderColor: '#E4E0D8' }}
       >
         {/* Logo wordmark */}
@@ -288,7 +288,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
       </motion.header>
 
       {/* ─── HERO ─── */}
-      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 pt-[98px] sm:pt-[122px] pb-0">
+      <section className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-20 pt-[98px] sm:pt-[122px] pb-0">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
 
           {/* Left: big display type */}
@@ -324,7 +324,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
 
             <motion.p
               variants={rise}
-              className="text-sm sm:text-base text-[#7C7269] leading-relaxed max-w-[48ch] mb-6 sm:mb-8"
+              className="text-sm sm:text-base text-[#3A3632] font-medium leading-relaxed max-w-[48ch] mb-6 sm:mb-8"
             >
               Drop any vendor config. NetSentry detects the dialect, redacts secrets, runs deterministic compliance evaluation against CIS, NIST, DISA STIG, and ISO 27001, and emits a cryptographically signed PDF - under 15ms.
             </motion.p>
@@ -361,7 +361,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                 <div key={s.label}>
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#1E1C1A] tabular">{s.val}</div>
                   <div className="text-xs font-semibold text-[#4A4440] mt-0.5">{s.label}</div>
-                  <div className="text-[10px] text-[#A89F92] mt-0.5 font-mono">{s.note}</div>
+                  <div className="text-xs sm:text-sm text-[#3A3632] mt-0.5 font-semibold leading-snug">{s.note}</div>
                 </div>
               ))}
             </motion.div>
@@ -396,7 +396,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
         className="mt-24 border-t border-b"
         style={{ backgroundColor: '#EDE8DF', borderColor: '#D1CBC0' }}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-20">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-20 py-20">
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -446,7 +446,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: 0.2 }}
-                className="text-sm text-[#7C7269] leading-relaxed mb-10 max-w-[44ch]"
+                className="text-sm text-[#3A3632] font-medium leading-relaxed mb-10 max-w-[44ch]"
               >
                 Vendor fingerprinting, credential redaction, deterministic parsing with LLM fallback for unknown dialects, and cryptographic report signing - all automated. No account, no data retention.
               </motion.p>
@@ -559,7 +559,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
       </section>
 
       {/* ─── COMPLIANCE FRAMEWORKS — editorial 2-col ─── */}
-      <section className="max-w-7xl mx-auto w-full px-6 lg:px-12 py-20">
+      <section className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-20 py-20">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -658,7 +658,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
         className="border-t border-b"
         style={{ backgroundColor: '#EDE8DF', borderColor: '#D1CBC0' }}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-20 py-16">
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -704,7 +704,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
       </section>
 
       {/* ─── FINAL CTA ─── */}
-      <section className="max-w-7xl mx-auto w-full px-6 lg:px-12 py-20">
+      <section className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-20 py-20">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
