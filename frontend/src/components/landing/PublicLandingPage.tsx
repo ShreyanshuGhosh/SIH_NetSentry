@@ -254,7 +254,6 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
         {/* Center nav links */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#7C7269]">
           {[
-            { label: 'Architecture', tab: 'architecture' },
             { label: 'Rule Packs', tab: 'rules' },
             { label: 'How It Works', tab: 'dashboard' },
           ].map((n) => (
@@ -473,7 +472,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
                     icon: Cpu,
                     title: 'Dialect detected, parsed, evaluated',
                     desc: 'TextFSM deterministic parser runs first. Falls back to human-gated LLM only for unrecognized syntax. Findings evaluated against your chosen framework.',
-                    tab: 'architecture',
+                    tab: 'rules',
                     col: '#2D6A3F',
                   },
                   {

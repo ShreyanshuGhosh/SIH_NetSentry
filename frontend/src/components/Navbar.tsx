@@ -12,7 +12,6 @@ interface NavbarProps {
 }
 
 const NAV = [
-  { id: 'pipeline',  label: 'Architecture' },
   { id: 'audit',     label: 'Audit Console' },
   { id: 'training',  label: 'Training UI' },
   { id: 'rules',     label: 'Rule Packs' },

@@ -10,7 +10,6 @@ import {
   Brain,
   FileCode,
   TerminalWindow,
-  Cpu,
   GearSix,
   Shield,
 } from '@phosphor-icons/react';
@@ -22,7 +21,6 @@ export type ActiveNavTab =
   | 'training'
   | 'rules'
   | 'live-pull'
-  | 'architecture'
   | 'settings';
 
 interface NavRailProps {
@@ -55,7 +53,6 @@ export const NavRail: React.FC<NavRailProps> = ({
     },
     { id: 'rules',        label: 'Rule Packs',              icon: FileCode },
     { id: 'live-pull',    label: 'Live Pull Simulator',     icon: TerminalWindow },
-    { id: 'architecture', label: 'Trust Boundary & Dual-Lane', icon: Cpu },
   ];
 
   return (

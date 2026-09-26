@@ -12,7 +12,6 @@ import { AuditResultsView } from './components/AuditResultsView';
 import { TrainingUI } from './components/TrainingUI';
 import { RulePackExplorer } from './components/RulePackExplorer';
 import { LivePullSimulator } from './components/LivePullSimulator';
-import { DualLaneEngine } from './components/DualLaneEngine';
 import { SettingsView } from './components/settings/SettingsView';
 
 import { FrameworkId, ParsingLane, SampleDeviceConfig } from './types/audit';
@@ -347,10 +346,6 @@ export function App() {
 
               {activeTab === 'live-pull' && (
                 <LivePullSimulator onIngestPulledConfig={handleIngestFromLivePull} onOpenTraining={() => setActiveTab('training')} />
-              )}
-
-              {activeTab === 'architecture' && (
-                <DualLaneEngine onOpenTraining={() => setActiveTab('training')} />
               )}
 
               {activeTab === 'settings' && <SettingsView />}

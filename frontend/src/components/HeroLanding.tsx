@@ -102,7 +102,7 @@ export const HeroLanding: React.FC<HeroLandingProps> = ({
               className="font-mono text-[11px] uppercase tracking-[0.12em] mb-4"
               style={{ color: 'var(--text-tertiary)' }}
             >
-              Trust Boundary
+              Security Concept
             </p>
             <p
               className="text-2xl font-semibold leading-snug mb-5"
