@@ -369,23 +369,23 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
 
           {/* Right: floating product UI / Video */}
           <motion.div
-            className="lg:col-span-6 relative flex items-center justify-center lg:justify-end mt-12 lg:mt-0"
+            className="lg:col-span-6 relative flex items-stretch mt-12 lg:mt-0"
             initial={reduce ? false : { opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="relative w-full max-w-[560px] h-[380px] sm:h-[440px]">
-              {/* Main animated demo container */}
-              <div 
-                className="w-full h-full rounded-2xl overflow-hidden border shadow-2xl relative z-10"
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderColor: '#E4E0D8',
-                  boxShadow: '0 32px 64px -12px rgba(30,28,26,0.15), 0 0 0 1px rgba(30,28,26,0.02)',
-                }}
-              >
-                <AnimatedProductDemo />
-              </div>
+            {/* Main animated demo container — fully fluid, min-height locked for balance */}
+            <div 
+              className="w-full rounded-2xl overflow-hidden border shadow-2xl relative z-10"
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderColor: '#E4E0D8',
+                boxShadow: '0 32px 64px -12px rgba(30,28,26,0.15), 0 0 0 1px rgba(30,28,26,0.02)',
+                minHeight: '400px',
+                aspectRatio: '4/3',
+              }}
+            >
+              <AnimatedProductDemo />
             </div>
           </motion.div>
         </div>

@@ -175,27 +175,25 @@ export const AnimatedProductDemo: React.FC = () => {
                 </div>
 
                 {/* Right: Engine Terminal */}
-                <div className="w-1/2 h-full bg-[#0F0F0F] p-4 flex flex-col overflow-hidden">
-                  <div className="flex items-center gap-2 text-[10px] font-mono text-[#888] mb-4">
+                <div className="w-1/2 h-full bg-[#0F0F0F] p-4 flex flex-col">
+                  <div className="flex items-center gap-2 text-[10px] font-mono text-[#A89F92] mb-4 border-b border-[#2A2A2A] pb-2">
                     <TerminalWindow size={14} /> Deterministic Evaluator
                   </div>
-                  <div className="flex-1 overflow-hidden relative font-mono text-[9px] sm:text-[10px] space-y-1.5">
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-                      <span className="text-[#666]">0.01s</span> <span className="text-green-400">[GREEN_LANE]</span> Matched IOS-XE AST
+                  <div className="flex-1 flex flex-col gap-2 font-mono text-[9px] sm:text-[10px] overflow-hidden">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="flex gap-2">
+                      <span className="text-[#555] shrink-0">0.01s</span><span className="text-green-400">[GREEN_LANE]</span><span className="text-[#CCC]"> Matched IOS-XE AST</span>
                     </motion.div>
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-                      <span className="text-[#666]">0.04s</span> <span className="text-yellow-400">[REDACT]</span> Secrets neutralized
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="flex gap-2">
+                      <span className="text-[#555] shrink-0">0.04s</span><span className="text-yellow-400">[REDACT]</span><span className="text-[#CCC]"> Secrets neutralized</span>
                     </motion.div>
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>
-                      <span className="text-[#666]">0.08s</span> <span className="text-gray-300">Evaluating CIS-1.1.4 (SSHv2)... </span>
-                      <span className="text-green-400 font-bold">PASS</span>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }} className="flex gap-2">
+                      <span className="text-[#555] shrink-0">0.08s</span><span className="text-[#CCC]">CIS-1.1.4 SSHv2...</span><span className="text-green-400 font-bold">PASS</span>
                     </motion.div>
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 }}>
-                      <span className="text-[#666]">0.11s</span> <span className="text-gray-300">Evaluating NIST SC-7 (Boundary)... </span>
-                      <span className="text-red-400 font-bold">FAIL</span>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 }} className="flex gap-2">
+                      <span className="text-[#555] shrink-0">0.11s</span><span className="text-[#CCC]">NIST SC-7 ACL...</span><span className="text-red-400 font-bold">FAIL</span>
                     </motion.div>
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.6 }} className="mt-3 text-[#58A6FF] flex items-center gap-1.5">
-                      <Sparkle size={12} weight="fill" /> Finalizing compliance signature...
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.6 }} className="flex items-center gap-2 mt-2 text-[#58A6FF] border-t border-[#2A2A2A] pt-2">
+                      <Sparkle size={12} weight="fill" /><span>Signing report...</span>
                     </motion.div>
                   </div>
                 </div>
