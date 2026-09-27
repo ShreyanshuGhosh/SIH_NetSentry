@@ -40,7 +40,7 @@ export const LivePullExplanation: React.FC = () => {
 
   return (
     <div className="bg-white border rounded-xl shadow-sm overflow-hidden mb-6" style={{ borderColor: 'var(--border-subtle)' }}>
-      <div className="p-5 md:p-8 flex flex-col items-center border-b bg-slate-50 relative overflow-hidden" style={{ borderColor: 'var(--border-subtle)' }}>
+      <div className="hidden md:flex p-5 md:p-8 flex-col items-center border-b bg-slate-50 relative overflow-hidden" style={{ borderColor: 'var(--border-subtle)' }}>
         
         {/* Animated Network Diagram */}
         <div className="relative w-full max-w-4xl h-64 flex items-center justify-between z-10 px-4 md:px-12 mx-auto">
