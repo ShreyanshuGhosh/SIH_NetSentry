@@ -128,13 +128,11 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
           </div>
           <button
             onClick={() => setShowExplanation(!showExplanation)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-sm shrink-0"
-            style={{ 
-              backgroundColor: showExplanation ? 'var(--bg-surface)' : 'var(--accent-primary)',
-              color: showExplanation ? 'var(--text-primary)' : '#fff',
-              border: '1px solid',
-              borderColor: showExplanation ? 'var(--border-default)' : 'transparent'
-            }}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200 cursor-pointer shrink-0 active:scale-95 ${
+              showExplanation
+                ? 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shadow-sm'
+                : 'bg-[#C8830A] text-white hover:bg-[#A66A06] shadow-md hover:shadow-[0_6px_16px_rgba(200,131,10,0.25)] hover:-translate-y-0.5'
+            }`}
           >
             {showExplanation ? <Info size={18} weight="bold" /> : <Question size={18} weight="bold" />}
             {showExplanation ? 'Hide Explanation' : 'How it works?'}
