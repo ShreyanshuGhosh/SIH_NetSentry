@@ -13,6 +13,7 @@ import {
   Globe, HardDrives, ArrowUp,
 } from '@phosphor-icons/react';
 import { AnimatedProductDemo } from './AnimatedProductDemo';
+import logoImg from '../../assets/netsentry-logo.jpg';
 
 interface PublicLandingPageProps {
   onLaunchConsole: (configId?: string, targetTab?: string) => void;
@@ -247,8 +248,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
       >
         {/* Logo wordmark */}
         <div className="flex items-center gap-2.5">
-          <ShieldCheck size={20} weight="fill" className="text-[#C8830A]" />
-          <span className="text-base font-extrabold tracking-tight text-[#1E1C1A]">NetSentry</span>
+          <img src={logoImg} alt="NetSentry Logo" className="h-6 w-auto mix-blend-multiply" />
         </div>
 
         {/* Center nav links */}

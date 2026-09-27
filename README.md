@@ -122,6 +122,7 @@ Parser         + Confidence
 | Rule storage | Declarative YAML data files | Hardcoded logic |
 | Remediation | Device-specific, executable CLI sequences | Generic advice |
 | Final compliance decision | Deterministic rule engine | AI |
+| Data Collection | Agentless SSH Live Pull Simulator with interactive flow animations | Static manual config uploads |
 
 > **AI Suggests. Rules Decide.**
 

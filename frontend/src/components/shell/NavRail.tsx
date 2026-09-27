@@ -13,6 +13,7 @@ import {
   GearSix,
   Shield,
 } from '@phosphor-icons/react';
+import logoImg from '../../assets/netsentry-logo.jpg';
 
 export type ActiveNavTab =
   | 'dashboard'
@@ -61,31 +62,14 @@ export const NavRail: React.FC<NavRailProps> = ({
       style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-default)' }}
     >
       <div>
-        {/* Brand — Hyperlinked NetSentry Logo & Title (Clicking returns to Public Landing Page) */}
+        {/* Brand - Hyperlinked NetSentry Logo & Title (Clicking returns to Public Landing Page) */}
         <button
           onClick={onViewLandingPage}
-          className="w-full h-14 flex items-center px-4 gap-3 border-b text-left hover:bg-[rgba(200,131,10,0.06)] transition-all cursor-pointer group"
+          className="w-full h-14 flex items-center justify-center px-2 md:px-4 border-b hover:bg-[rgba(200,131,10,0.06)] transition-all cursor-pointer group"
           style={{ borderColor: 'var(--border-subtle)' }}
           title="NetSentry - Return to Public Landing Page"
         >
-          <div
-            className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 border group-hover:scale-105 transition-transform"
-            style={{ backgroundColor: 'rgba(200,131,10,0.10)', borderColor: 'rgba(200,131,10,0.30)' }}
-          >
-            <Shield size={17} weight="bold" className="text-[#C8830A]" />
-          </div>
-          <div className="hidden md:block overflow-hidden">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-sm font-extrabold text-[#1E1C1A] tracking-tight group-hover:text-[#C8830A] transition-colors">
-                NetSentry
-              </span>
-            </div>
-            <div className="text-[10px] font-mono text-[#A89F92] flex items-center gap-1 mt-0.5">
-              <span>NTRO</span>
-              <span className="text-[#D1CBC0]">/</span>
-              <span>SIH26155</span>
-            </div>
-          </div>
+          <img src={logoImg} alt="NetSentry Logo" className="h-4 md:h-6 max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform" />
         </button>
 
         {/* Nav items */}

@@ -11,11 +11,15 @@ import {
   ArrowsClockwise,
   ShieldCheck,
   Terminal,
+  Question,
+  Info
 } from '@phosphor-icons/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { SampleDeviceConfig } from '../types/audit';
 import { SAMPLE_CONFIGS } from '../data/sampleConfigs';
 import { CollectorLogStream, CollectorLogLine } from './live-pull/CollectorLogStream';
 import { LivePullState } from '../types/canonical';
+import { LivePullExplanation } from './live-pull/LivePullExplanation';
 
 interface LivePullSimulatorProps {
   onIngestPulledConfig: (config: SampleDeviceConfig) => void;
@@ -40,6 +44,7 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
   const [user, setUser] = useState('audit_readonly');
   const [state, setState] = useState<LivePullState>('idle');
   const [simulateError, setSimulateError] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
   const [logs, setLogs] = useState<CollectorLogLine[]>([
     {
       id: 'log-0',
@@ -111,15 +116,44 @@ export const LivePullSimulator: React.FC<LivePullSimulatorProps> = ({ onIngestPu
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
       {/* Header */}
       <div className="border-b pb-6" style={{ borderColor: 'var(--border-subtle)' }}>
-        <div className="flex items-center gap-2">
-          <Terminal size={22} style={{ color: 'var(--accent-primary)' }} />
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Live SSH Collector Simulator</h1>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Terminal size={22} style={{ color: 'var(--accent-primary)' }} />
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Live SSH Collector Simulator</h1>
+            </div>
+            <p className="text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
+              Securely connects to network devices via SSH to extract read-only configurations without making any changes.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowExplanation(!showExplanation)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-sm shrink-0"
+            style={{ 
+              backgroundColor: showExplanation ? 'var(--bg-surface)' : 'var(--accent-primary)',
+              color: showExplanation ? 'var(--text-primary)' : '#fff',
+              border: '1px solid',
+              borderColor: showExplanation ? 'var(--border-default)' : 'transparent'
+            }}
+          >
+            {showExplanation ? <Info size={18} weight="bold" /> : <Question size={18} weight="bold" />}
+            {showExplanation ? 'Hide Explanation' : 'How it works?'}
+          </button>
         </div>
-        <p className="text-xs text-slate-600 mt-1">
-          Automated read-only telemetry collection via Netmiko. Strictly executes non-modifying retrieval commands
-          with immediate client-side secret masking.
-        </p>
       </div>
+
+      <AnimatePresence>
+        {showExplanation && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+            animate={{ height: 'auto', opacity: 1, marginBottom: 24 }}
+            exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+            className="overflow-hidden"
+          >
+            <LivePullExplanation />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left: Connection Parameters (4 cols) */}
