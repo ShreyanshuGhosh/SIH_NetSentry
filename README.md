@@ -241,8 +241,15 @@ Generated audit PDF reports follow the R30 government-grade standard:
    - `Evidence / AI Citation` (Line number + verbatim raw CLI statement)
    - `Step-by-Step Vendor CLI Remediation Sequence` (Executable CLI command sequences).
 6. **Governance Attestation Block:** Multi-vendor ecosystem compatibility note and formal CISO signature approval block.
-
 ---
+
+## Frontend Navigation & State Management
+
+The NetSentry application is a Single Page Application (SPA) that uses a custom state-driven router integrated directly with the native Browser History API. 
+
+- **Session History Tracking**: As operators navigate through different compliance views (Dashboard, Ingest, Results, Training, Rules), the internal application state is synchronized with the browser's history stack. This allows users to rely on their browser's "Back" and "Forward" buttons seamlessly, maintaining standard web navigation expectations.
+- **Base Trap & Context Retention**: To prevent accidental app exits during high-stakes monitoring, the frontend establishes a secure history trap at the root (`landing`). Pressing "Back" from the initial application entry point will securely retain the user on the platform rather than abruptly ejecting them to their previous browsing context.
+- **Data Loss Prevention**: The frontend implements `beforeunload` protections during active authenticated operations to ensure uncommitted mappings or pending audit results are not lost upon accidental refreshes.
 
 ## Tech Stack
 

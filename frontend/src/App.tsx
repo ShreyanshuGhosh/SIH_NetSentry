@@ -79,26 +79,48 @@ export function App() {
   });
 
   // Browser history integration — makes Back button work correctly
+  // Manage initial history setup and popstate
   React.useEffect(() => {
-    if (viewMode === 'console') {
-      window.history.pushState({ viewMode: 'console', tab: activeTab }, '', `#${activeTab}`);
-    } else {
-      window.history.pushState({ viewMode: 'landing' }, '', ' ');
+    // On mount, check if we are already in our app's state
+    if (!window.history.state?.viewMode && !window.history.state?.isAppBase) {
+      // Initialize the history trap so we can catch "back" from the landing page
+      window.history.replaceState({ isAppBase: true }, '', window.location.pathname);
+      window.history.pushState({ viewMode: 'landing' }, '', window.location.pathname);
     }
-  }, [viewMode, activeTab]);
 
-  React.useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
-      if (e.state?.viewMode === 'landing' || !e.state) {
+      const state = e.state;
+      
+      if (!state || state.isAppBase) {
+        // User tried to go back past our entry point. Trap them on landing!
+        window.history.pushState({ viewMode: 'landing' }, '', window.location.pathname);
         setViewMode('landing');
-      } else if (e.state?.viewMode === 'console') {
+      } else if (state.viewMode === 'landing') {
+        setViewMode('landing');
+      } else if (state.viewMode === 'console') {
         setViewMode('console');
-        if (e.state.tab) setActiveTab(e.state.tab as ActiveNavTab);
+        if (state.tab) setActiveTab(state.tab as ActiveNavTab);
       }
     };
+    
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  // Sync state changes to history (only when caused by user interaction, not popstate)
+  React.useEffect(() => {
+    const currentState = window.history.state;
+    
+    if (viewMode === 'console') {
+      if (currentState?.viewMode !== 'console' || currentState?.tab !== activeTab) {
+        window.history.pushState({ viewMode: 'console', tab: activeTab }, '', `#${activeTab}`);
+      }
+    } else if (viewMode === 'landing') {
+      if (currentState?.viewMode !== 'landing') {
+        window.history.pushState({ viewMode: 'landing' }, '', window.location.pathname);
+      }
+    }
+  }, [viewMode, activeTab]);
 
   // Automatically scroll to top whenever activeTab changes
   React.useEffect(() => {
