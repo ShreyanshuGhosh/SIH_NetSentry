@@ -251,21 +251,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onLaunchCo
           <img src={logoImg} alt="NetSentry Logo" className="h-6 w-auto mix-blend-multiply" />
         </div>
 
-        {/* Center nav links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#7C7269]">
-          {[
-            { label: 'Rule Packs', tab: 'rules' },
-            { label: 'How It Works', tab: 'dashboard' },
-          ].map((n) => (
-            <button
-              key={n.tab}
-              onClick={() => onLaunchConsole(undefined, n.tab)}
-              className="hover:text-[#1E1C1A] transition-colors cursor-pointer"
-            >
-              {n.label}
-            </button>
-          ))}
-        </nav>
+
 
         {/* Right CTA */}
         <div className="flex items-center gap-3">
