@@ -9,17 +9,19 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [The Defensible Novelty Claim (§1)](#the-defensible-novelty-claim-1)
 - [How It Works](#how-it-works)
 - [Key Differentiators](#key-differentiators)
 - [Architecture](#architecture)
 - [Multi-Framework & Multi-Vendor Engine](#multi-framework--multi-vendor-engine)
 - [Institutional PDF Reporting Specification](#institutional-pdf-reporting-specification)
+- [Frontend Navigation & State Management](#frontend-navigation--state-management)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Setup Instructions](#setup-instructions)
   - [Prerequisites](#prerequisites)
   - [Backend Setup](#backend-setup)
-  - [Frontend Setup](#frontend-setup)
+  - [Frontend Setup & Automated Verification](#frontend-setup--automated-verification)
   - [Database Setup](#database-setup)
   - [Environment Variables](#environment-variables)
 - [Running the Application](#running-the-application)
@@ -46,13 +48,16 @@ Modern enterprise networks are heterogeneous by nature — Cisco, Juniper, Palo 
    - **Fortinet FortiOS** (FortiGate firewalls)
    - **Arista EOS** (7050X / 7280R data center switches)
    - **Cloud & SASE** (AWS, Azure Security Groups, Zscaler, Cato Networks)
-2. Sanitises and cryptographically seals each configuration client-side (`SHA-256` provenance) while actively masking sensitive secrets (passwords, tokens, SNMP community strings).
-3. Normalises syntax into an extensible, open **Security Baseline Model** decoupled from vendor-specific CLI idioms.
-4. Evaluates that schema against user-selected, multi-framework benchmark rule packs with cross-framework control deduplication (`controlGroupId`).
-5. Powers an administrator-in-the-loop **Few-Shot Exemplar Store** where an unknown command mapped once immediately generalizes across all other devices.
+2. Sanitises and cryptographically seals each configuration client-side (`SHA-256` provenance) while actively masking sensitive secrets (**Secret Redaction** via Regex before LLM API calls).
+3. Normalises syntax into an extensible, open **Security Baseline Model** decoupled from vendor-specific CLI idioms, utilizing an advanced Schema that supports `min_version`, `absence_required`, `presence_required`, and multi-instance fields (`instance_id`).
+4. Evaluates that schema against user-selected, multi-framework benchmark rule packs with cross-framework control deduplication (`controlGroupId`) and vendor-specific remediation dictionaries (`remediation_templates`).
+5. Powers an administrator-in-the-loop **Few-Shot Exemplar Store** where an unknown command mapped once immediately generalizes across all other devices. Submitting a correction triggers **automated re-evaluation** across all affected devices.
 6. Delivers line-level evidence, before/after tactical remediation diff scrubbing, and government-grade audit-ready PDF reports with formal CISO attestation.
 
-The system uses a **Dual-Lane Architecture** — a deterministic Green Lane for known vendor grammars (< 15ms latency) and an Amber Lane for unknown syntax with confidence scoring and an active human review gate.
+The system uses a **3-Lane Architecture**:
+- **Lane 1 (Deterministic)**: Known vendor grammars via `ntc-templates` and Syntax Family Tokenizers (< 15ms latency).
+- **Lane 2 (LLM Fallback)**: Known vendors lacking deterministic templates, routed directly to an **Async LLM** via `AsyncAnthropic`.
+- **Lane 3 (LLM + Human Training)**: Genuinely unrecognized formats sent to the LLM and gated by a confidence score. Low confidence results trigger the Training UI for active human review.
 
 ---
 
@@ -69,42 +74,41 @@ Configuration file uploaded (or generated)
          │
          ▼
  [Vendor Fingerprint]
-   Identifies dialect
+  (re.MULTILINE scored)
          │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-[GREEN]     [AMBER]
-Deterministic  LLM Fallback
-Parser         + Confidence
-(known vendor) Score per value
-    │         │
-    │         ├── confidence ≥ threshold → proceeds
-    │         └── confidence < threshold → Training UI
-    │                 Admin maps line once
-    │                 Stored as few-shot example
-    │                 Reused on next similar device
-    │         │
-    └────┬────┘
-         │
-         ▼
- [Normalised Schema JSON]
-   ssh_version, telnet_enabled,
-   remote_logging_enabled, acl_present …
-         │
-         ▼
- [Multi-Framework Engine]
+    ┌────┼───────────────┐
+    │    │               │
+    ▼    ▼               ▼
+ [LANE 1] [LANE 2]      [LANE 3]
+ Determin- LLM Fallback  LLM + Human
+ istic     (Known Vendor,(Unknown
+ Parser    No Template)  Format)
+    │    │               │
+    │    │               ├── confidence ≥ threshold → proceeds
+    │    │               └── confidence < threshold → Training UI
+    │    │                       Admin maps line once
+    │    │                       Re-evaluates all affected devices
+    │    │                       Stored as few-shot example
+    └────┴──────┬────────┘
+                │
+                ▼
+  [Normalised Schema JSON]
+   min_version, telnet_enabled,
+   absence_required, instance_id …
+                │
+                ▼
+  [Multi-Framework Engine]
    Multi-Select Rules Selection:
    CIS v8 + NIST SP 800-53 + DISA STIG + ISO 27001
-         │
-         ▼
+                │
+                ▼
    PASS · FAIL · UNKNOWN
    NOT_APPLICABLE · CONFLICT
    + source-line evidence
    + risk severity assessment
-   + device-specific CLI fix sequences
-         │
-         ▼
+   + vendor-specific CLI fix sequences
+                │
+                ▼
    [Institutional PDF Report]
 ```
 
@@ -115,14 +119,16 @@ Parser         + Confidence
 | Property | NetSentry | Typical AI approach |
 |---|---|---|
 | Framework Selection | Multi-select combined deduplicated evaluation | Single benchmark lock |
-| Parsing lanes | Two: deterministic + LLM fallback | Single AI pipeline |
+| Parsing lanes | Three: Deterministic + LLM known + LLM unknown | Single AI pipeline |
+| Secret Redaction | Regex-based redaction of secrets BEFORE any LLM call | Unfiltered config transmission |
+| Architecture | Fast Async API + Asyncio `AsyncAnthropic` | Blocking synchronous calls |
+| Detection Precision | Multi-keyword `re.MULTILINE` scoring | Fragile single regex anchors |
 | Source-line evidence | Every AI-derived value traces to its origin line | Findings without provenance |
 | Confidence gating | Training UI fires only below threshold | AI always used regardless |
 | `UNKNOWN` state | First-class result — never a silent pass | Missing or treated as pass |
-| Rule storage | Declarative YAML data files | Hardcoded logic |
-| Remediation | Device-specific, executable CLI sequences | Generic advice |
+| Rule storage | Declarative YAML data files with complex schema (`min_version`, `absence_required`) | Hardcoded logic |
+| Remediation | Vendor-specific, executable CLI sequences via Dict `remediation_templates` | Generic advice |
 | Final compliance decision | Deterministic rule engine | AI |
-| Data Collection | Agentless SSH Live Pull Simulator with interactive flow animations | Static manual config uploads |
 
 > **AI Suggests. Rules Decide.**
 
@@ -135,42 +141,42 @@ Parser         + Confidence
 │                        Frontend (React)                      │
 │  Upload Dashboard · Audit Results · Training UI · Reports   │
 └──────────────────────────┬──────────────────────────────────┘
-                           │ REST / JSON
+                           │ REST / JSON (CORS enabled)
 ┌──────────────────────────▼──────────────────────────────────┐
 │                     Backend (FastAPI)                        │
 │                                                              │
 │  ┌──────────┐  ┌─────────────────────────────────────────┐  │
 │  │ Ingestion│  │          Processing Pipeline            │  │
 │  │ Module   │  │                                         │  │
-│  │          │  │  ┌─────────────┐  ┌──────────────────┐ │  │
-│  │ • Upload │→→│  │ Deterministic│  │  LLM Fallback    │ │  │
-│  │ • Hash   │  │  │ Parser       │  │  Lane            │ │  │
-│  │ • Redact │  │  │ (known       │  │  • LLM API call  │ │  │
-│  │ • Meta   │  │  │  vendors)    │  │  • Confidence ≥  │ │  │
-│  └──────────┘  │  └──────┬──────┘  │    threshold?    │ │  │
-│                │         │         │  • Few-shot store │ │  │
-│                │  ┌──────▼─────────▼──────────────┐   │ │  │
-│                │  │     Normalised Schema JSON     │   │ │  │
-│                │  └───────────────┬────────────────┘   │ │  │
-│                │                  │                     │ │  │
-│                │  ┌───────────────▼────────────────┐   │ │  │
-│                │  │   Rule Engine (deterministic)  │   │ │  │
-│                │  │   Multi-Framework YAML Rules   │   │ │  │
-│                │  └───────────────┬────────────────┘   │ │  │
-│                └──────────────────┼─────────────────────┘  │
-│                                   │                          │
-│  ┌────────────────────────────────▼─────────────────────┐  │
-│  │              Report Generator (ReportLab / jsPDF)     │  │
-│  │   5-Column PDF report · device grid · CISO attestation│  │
-│  └──────────────────────────────────────────────────────┘  │
+│  │          │  │  ┌─────────┐  ┌─────────┐  ┌──────────┐ │  │
+│  │ • Upload │→→│  │ Lane 1  │  │ Lane 2  │  │ Lane 3   │ │  │
+│  │ • Multi- │  │  │ Determ- │  │ LLM for │  │ LLM +    │ │  │
+│  │   line   │  │  │ inistic │  │ No Temp-│  │ Training │ │  │
+│  │   Hash   │  │  │ Parser  │  │ late    │  │ UI       │ │  │
+│  │ • Redact │  │  └────┬────┘  └────┬────┘  └────┬─────┘ │  │
+│  └──────────┘  │       │            │            │       │  │
+│                │  ┌────▼────────────▼────────────▼────┐  │  │
+│                │  │     Normalised Schema JSON        │  │  │
+│                │  │ (instance_id, min_version checks) │  │  │
+│                │  └───────────────┬───────────────────┘  │  │
+│                │                  │                      │  │
+│                │  ┌───────────────▼───────────────────┐  │  │
+│                │  │   Rule Engine (deterministic)     │  │  │
+│                │  │   Multi-Framework YAML Rules      │  │  │
+│                │  └───────────────┬───────────────────┘  │  │
+│                └──────────────────┼──────────────────────┘  │
+│                                   │                         │
+│  ┌────────────────────────────────▼──────────────────────┐  │
+│  │              Report Generator (WeasyPrint / jsPDF)     │  │
+│  │   5-Column PDF report · device grid · CISO attestation │  │
+│  └───────────────────────────────────────────────────────┘  │
 └──────────────────────────┬──────────────────────────────────┘
                            │
            ┌───────────────┼────────────────────┐
            ▼               ▼                    ▼
      [PostgreSQL]    [Object Storage]    [Few-shot Store]
       Audit runs      Config files        Training examples
-      Findings        Reports             (per-vendor)
-      Rule versions
+      Findings        Reports             (re-evaluates on update)
 ```
 
 **Trust boundary:** The LLM component only *suggests* schema mappings. All compliance pass/fail decisions are made by the deterministic rule engine — LLM output never directly determines a compliance result.
@@ -187,8 +193,6 @@ NetSentry provides native multi-select framework evaluation across four major in
 | **NIST SP 800-53** | Rev. 5 (Federal Baselines) | 24 Rules | 18 Rules | 6 Rules | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | NIST SP 800-53 Rev. 5 (AC-2, AC-8, AC-17, AU-2, AU-6, AU-8, CM-7, IA-2, IA-5, PE-3, SC-5, SC-7, SC-10, SC-12, SC-13) |
 | **DISA STIG Network** | Release 34 (DoD) | 24 Rules | 18 Rules | 6 Rules | **`CAT I`** (Critical) / **`CAT II`** (High/Medium) / **`CAT III`** (Low) | DoD DISA Network L2S / Router STIG (V-216960 to V-220548 / SRG-NET) |
 | **ISO/IEC 27001** | 2022 Revision | 24 Rules | 18 Rules | 6 Rules | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | ISO/IEC 27001:2022 Annex A (A.5.15, A.5.16, A.7.1, A.8.15, A.8.17, A.8.20, A.8.22, A.8.24, A.8.26) |
-
-Operators can select any combination of benchmarks or click **Select All (4)** to produce a unified, deduplicated audit report.
 
 ### Canonical Control Baseline (1-to-1 Cross-Framework Deduplication)
 
@@ -215,16 +219,7 @@ To eliminate artificial score inflation when running multi-framework audits, Net
 18. `CTRL-SNMP-COMMUNITY` — Prohibit Default Insecure SNMP Communities (`public` / `private`)
 
 #### "Checking Infra Missing" Operational Controls (6 Controls)
-Certain essential network security safeguards cannot be proven by static device configuration text alone. NetSentry transparently tags these rules as **`CHECKING INFRA MISSING`** (`INFRA REQ`), providing an in-depth diagnostic modal with executable synthetic probes, telemetry signals, and audit procedures:
-
-19. `CTRL-AAA-LIVE` — Dynamic TACACS+/RADIUS Server Live Reachability & Latency SLA (<120ms)
-20. `CTRL-SIEM-INGEST` — Real-Time SIEM Ingestion Pipeline & Structured Schema Parsability
-21. `CTRL-OOB-ISOLATION` — Out-of-Band (OOB) Management Plane Physical & VRF Air-Gap Isolation
-22. `CTRL-PKI-REVOCATION` — PKI Certificate Revocation List (CRL) & OCSP Responder Live Reachability
-23. `CTRL-COPP-TELEMETRY` — Control Plane Policing (CoPP) Hardware Rate-Limiter Telemetry & Drop Monitoring
-24. `CTRL-PHYSICAL-TAMPER` — Datacenter Chassis Physical Tamper Microswitches & SFP Enclosure Sensors
-
-When evaluating CIS + NIST simultaneously (48 raw rule findings), deduplication consolidates them into the 24 core controls, preventing double-penalizing or artificially inflating the compliance score.
+Certain essential network security safeguards cannot be proven by static device configuration text alone. NetSentry transparently tags these rules as **`CHECKING INFRA MISSING`** (`INFRA REQ`), providing an in-depth diagnostic modal with executable synthetic probes, telemetry signals, and audit procedures.
 
 ---
 
@@ -232,25 +227,28 @@ When evaluating CIS + NIST simultaneously (48 raw rule findings), deduplication 
 
 Generated audit PDF reports follow the R30 government-grade standard:
 1. **Top Header Banner:** Deep Charcoal header with Saffron Gold accent border and cryptographic session hash.
-2. **Device Identification Grid (4x2):** Hostname, Serial Number (`APX-98420-NX7K`), Hardware Model, Vendor Dialect & Firmware Version, Evaluated Frameworks, Evaluation Date, Operator User ID (`operator-admin`), and AI Engine Lane.
-3. **AI Normalization Scope Callout:** Explicitly documents how heterogeneous CLI syntaxes across Palo Alto, Fortinet, Cisco, Check Point, Juniper, SONiC, and Cloud SASE are normalized into a vendor-neutral baseline model.
+2. **Device Identification Grid (4x2):** Hostname, Serial Number, Hardware Model, Vendor Dialect & Firmware Version, Evaluated Frameworks, Evaluation Date, Operator User ID, and AI Engine Lane.
+3. **AI Normalization Scope Callout:** Explicitly documents how heterogeneous CLI syntaxes are normalized into a vendor-neutral baseline model.
 4. **5-Column KPI Executive Summary Box:** Total Clauses, Compliant Count, Non-Compliant Count, Overridden Count, and Compliance Score (%).
 5. **Actionable Compliance Findings & Remediation Table (5 Columns):**
    - `Clause ID`
    - `Control Title & Risk Severity` (`[CRITICAL]`, `[HIGH]`, `[MEDIUM]`, `[LOW]`)
    - `Status` (`COMPLIANT`, `NON-COMPLIANT`, `N/A`)
    - `Evidence / AI Citation` (Line number + verbatim raw CLI statement)
-   - `Step-by-Step Vendor CLI Remediation Sequence` (Executable CLI command sequences).
+   - `Step-by-Step Vendor CLI Remediation Sequence` (Executable CLI command sequences using dynamically resolved dictionaries based on OS hint).
 6. **Governance Attestation Block:** Multi-vendor ecosystem compatibility note and formal CISO signature approval block.
+
 ---
 
 ## Frontend Navigation & State Management
 
-The NetSentry application is a Single Page Application (SPA) that uses a custom state-driven router integrated directly with the native Browser History API. 
+The NetSentry application is a Single Page Application (SPA) that uses a custom state-driven router integrated directly with the native Browser History API.
 
-- **Session History Tracking**: As operators navigate through different compliance views (Dashboard, Ingest, Results, Training, Rules), the internal application state is synchronized with the browser's history stack. This allows users to rely on their browser's "Back" and "Forward" buttons seamlessly, maintaining standard web navigation expectations.
-- **Base Trap & Context Retention**: To prevent accidental app exits during high-stakes monitoring, the frontend establishes a secure history trap at the root (`landing`). Pressing "Back" from the initial application entry point will securely retain the user on the platform rather than abruptly ejecting them to their previous browsing context.
-- **Data Loss Prevention**: The frontend implements `beforeunload` protections during active authenticated operations to ensure uncommitted mappings or pending audit results are not lost upon accidental refreshes.
+- **Session History Tracking**: Internal state synchronized with the browser's history stack.
+- **Base Trap & Context Retention**: Protects root entry point from accidentally ejecting the user via back button.
+- **Data Loss Prevention**: `beforeunload` protections during active operations.
+
+---
 
 ## Tech Stack
 
@@ -259,11 +257,11 @@ The NetSentry application is a Single Page Application (SPA) that uses a custom 
 | Frontend | React 18, TypeScript, Tailwind CSS, Vite |
 | Backend API | FastAPI (Python 3.11+) |
 | Database | PostgreSQL 15 |
-| LLM integration | OpenAI-compatible API (configurable endpoint) |
-| Few-shot store | PostgreSQL JSONB table |
-| Rule packs | Declarative YAML (versioned, per-framework) |
-| PDF generation | ReportLab (Backend) & jsPDF / autoTable (Client) |
-| Live collection | Netmiko / NAPALM (read-only driver sessions) |
+| LLM integration | Anthropic (`claude-opus-5`) via `instructor` (`AsyncAnthropic`) |
+| Background concurrency| `asyncio.gather` for bulk file ingestion |
+| Deterministic Engine | `TextFSM` + `ntc-templates` + custom Syntax Family Tokenizers |
+| Rule packs | Declarative YAML (supports `min_version`, `absence_required`) |
+| PDF generation | WeasyPrint with autoescape Jinja2 templates |
 
 ---
 
@@ -273,57 +271,38 @@ The NetSentry application is a Single Page Application (SPA) that uses a custom 
 netsentry/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py                  # FastAPI entrypoint
+│   │   ├── main.py                  # FastAPI entrypoint, CORS config
 │   │   ├── api/
 │   │   │   ├── routes/
 │   │   │   │   ├── ingestion.py     # Upload endpoints
 │   │   │   │   ├── audit.py         # Audit trigger + results
 │   │   │   │   ├── training.py      # Training UI endpoints
-│   │   │   │   └── reports.py       # PDF download
+│   │   │   │   └── reports.py       # WeasyPrint PDF download
 │   │   ├── core/
-│   │   │   ├── fingerprint.py       # Vendor detection
-│   │   │   ├── parser_registry.py   # Deterministic parser loader
-│   │   │   ├── llm_lane.py          # LLM fallback + confidence scoring
-│   │   │   ├── schema.py            # Security Baseline Model (Pydantic)
-│   │   │   ├── rule_engine.py       # YAML rule evaluation
-│   │   │   └── report_gen.py        # ReportLab PDF builder
-│   │   ├── services/
-│   │   │   └── reporting.py         # ReportLab PDF Service
+│   │   │   ├── fingerprint.py       # re.MULTILINE scored detection
+│   │   │   ├── parser_registry.py   # Canonical Extractor Registry
+│   │   │   ├── llm_lane.py          # Async instructor LLM lane
+│   │   │   ├── schema.py            # Pydantic baseline with instance_id
+│   │   │   ├── rule_engine.py       # YAML evaluation with advanced checks
+│   │   │   └── report_gen.py        # PDF builder
+│   │   ├── ingestion/
+│   │   │   └── redact.py            # Pre-LLM secret redaction
 │   │   ├── parsers/
-│   │   │   ├── cisco_ios.py
-│   │   │   ├── juniper_junos.py
-│   │   │   └── sonic.py             # White-box SONiC parser
+│   │   │   ├── tokenizers.py        # Syntax Family tokenizers
+│   │   │   └── registry.py          # Cisco/Juniper adapters
 │   │   ├── rule_packs/
 │   │   │   ├── cis_network_v8.yaml
-│   │   │   ├── nist_800_53_r5.yaml
-│   │   │   ├── disa_stig_network.yaml
-│   │   │   └── iso_27001.yaml
-│   │   ├── models/                  # SQLAlchemy ORM models
+│   │   │   └── nist_800_53_r5.yaml
+│   │   ├── models/                  # SQLModel / SQLAlchemy definitions
 │   │   └── db/
 │   │       └── migrations/          # Alembic migrations
 │   ├── tests/
-│   │   ├── test_parsers/
-│   │   ├── test_rule_engine/
-│   │   └── fixtures/                # Sample config files per vendor
 │   ├── requirements.txt
-│   └── Dockerfile
+│   └── Dockerfile                   # Includes WeasyPrint deps
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── IngestionConsole.tsx # Multi-framework upload & viewer
-│   │   │   ├── AuditResultsView.tsx # Audit findings & summary
-│   │   │   ├── RulePackExplorer.tsx # Interactive benchmark explorer
-│   │   │   ├── AnimatedProductDemo.tsx # Full-bleed animated product demo
-│   │   │   ├── TrainingUI.tsx       # Few-shot mapping queue
-│   │   │   ├── dashboard/           # Fleet posture dashboard
-│   │   │   ├── results/
-│   │   │   │   ├── FindingsTable.tsx
-│   │   │   │   └── PdfReportPreview.tsx
-│   │   │   ├── shared/              # Status badges, severity tags
-│   │   │   └── shell/               # NavRail & TopBar shell
-│   │   ├── utils/
-│   │   │   └── pdfGenerator.ts      # Client PDF generator
+│   │   └── components/
 │   ├── package.json
 │   └── Dockerfile
 │
@@ -342,7 +321,7 @@ netsentry/
 - **Node.js** 18 or later and npm 9+
 - **PostgreSQL** 15 or later
 - **Docker + Docker Compose** *(optional but recommended)*
-- An OpenAI-compatible LLM API key (OpenAI, Azure OpenAI, or a self-hosted endpoint)
+- An Anthropic API key (`claude-opus-5` access)
 
 ---
 
@@ -387,8 +366,6 @@ npm run build
 npm run dev
 ```
 
-The frontend runs locally on `http://localhost:3000`.
-
 ---
 
 ### Database Setup
@@ -420,12 +397,12 @@ cp .env.example .env
 DATABASE_URL=postgresql://netsentry:netsentry_dev@localhost:5432/netsentry
 
 # LLM configuration
-LLM_API_BASE=https://api.openai.com/v1
+LLM_API_BASE=https://api.anthropic.com
 LLM_API_KEY=sk-...
-LLM_MODEL=gpt-4o-mini
+LLM_MODEL=claude-opus-5
 
 # Confidence threshold for Training UI
-LLM_CONFIDENCE_THRESHOLD=0.80
+LLM_CONFIDENCE_THRESHOLD=0.75
 
 # File storage
 UPLOAD_DIR=./uploads
@@ -473,23 +450,44 @@ npm run dev
 
 ### 1. Upload or Generate a configuration file
 
-Navigate to **Ingest & Audit**. You can drag and drop plain-text CLI files (`.txt`, `.conf`, `.cfg`), upload bulk ZIP archives, or click **Generate Unique Random File** to create a timestamped configuration with randomized compliance controls.
+Navigate to **Ingest & Audit**. You can drag and drop plain-text CLI files (`.txt`, `.conf`, `.cfg`), upload bulk ZIP archives, or click **Generate Unique Random File** to create a timestamped configuration with randomized compliance controls. Upload configs are processed through `re.MULTILINE` scoring. Secrets are redacted automatically before hitting any LLM. Bulk uploads are handled concurrently using `asyncio.gather`.
 
 ### 2. Multi-Select Compliance Frameworks
 
-Select as many benchmark frameworks as desired (CIS, NIST SP 800-53, DISA STIG, ISO 27001) or click **Select All (4)** for a combined deduplicated audit report.
+Select as many benchmark frameworks as desired (CIS, NIST SP 800-53, DISA STIG, ISO 27001) or click **Select All (4)** for a combined deduplicated audit report. Advanced rule logic supports checks like `min_version`, `absence_required`, and multi-instance fields (`instance_id`).
 
 ### 3. Review audit findings & remediation
 
-Review findings with exact line citations, AI lane provenance, risk severity tags (`[CRITICAL]`, `[HIGH]`, `[MEDIUM]`, `[LOW]`), and exact step-by-step vendor CLI remediation command sequences.
+Review findings with exact line citations, AI lane provenance, risk severity tags (`[CRITICAL]`, `[HIGH]`, `[MEDIUM]`, `[LOW]`), and exact step-by-step vendor CLI remediation command sequences dynamically populated using `remediation_templates`.
 
 ### 4. Training UI (admin only)
 
-When a finding cannot be resolved with sufficient confidence, the **Training UI** presents the raw unrecognised command block for admin mapping. Approved mappings update internal heuristics instantly without backend code redeployment.
+When a finding cannot be resolved with sufficient confidence, the **Training UI** presents the raw unrecognised command block for admin mapping. Approved mappings update internal heuristics instantly. **Submitting a correction automatically re-evaluates all affected devices** without backend redeployment.
 
 ### 5. Download Institutional PDF Report
 
 Click **Download Full Audit PDF Report** to export the institutional 5-column PDF report complete with device identification grid, AI baseline callout, step-by-step CLI remediation, and CISO attestation signature block.
+
+---
+
+## Rule Packs
+
+Rule packs are declarative YAML files stored in `app/rule_packs/`. The engine supports flexible validations out of the box using `check_type` (`equals`, `not_equals`, `min_value`, `max_value`, `min_version`, `regex_match`, `in_list`, `not_in_list`, `presence_required`, `absence_required`).
+
+---
+
+## Adding a New Vendor
+
+To support a new vendor dialect:
+1. (Optional) Add a new parser logic in `app/parsers/registry.py` with custom Syntax Family Tokenizers to extract specific traits.
+2. The platform will automatically route formats missing deterministic support to the **Async LLM** component for evaluation with the few-shot Training UI fallback.
+3. Supply new `remediation_templates` logic for the vendor inside existing `yaml` rules to ensure valid resolutions.
+
+---
+
+## API Reference
+
+A fully documented OpenAPI specification is available at `http://localhost:8000/docs` when the backend is running.
 
 ---
 
